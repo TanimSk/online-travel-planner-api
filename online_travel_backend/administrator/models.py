@@ -10,13 +10,14 @@ class User(AbstractUser):
     is_agent = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
 
+    def __str__(self) -> str:
+        return self.email
+
 
 class Category(models.Model):
-    adminisitrator = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="category_admin",
-    )
     category_name = models.CharField(max_length=200)
     image_urls = ArrayField(models.URLField(), default=list, blank=True)
     description = models.CharField(max_length=500)
+
+    def __str__(self) -> str:
+        return self.category_name

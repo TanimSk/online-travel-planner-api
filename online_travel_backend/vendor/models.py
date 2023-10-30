@@ -9,11 +9,14 @@ class Vendor(models.Model):
     vendor = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="vendor"
     )
-    logo_url = models.URLField()
     contact_name = models.CharField(max_length=200)
     vendor_name = models.CharField(max_length=200)
     vendor_address = models.CharField(max_length=500)
     vendor_number = models.CharField(max_length=20)
+    logo_url = models.URLField()
+
+    def __str__(self) -> str:
+        return self.vendor_name
 
 
 class VendorCategory(models.Model):
@@ -24,11 +27,22 @@ class VendorCategory(models.Model):
         Category, on_delete=models.CASCADE, related_name="vendorcategory_category"
     )
 
+    class Meta:
+        unique_together = (
+            "vendor",
+            "category",
+        )
+
+    def __str__(self) -> str:
+        return self.category.category_name
+
 
 class Service(models.Model):
     vendor_category = models.ForeignKey(
         VendorCategory, on_delete=models.CASCADE, related_name="service_vendorcategory"
     )
+    # logging
+    created_on = models.DateTimeField(auto_now=True, editable=False)
 
     # Commons
     service_name = models.CharField(max_length=200)

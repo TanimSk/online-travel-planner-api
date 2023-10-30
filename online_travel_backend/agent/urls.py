@@ -1,7 +1,6 @@
 from django.urls import path
-
-# from .views import VendorRegistrationView
+from .views import AgentRegistrationView
 
 urlpatterns = [
-    # path("registration/", VendorRegistrationView.as_view(), name="vendor_registration"),
+    path("registration/", AgentRegistrationView.as_view(), name="agent_registration"),
 ]

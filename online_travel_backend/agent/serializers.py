@@ -1,6 +1,6 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
-from .models import Agent
+from .models import Agent, Rfq, RfqCategory, RfqService
 
 
 class AgentCustomRegistrationSerializer(RegisterSerializer):
@@ -44,3 +44,42 @@ class AgentCustomRegistrationSerializer(RegisterSerializer):
         return user
 
 
+class RfqServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        exclude = ("rfq_category",)
+        model = RfqService
+
+
+class RfqCategorySerializer(serializers.ModelSerializer):
+    rfq_services = RfqServiceSerializer(many=True)
+
+    class Meta:
+        exclude = ("rfq",)
+        model = RfqCategory
+
+
+class RfqSerializer(serializers.ModelSerializer):
+    rfq_categories = RfqCategorySerializer(many=True)
+
+    class Meta:
+        exclude = ("agent",)
+        model = Rfq
+
+    def create(self, validated_data):
+        rfq_categories = validated_data.pop("rfq_categories")
+        rfq_instance = Rfq.objects.create(
+            agent=self.context.get("request").user, **validated_data
+        )
+
+        for rfq_category in rfq_categories:
+            rfq_services = rfq_category.pop("rfq_services")
+            rfq_category_instance = RfqCategory.objects.create(
+                rfq=rfq_instance, category_id=rfq_category.get("category")
+            )
+
+            for rfq_service in rfq_services:
+                RfqService.objects.create(
+                    rfq_category=rfq_category_instance, **rfq_service
+                )
+
+        return rfq_instance

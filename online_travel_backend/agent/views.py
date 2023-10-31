@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 from django.shortcuts import get_object_or_404
 
+from .serializers import RfqServiceSerializer, RfqSerializer
+from .models import Rfq, RfqCategory, RfqService
+
 
 # Authenticate Vendor Only Class
 class AuthenticateOnlyAgent(BasePermission):
@@ -20,3 +23,20 @@ class AuthenticateOnlyAgent(BasePermission):
 # Agent Registration
 class AgentRegistrationView(RegisterView):
     serializer_class = AgentCustomRegistrationSerializer
+
+
+class CreateRfqAPI(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        return Response(RfqSerializer(Rfq.objects.all().first()).data)
+
+
+"""
+{
+    ...rfq,
+    category: [],
+    services: [
+        ...info,
+        service_id
+    ]
+}
+"""

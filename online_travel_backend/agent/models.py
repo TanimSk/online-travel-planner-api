@@ -16,16 +16,27 @@ class Agent(models.Model):
     logo_url = models.URLField()
     trade_license_url = models.URLField()
 
+    def __str__(self) -> str:
+        return self.agency_name
+
 
 class Rfq(models.Model):
     agent = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rfq_agent"
     )
+    created_on = models.DateTimeField(auto_now_add=True)
     customer_name = models.CharField(max_length=200)
     customer_address = models.CharField(max_length=200)
     contact_no = models.CharField(max_length=20)
     email_address = models.EmailField()
     travel_date = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"RFQ | {self.email_address}"
+
+    @property
+    def rfq_categories(self):
+        return self.rfqcategory_rfq.all()
 
 
 class RfqCategory(models.Model):
@@ -36,10 +47,17 @@ class RfqCategory(models.Model):
         Category, on_delete=models.CASCADE, related_name="rfqcategory_category"
     )
 
+    def __str__(self) -> str:
+        return f"RFQ | {self.category.category_name}"
+    
+    @property
+    def rfq_services(self):
+        return self.rfqservice_rfqcategory.all()
+
 
 class RfqService(models.Model):
     rfq_category = models.ForeignKey(
-        Rfq, on_delete=models.CASCADE, related_name="rfqservice_rfqcategory"
+        RfqCategory, on_delete=models.CASCADE, related_name="rfqservice_rfqcategory"
     )
     service = models.ForeignKey(
         Service, on_delete=models.CASCADE, related_name="rfqservice_rfqservice"

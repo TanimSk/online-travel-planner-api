@@ -42,9 +42,12 @@ class Service(models.Model):
         VendorCategory, on_delete=models.CASCADE, related_name="service_vendorcategory"
     )
     # logging
-    created_on = models.DateTimeField(auto_now=True, editable=False)
+    created_on = models.DateTimeField(auto_now_add=True, editable=False)
 
     # Commons
     service_name = models.CharField(max_length=200)
     image_urls = ArrayField(models.URLField(), default=list, blank=True)
     description = models.CharField(max_length=600)
+
+    def __str__(self) -> str:
+        return self.service_name

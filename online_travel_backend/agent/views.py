@@ -26,8 +26,21 @@ class AgentRegistrationView(RegisterView):
 
 
 class CreateRfqAPI(APIView):
+    serializer_class = RfqSerializer
+    permission_classes = [AuthenticateOnlyAgent]
+
     def get(self, request, format=None, *args, **kwargs):
-        return Response(RfqSerializer(Rfq.objects.all().first()).data)
+        return Response(RfqSerializer(Rfq.objects.all(), many=True).data)
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = self.serializer_class(
+            data=request.data, context={"request": request}
+        )
+
+        if serialized_data.is_valid(raise_exception=True):
+            serialized_data.create(serialized_data.data)
+
+            return Response({"status": "Successfully created RFQ"})
 
 
 """

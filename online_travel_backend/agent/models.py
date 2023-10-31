@@ -24,7 +24,15 @@ class Rfq(models.Model):
     agent = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rfq_agent"
     )
+    # tracing
     created_on = models.DateTimeField(auto_now_add=True)
+    STATUS = (
+        ("pending", "pending"),
+        ("approved", "approved"),
+        ("updated", "updated"),
+        ("declined", "declined"),
+    )
+    status = models.CharField(choices=STATUS, max_length=20, default="pending")
     customer_name = models.CharField(max_length=200)
     customer_address = models.CharField(max_length=200)
     contact_no = models.CharField(max_length=20)
@@ -49,7 +57,7 @@ class RfqCategory(models.Model):
 
     def __str__(self) -> str:
         return f"RFQ | {self.category.category_name}"
-    
+
     @property
     def rfq_services(self):
         return self.rfqservice_rfqcategory.all()

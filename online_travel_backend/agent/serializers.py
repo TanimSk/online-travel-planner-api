@@ -78,8 +78,11 @@ class RfqSerializer(serializers.ModelSerializer):
             )
 
             for rfq_service in rfq_services:
+                service_id = rfq_service.pop("service")
                 RfqService.objects.create(
-                    rfq_category=rfq_category_instance, **rfq_service
+                    rfq_category=rfq_category_instance,
+                    service_id=service_id,
+                    **rfq_service
                 )
 
         return rfq_instance

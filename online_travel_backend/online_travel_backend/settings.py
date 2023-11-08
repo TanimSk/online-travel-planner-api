@@ -196,7 +196,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_ADAPTER = "all_auth_extended.all_auth_extended.CustomAccountAdapter"
-AUTH_USER_MODEL = "administrator.User"
+AUTH_USER_MODEL = "commons.User"
 
 SITE_ID = 1
 

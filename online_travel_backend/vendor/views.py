@@ -4,10 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 
-from .serializers import ManageServicesSerializer
+from .serializers import ManageServicesSerializer, RfqServiceSerializer, RfqSerializer
 from .models import Service, VendorCategory, Vendor
-from administrator.models import Category
+from agent.models import RfqService, Rfq
+from commons.models import Category
 
 
 # Authenticate Vendor Only Class
@@ -81,3 +83,43 @@ class ManageServicesAPI(APIView):
                     return Response({"error": "Category doesn't exist!"})
 
             return Response({"status": "Successfully created service"})
+
+
+# Managing Tasks
+class NewTasksAPI(APIView):
+    permission_classes = [AuthenticateOnlyVendor]
+
+    def get(self, request, rfq_id=None, format=None, *args, **kwargs):
+        rfq_instances = Rfq.objects.filter(
+            rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
+            status="assigned",
+        ).distinct()
+
+        # rfq_service_instances = RfqService.objects.filter(
+        #     service__vendor_category__vendor__vendor=request.user,
+        #     rfq_category__rfq__status="assigned",
+        # )
+
+        # rfq_services = rfq_service_instances.values("rfq_category__rfq", "id").annotate(
+        #     count=Count("rfq_category__rfq"),
+        # )
+
+        response_arr = []
+
+        for rfq_instance in rfq_instances:
+            obj_data = {}
+            obj_data["rfq_details"] = RfqSerializer(rfq_instance).data
+
+            services_instance = RfqService.objects.filter(
+                rfq_category__rfq=rfq_instance
+            )
+            # print(services_instance)
+            serialized_data = RfqServiceSerializer(services_instance, many=True)
+            obj_data["services_details"] = serialized_data.data
+
+            response_arr.append(obj_data)
+
+        # serialized_service = RfqServiceSerializer(rfq_services, many=True)
+        # print(response_arr)
+
+        return Response(response_arr)

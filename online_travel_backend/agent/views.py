@@ -3,13 +3,12 @@ from .serializers import AgentCustomRegistrationSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
-from django.shortcuts import get_object_or_404
 
-from .serializers import RfqServiceSerializer, RfqSerializer
-from .models import Rfq, RfqCategory, RfqService
+from .serializers import RfqSerializer
+from .models import Rfq
 
 
-# Authenticate Vendor Only Class
+# Authenticate Agent Only Class
 class AuthenticateOnlyAgent(BasePermission):
     def has_permission(self, request, view):
         if request.user and request.user.is_authenticated:
@@ -41,15 +40,3 @@ class CreateRfqAPI(APIView):
             serialized_data.create(serialized_data.data)
 
             return Response({"status": "Successfully created RFQ"})
-
-
-"""
-{
-    ...rfq,
-    category: [],
-    services: [
-        ...info,
-        service_id
-    ]
-}
-"""

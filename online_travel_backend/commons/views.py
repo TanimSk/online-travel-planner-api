@@ -2,7 +2,7 @@ from .serializers import CategorySerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from administrator.models import Category
+from .models import Category
 
 
 class CategoriesAPI(APIView):

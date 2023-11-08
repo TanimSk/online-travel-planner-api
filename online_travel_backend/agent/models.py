@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
-from administrator.models import Category
+from commons.models import Category
 from vendor.models import Service
 
 
@@ -26,13 +25,17 @@ class Rfq(models.Model):
     )
     # tracing
     created_on = models.DateTimeField(auto_now_add=True)
+    assigned_on = models.DateTimeField(blank=True, null=True)
+
     STATUS = (
         ("pending", "pending"),
         ("approved", "approved"),
+        ("assigned", "assigned"),
         ("updated", "updated"),
         ("declined", "declined"),
     )
     status = models.CharField(choices=STATUS, max_length=20, default="pending")
+
     customer_name = models.CharField(max_length=200)
     customer_address = models.CharField(max_length=200)
     contact_no = models.CharField(max_length=20)
@@ -46,6 +49,10 @@ class Rfq(models.Model):
     def rfq_categories(self):
         return self.rfqcategory_rfq.all()
 
+    @property
+    def agent_info(self):
+        return self.agent.agent
+
 
 class RfqCategory(models.Model):
     rfq = models.ForeignKey(
@@ -56,7 +63,7 @@ class RfqCategory(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"RFQ | {self.category.category_name}"
+        return f"{self.rfq.email_address} | {self.category.category_name}"
 
     @property
     def rfq_services(self):

@@ -1,6 +1,7 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
 from .models import Agent, Rfq, RfqCategory, RfqService
+from django.db import transaction
 
 
 class AgentCustomRegistrationSerializer(RegisterSerializer):
@@ -66,23 +67,24 @@ class RfqSerializer(serializers.ModelSerializer):
         model = Rfq
 
     def create(self, validated_data):
-        rfq_categories = validated_data.pop("rfq_categories")
-        rfq_instance = Rfq.objects.create(
-            agent=self.context.get("request").user, **validated_data
-        )
-
-        for rfq_category in rfq_categories:
-            rfq_services = rfq_category.pop("rfq_services")
-            rfq_category_instance = RfqCategory.objects.create(
-                rfq=rfq_instance, category_id=rfq_category.get("category")
+        with transaction.atomic():
+            rfq_categories = validated_data.pop("rfq_categories")
+            rfq_instance = Rfq.objects.create(
+                agent=self.context.get("request").user, **validated_data
             )
 
-            for rfq_service in rfq_services:
-                service_id = rfq_service.pop("service")
-                RfqService.objects.create(
-                    rfq_category=rfq_category_instance,
-                    service_id=service_id,
-                    **rfq_service
+            for rfq_category in rfq_categories:
+                rfq_services = rfq_category.pop("rfq_services")
+                rfq_category_instance = RfqCategory.objects.create(
+                    rfq=rfq_instance, category_id=rfq_category.get("category")
                 )
+
+                for rfq_service in rfq_services:
+                    service_id = rfq_service.pop("service")
+                    RfqService.objects.create(
+                        rfq_category=rfq_category_instance,
+                        service_id=service_id,
+                        **rfq_service
+                    )
 
         return rfq_instance

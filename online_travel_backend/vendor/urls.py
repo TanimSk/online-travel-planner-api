@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import VendorRegistrationView, ManageServicesAPI
+from .views import VendorRegistrationView, ManageServicesAPI, NewTasksAPI
 
 urlpatterns = [
     path("registration/", VendorRegistrationView.as_view(), name="vendor_registration"),
@@ -9,4 +9,5 @@ urlpatterns = [
         ManageServicesAPI.as_view(),
         name="manage_services",
     ),
+    path("new_tasks/", NewTasksAPI.as_view(), name="new_tasks"),
 ]

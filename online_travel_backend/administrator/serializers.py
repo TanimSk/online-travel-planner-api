@@ -2,8 +2,10 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
 from .models import Administrator
 from agent.models import Rfq, RfqCategory, RfqService, Agent
-from django.conf import settings
-from commons.models import Category, User
+
+# from django.conf import settings
+# from commons.models import Category, User
+from vendor.models import Vendor, VendorCategory, Service
 
 
 class AdminCustomRegistrationSerializer(RegisterSerializer):
@@ -46,6 +48,7 @@ class AgentSerializer(serializers.ModelSerializer):
         )
 
 
+# RFQ
 class RfqServiceSerializer(serializers.ModelSerializer):
     class Meta:
         exclude = ("rfq_category",)
@@ -74,5 +77,33 @@ class RfqSerializer(serializers.ModelSerializer):
         model = Rfq
 
 
-class RfqApproveSerializer(serializers.Serializer):
+class ApprovalSerializer(serializers.Serializer):
     approved = serializers.BooleanField(required=True)
+
+
+# Vendor
+class VendorServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("service_name",)
+        model = Service
+
+
+class VendorCategorySerializer(serializers.ModelSerializer):
+    vendor_services = VendorServiceSerializer(many=True)
+    category_name = serializers.CharField(source="category.category_name")
+
+    class Meta:
+        fields = (
+            "category_name",
+            "vendor_services",
+        )
+        model = VendorCategory
+
+
+class VendorListSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source="vendor.email")
+    vendor_categories = VendorCategorySerializer(many=True)
+
+    class Meta:
+        exclude = ("approved",)
+        model = Vendor

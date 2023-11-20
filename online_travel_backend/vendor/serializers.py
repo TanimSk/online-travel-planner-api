@@ -78,3 +78,17 @@ class RfqServiceSerializer(serializers.ModelSerializer):
         exclude = ("rfq_category",)
         model = RfqService
         depth = 1
+
+
+# vendor update
+class RfqServiceUpdateSerializer(serializers.ModelSerializer):
+    service_id = serializers.IntegerField(source="id")
+
+    class Meta:
+        fields = (
+            "service_id",
+            "order_status",
+            "service_price",
+        )
+        model = RfqService
+

@@ -6,7 +6,12 @@ from rest_framework.permissions import BasePermission
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 
-from .serializers import ManageServicesSerializer, RfqServiceSerializer, RfqSerializer
+from .serializers import (
+    ManageServicesSerializer,
+    RfqServiceSerializer,
+    RfqSerializer,
+    RfqServiceUpdateSerializer,
+)
 from .models import Service, VendorCategory, Vendor
 from agent.models import RfqService, Rfq
 from commons.models import Category
@@ -90,36 +95,74 @@ class NewTasksAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
-        rfq_instances = Rfq.objects.filter(
-            rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
-            status="assigned",
-        ).distinct()
-
-        # rfq_service_instances = RfqService.objects.filter(
-        #     service__vendor_category__vendor__vendor=request.user,
-        #     rfq_category__rfq__status="assigned",
-        # )
-
-        # rfq_services = rfq_service_instances.values("rfq_category__rfq", "id").annotate(
-        #     count=Count("rfq_category__rfq"),
-        # )
-
-        response_arr = []
-
-        for rfq_instance in rfq_instances:
-            obj_data = {}
-            obj_data["rfq_details"] = RfqSerializer(rfq_instance).data
-
-            services_instance = RfqService.objects.filter(
-                rfq_category__rfq=rfq_instance
+        if rfq_id is None:
+            rfq_instances = (
+                Rfq.objects.filter(
+                    rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
+                    status="assigned",
+                )
+                .distinct()
+                .order_by("-assigned_on")
             )
-            # print(services_instance)
-            serialized_data = RfqServiceSerializer(services_instance, many=True)
-            obj_data["services_details"] = serialized_data.data
 
-            response_arr.append(obj_data)
+            response_arr = []
+            for rfq_instance in rfq_instances:
+                obj_data = {}
+                obj_data["rfq_details"] = RfqSerializer(rfq_instance).data
 
-        # serialized_service = RfqServiceSerializer(rfq_services, many=True)
-        # print(response_arr)
+                services_instance = RfqService.objects.filter(
+                    rfq_category__rfq=rfq_instance
+                )
+                serialized_data = RfqServiceSerializer(services_instance, many=True)
+                obj_data["services_details"] = serialized_data.data
 
-        return Response(response_arr)
+                response_arr.append(obj_data)
+
+            return Response(response_arr)
+
+        # Get one rfq
+        rfq_instance = (
+            Rfq.objects.filter(
+                id=rfq_id,
+            )
+            .filter(
+                rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
+                status="assigned",
+            )
+            .first()
+        )
+
+        # Create object
+        obj_data = {}
+        obj_data["rfq_details"] = RfqSerializer(rfq_instance).data
+
+        services_instance = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
+        serialized_data = RfqServiceSerializer(services_instance, many=True)
+        obj_data["services_details"] = serialized_data.data
+        return Response(obj_data)
+
+    def put(self, request, rfq_id=None, format=None, *args, **kwargs):
+        serialized_data = RfqServiceUpdateSerializer(data=request.data, many=True)
+
+        if serialized_data.is_valid(raise_exception=True):
+            rfq_instance = (
+                Rfq.objects.filter(
+                    id=rfq_id,
+                )
+                .filter(
+                    rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
+                    status="assigned",
+                )
+                .first()
+            )
+
+            # Update service one by one
+            for service in serialized_data.data:
+                rfq_service_instance = RfqService.objects.get(
+                    id=service.get("service_id"), rfq_category__rfq=rfq_instance
+                )
+                rfq_service_instance.order_status = service.get("order_status")
+                rfq_service_instance.service_price = service.get("service_price")
+                rfq_service_instance.save()
+
+            return Response({"status": "Successfully updated services"})

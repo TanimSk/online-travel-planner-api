@@ -21,10 +21,12 @@ from dj_rest_auth.registration.views import VerifyEmailView
 from rest_framework_simplejwt.views import TokenVerifyView
 from dj_rest_auth.views import PasswordResetConfirmView, PasswordResetView
 from django.views.generic import TemplateView
+from commons.views import LoginWthPermission
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     # ---------- Auth ------------
+    path("rest-auth/login/", LoginWthPermission.as_view(), name="login_view"),
     path("rest-auth/", include("dj_rest_auth.urls")),
     path(
         "rest-auth/registration/account-confirm-email/",

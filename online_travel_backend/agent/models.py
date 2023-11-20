@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from commons.models import Category
 from vendor.models import Service
+import uuid
 
 
 class Agent(models.Model):
@@ -23,9 +24,11 @@ class Rfq(models.Model):
     agent = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rfq_agent"
     )
+
     # tracing
     created_on = models.DateTimeField(auto_now_add=True)
     assigned_on = models.DateTimeField(blank=True, null=True)
+    tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     STATUS = (
         ("pending", "pending"),
@@ -77,6 +80,17 @@ class RfqService(models.Model):
     service = models.ForeignKey(
         Service, on_delete=models.CASCADE, related_name="rfqservice_rfqservice"
     )
+
+    STATUS = (
+        ("incomplete", "incomplete"),
+        ("processing", "processing"),
+        ("complete", "complete"),
+    )
+    order_status = models.CharField(max_length=40, default="incomplete")
+
     # Commons
     date = models.DateTimeField()
     members = models.IntegerField()
+
+    # Calculate price, when placing rfq order
+    service_price = models.FloatField(default=0)

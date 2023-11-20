@@ -10,4 +10,5 @@ urlpatterns = [
         name="manage_services",
     ),
     path("new_tasks/", NewTasksAPI.as_view(), name="new_tasks"),
+    path("new_tasks/<int:rfq_id>", NewTasksAPI.as_view(), name="new_tasks"),
 ]

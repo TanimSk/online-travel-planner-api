@@ -27,13 +27,12 @@ class Rfq(models.Model):
 
     # tracing
     created_on = models.DateTimeField(auto_now_add=True)
-    assigned_on = models.DateTimeField(blank=True, null=True)
+    approved_on = models.DateTimeField(blank=True, null=True)
     tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     STATUS = (
         ("pending", "pending"),
         ("approved", "approved"),
-        ("assigned", "assigned"),
         ("updated", "updated"),
         ("declined", "declined"),
     )
@@ -78,9 +77,14 @@ class RfqService(models.Model):
         RfqCategory, on_delete=models.CASCADE, related_name="rfqservice_rfqcategory"
     )
     service = models.ForeignKey(
-        Service, on_delete=models.CASCADE, related_name="rfqservice_rfqservice"
+        Service,
+        on_delete=models.CASCADE,
+        related_name="rfqservice_rfqservice",
+        blank=True,
+        null=True,
     )
 
+    # Tracing
     STATUS = (
         ("incomplete", "incomplete"),
         ("processing", "processing"),

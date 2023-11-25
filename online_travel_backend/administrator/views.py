@@ -4,13 +4,18 @@ from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from django.db import transaction
 from django.utils import timezone
+
+# from django.db.models import Count
 
 from .serializers import (
     AdminCustomRegistrationSerializer,
     RfqSerializer,
     ApprovalSerializer,
     VendorListSerializer,
+    BasicRfqSerializer,
+    AssignServiceSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import RfqServiceSerializer, ManageServicesSerializer
@@ -62,7 +67,7 @@ class PendingRfqAPI(APIView):
 
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
-            rfqs_instance = Rfq.objects.filter(status="pending")
+            rfqs_instance = Rfq.objects.filter(status="pending").order_by("-created_on")
             serialized_data = RfqSerializer(rfqs_instance, many=True)
             return Response(serialized_data.data)
 
@@ -85,6 +90,7 @@ class PendingRfqAPI(APIView):
                 status = "declined"
 
             rfqs_instance.status = status
+            rfqs_instance.approved_on = timezone.now()
             rfqs_instance.save()
 
             return Response({"status": f"Successfully {status}"})
@@ -99,7 +105,9 @@ class ApprovedRfqAPI(APIView):
 
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
-            rfqs_instance = Rfq.objects.filter(status="approved")
+            rfqs_instance = Rfq.objects.filter(status="approved").order_by(
+                "-created_on"
+            )
             serialized_data = RfqSerializer(rfqs_instance, many=True)
             return Response(serialized_data.data)
 
@@ -107,16 +115,16 @@ class ApprovedRfqAPI(APIView):
         serialized_data = RfqSerializer(rfqs_instance)
         return Response(serialized_data.data)
 
-    def post(self, request, rfq_id=None, format=None, *args, **kwargs):
-        if rfq_id is None:
-            return Response({"error": "RFQ ID missing"})
+    # def post(self, request, rfq_id=None, format=None, *args, **kwargs):
+    #     if rfq_id is None:
+    #         return Response({"error": "RFQ ID missing"})
 
-        rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="approved")
-        rfqs_instance.status = "assigned"
-        rfqs_instance.assigned_on = timezone.now()
-        rfqs_instance.save()
+    #     rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="approved")
+    #     rfqs_instance.status = "assigned"
+    #     rfqs_instance.assigned_on = timezone.now()
+    #     rfqs_instance.save()
 
-        return Response({"status": "Successfully assigned to agent"})
+    #     return Response({"status": "Successfully assigned to agent"})
 
 
 # Manage Vendors
@@ -197,25 +205,38 @@ class TaskListAPI(APIView):
 
         return Response(response_arr)
 
-# --------------- Manage Services ---------------
 
+# --------------- Manage Services ---------------
 # vendor services
-class ManageServicesAPI(APIView):
+# approve service, view unapproved/approved service,
+class ManageVendorServicesAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
-    
+    serializer_class = ManageServicesSerializer
+
     def get(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:
-            instance = Service.objects.filter(added_by_admin=True)
+            approved = True if request.GET.get("approved") == "true" else False
+            instance = Service.objects.filter(approved=approved, added_by_admin=False)
             serialized_data = self.serializer_class(instance, many=True)
             return Response(serialized_data.data)
+
         try:
-            instance = Service.objects.get(id=service_id, added_by_admin=True)
+            instance = Service.objects.get(id=service_id, added_by_admin=False)
             serialized_data = self.serializer_class(instance)
 
         except Service.DoesNotExist:
             return Response({"error": "Service not found"})
 
         return Response(serialized_data.data)
+
+    def post(self, request, service_id=None, format=None, *args, **kwargs):
+        if service_id is None:
+            return Response({"error": "Service id is missing"})
+
+        instance = Service.objects.get(id=service_id, added_by_admin=False)
+        instance.approved = True
+        instance.save()
+        return Response({"status": "Service has been approved"})
 
 
 # admin services
@@ -262,3 +283,140 @@ class ManageServicesAPI(APIView):
                 return Response({"error": "Category doesn't exist!"})
 
             return Response({"status": "Successfully created service"})
+
+
+# Assign Agent
+class AssignAgentAPI(APIView):
+    permission_classes = [AuthenticateOnlyAdmin]
+
+    def get(self, request, service_id=None, format=None, *args, **kwargs):
+        is_assigned = False if request.GET.get("assigned") == "true" else True
+
+        # Get rfq ids with `added_by_admin=true` service value and assigned vendor is null/not null
+        rfq_instances = (
+            RfqService.objects.filter(
+                service__added_by_admin=True,
+                rfq_category__rfq__status="approved",
+                service__vendor_category__vendor__isnull=is_assigned,
+            )
+            .values("rfq_category__rfq_id")
+            .distinct()
+        )
+
+        response_array = []
+        for rfq_instance in rfq_instances:
+            data = {}
+
+            rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
+            rfq_service_instance = RfqService.objects.filter(
+                rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                service__added_by_admin=True,
+                service__vendor_category__vendor__isnull=is_assigned,
+            )
+
+            data["rfq"] = BasicRfqSerializer(rfq).data
+            data["rfq_services"] = RfqServiceSerializer(
+                rfq_service_instance, many=True
+            ).data
+
+            response_array.append(data)
+
+        return Response(response_array)
+
+    def post(self, request, service_id=None, format=None, *args, **kwargs):
+        serialized_data = AssignServiceSerializer(data=request.data)
+
+        if serialized_data.is_valid(raise_exception=True):
+            # get rfq & vendor service with verification filter
+            rfq_service_instance = RfqService.objects.get(
+                id=serialized_data.data.get("rfq_service_id"),
+                service__added_by_admin=True,
+                rfq_category__rfq__status="approved",
+            )
+
+            vendor_instance = Vendor.objects.get(
+                id=serialized_data.data.get("vendor_id"),
+                approved=True,
+            )
+
+            # check for category repeatation, if exists then copy the model, attach and update
+            # if not, then create category, then copy, attach, update
+            # vendor_category = rfq_service_instance.service.vendor_category
+            category_id = rfq_service_instance.service.vendor_category.category.id
+
+            # Search Category
+            vendor_category_instance = VendorCategory.objects.filter(
+                vendor=vendor_instance, category_id=category_id
+            )
+
+            if vendor_category_instance.exists():
+                # Check if the service already exists
+                # if does then only update
+                print("---------exitst-----------")
+                service_instance = Service.objects.filter(
+                    vendor_category__vendor=vendor_instance,
+                    tracking_id=rfq_service_instance.service.tracking_id,
+                )
+
+                if service_instance.exists():
+                    # shift
+                    rfq_service_instance.service = service_instance
+                    rfq_service_instance.save()
+
+                    return Response({"status": "Successfully assigned service to vendor"})
+                
+                vendor_category_instance = vendor_category_instance.first()
+
+            else:
+                print("---------not  exitst-----------")
+                vendor_category_instance = VendorCategory.objects.create(
+                    vendor=vendor_instance, category_id=category_id
+                )
+
+            print("hola--------------------")
+
+            with transaction.atomic():
+                print("1--------------------")
+                copied_service_instance = rfq_service_instance.service
+
+                # dettach rfq from service
+                print("2--------------------")
+                rfq_service_instance.service = None
+                rfq_service_instance.save()
+
+                # copy the service
+                print("3--------------------")
+                copied_service_instance.pk = None
+                copied_service_instance.save()
+
+                # attach to vendor
+                print("4--------------------")
+                print(copied_service_instance.pk)
+                copied_service_instance.vendor_category = vendor_category_instance
+                copied_service_instance.save()
+
+                # assign
+                print("5--------------------")
+                rfq_service_instance.service = copied_service_instance
+                rfq_service_instance.save()
+
+            return Response({"status": "Successfully assigned service to vendor"})
+
+            #     print("exits")
+            #     with transaction.atomic():
+            #         # shift services to existing category
+            #         rfq_service_instance.service.vendor_category.id = (
+            #             vendor_category_instance.first().id
+            #         )
+            #         rfq_service_instance.service.vendor_category.save()
+
+            #         # delete the new category if no products left
+            #         if not Service.objects.filter(
+            #             vendor_category=vendor_category
+            #         ).exists():
+            #             vendor_category.delete()
+
+            # else:
+            #     print("!exits")
+            #     rfq_service_instance.service.vendor_category.vendor = vendor_instance
+            #     rfq_service_instance.service.vendor_category.vendor.save()

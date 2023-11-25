@@ -6,7 +6,9 @@ from .views import (
     ApprovedRfqAPI,
     VendorListAPI,
     RequestedVendorAPI,
-    ManageServicesAPI
+    ManageServicesAPI,
+    ManageVendorServicesAPI,
+    AssignAgentAPI,
 )
 
 urlpatterns = [
@@ -27,10 +29,31 @@ urlpatterns = [
         RequestedVendorAPI.as_view(),
         name="requested_vendor",
     ),
-
     # manage services
-    path("pending_services/", ManageServicesAPI.as_view(), name="manage_admin_services"),
+    path(
+        "pending_services/",
+        ManageVendorServicesAPI.as_view(),
+        name="manage_admin_services",
+    ),
+    path(
+        "pending_services/<int:service_id>",
+        ManageVendorServicesAPI.as_view(),
+        name="manage_admin_services",
+    ),
     path("manage_services/", ManageServicesAPI.as_view(), name="manage_admin_services"),
-    path("manage_services/<int:service_id>", ManageServicesAPI.as_view(), name="manage_admin_services"),
-
+    path(
+        "manage_services/<int:service_id>",
+        ManageServicesAPI.as_view(),
+        name="manage_admin_services",
+    ),
+    path(
+        "manage_services/<int:service_id>",
+        ManageServicesAPI.as_view(),
+        name="manage_admin_services",
+    ),
+    # assigning agents
+    path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
+    path(
+        "assign_agents/<int:service_id>", AssignAgentAPI.as_view(), name="assign_agents"
+    ),
 ]

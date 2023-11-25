@@ -51,7 +51,11 @@ class ManageServicesSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(source="vendor_category.category.id")
 
     class Meta:
-        exclude = ("vendor_category",)
+        exclude = (
+            "vendor_category",
+            "approved",
+            "added_by_admin",
+        )
         model = Service
 
 
@@ -91,4 +95,3 @@ class RfqServiceUpdateSerializer(serializers.ModelSerializer):
             "service_price",
         )
         model = RfqService
-

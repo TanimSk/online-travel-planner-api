@@ -88,3 +88,56 @@ class RfqSerializer(serializers.ModelSerializer):
                     )
 
         return rfq_instance
+
+
+class QueryServiceSerializer(serializers.Serializer):
+    category_id = serializers.IntegerField(required=True)
+
+    # venue sourcing
+    area_name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    # hotel booking
+    hotel_name = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+    room_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    bed_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    # flight booking + transportation
+    from_area = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    to_area = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+
+    # flight booking
+    flight_class = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+    trip_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    depart_time = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+    )
+    return_time = serializers.DateTimeField(
+        required=False,
+        allow_null=True,
+    )
+
+    # entertainment - v
+    # meeting and event management - v
+    # special activities
+
+    # event decoration
+    event_type = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+    event_venue = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+
+    # sight seeing
+    day_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    transfer_type = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+
+    # daily transportation
+    car_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)

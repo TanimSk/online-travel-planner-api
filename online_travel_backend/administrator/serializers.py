@@ -107,3 +107,20 @@ class VendorListSerializer(serializers.ModelSerializer):
     class Meta:
         exclude = ("approved",)
         model = Vendor
+
+
+# assign vendor
+class BasicRfqSerializer(serializers.ModelSerializer):
+    agent_info = AgentSerializer(read_only=True)
+
+    class Meta:
+        exclude = (
+            "agent",
+            "approved_on",
+        )
+        model = Rfq
+
+
+class AssignServiceSerializer(serializers.Serializer):
+    rfq_service_id = serializers.IntegerField(required=True)
+    vendor_id = serializers.IntegerField(required=True)

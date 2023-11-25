@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+import uuid
 
 from commons.models import Category
 
@@ -61,6 +62,7 @@ class Service(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, editable=False)
     added_by_admin = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)  # service should be approved by admin
+    tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     # Commons
     service_name = models.CharField(max_length=200, blank=True, null=True)

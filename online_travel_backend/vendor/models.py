@@ -68,6 +68,12 @@ class Service(models.Model):
     service_name = models.CharField(max_length=200, blank=True, null=True)
     image_urls = ArrayField(models.URLField(), default=list, blank=True, null=True)
     description = models.CharField(max_length=600, blank=True, null=True)
+    
+    # price
+    infant_price = models.FloatField(default=0)
+    child_price = models.FloatField(default=0)
+    adult_price = models.FloatField(default=0)
+    service_price = models.FloatField(default=0)
 
     # venue sourcing
     area_name = models.CharField(max_length=500, blank=True, null=True)
@@ -76,6 +82,7 @@ class Service(models.Model):
     hotel_name = models.CharField(max_length=300, blank=True, null=True)
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
+
 
     # flight booking + transportation
     from_area = models.CharField(max_length=500, blank=True, null=True)

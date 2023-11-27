@@ -94,7 +94,10 @@ class RfqService(models.Model):
 
     # Commons
     date = models.DateTimeField()
-    members = models.IntegerField()
+    infant_members = models.IntegerField(default=0)
+    child_members = models.IntegerField(default=0)
+    adult_members = models.IntegerField(default=0)    
+    members = models.IntegerField(default=1)
 
     # Calculate price, when placing rfq order
     service_price = models.FloatField(default=0)

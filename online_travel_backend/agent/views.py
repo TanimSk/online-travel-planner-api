@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .serializers import RfqSerializer, QueryServiceSerializer
-from vendor.serializers import ManageServicesSerializer
+from .serializers import RfqSerializer, QueryServiceSerializer, QueryResultSerializer
+
+# from vendor.serializers import ManageServicesSerializer
 from .models import Rfq
 from vendor.models import Service
 
@@ -30,9 +31,6 @@ class AgentRegistrationView(RegisterView):
 class CreateRfqAPI(APIView):
     serializer_class = RfqSerializer
     permission_classes = [AuthenticateOnlyAgent]
-
-    def get(self, request, format=None, *args, **kwargs):
-        return Response(RfqSerializer(Rfq.objects.all(), many=True).data)
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = self.serializer_class(
@@ -61,16 +59,40 @@ class QueryServicesAPI(APIView):
         serialized_data = self.serializer_class(data=request.data)
 
         if serialized_data.is_valid(raise_exception=True):
-            # keeping all keys instead of category_id, for searching
+            # keeping all keys instead of non-search params, for searching
             serialized_copy = serialized_data.data
-            serialized_copy.pop("category_id")
+
+            for key in [
+                "category_id",
+                "infant_members",
+                "child_members",
+                "adult_members",
+                "members",
+            ]:
+                serialized_copy.pop(key)
 
             services_instances = Service.objects.filter(
                 vendor_category__category__id=serialized_data.data.get("category_id"),
                 approved=True,
                 **self.get_search_keys(serialized_copy),
             )
-            serialized_services = ManageServicesSerializer(
-                services_instances, many=True
+            serialized_services = QueryResultSerializer(
+                services_instances, many=True, context={'dictionary': serialized_data.data}
             )
             return Response(serialized_services.data)
+
+
+# RFQ Types
+class RFQTypesAPI(APIView):
+    def get(self, request, format=None, *args, **kwargs):
+        if request.GET.get("type") == "pending":
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="pending")
+
+        elif request.GET.get("type") == "approved":
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="approved")
+
+        elif request.GET.get("type") == "declined":
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="declined")
+
+        serialized_data = RfqSerializer(rfq_instances, many=True)
+        return Response(serialized_data.data)

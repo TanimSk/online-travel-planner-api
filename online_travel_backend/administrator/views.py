@@ -352,7 +352,6 @@ class AssignAgentAPI(APIView):
             if vendor_category_instance.exists():
                 # Check if the service already exists
                 # if does then only update
-                print("---------exitst-----------")
                 service_instance = Service.objects.filter(
                     vendor_category__vendor=vendor_instance,
                     tracking_id=rfq_service_instance.service.tracking_id,
@@ -368,35 +367,27 @@ class AssignAgentAPI(APIView):
                 vendor_category_instance = vendor_category_instance.first()
 
             else:
-                print("---------not  exitst-----------")
                 vendor_category_instance = VendorCategory.objects.create(
                     vendor=vendor_instance, category_id=category_id
                 )
 
-            print("hola--------------------")
-
             with transaction.atomic():
-                print("1--------------------")
                 copied_service_instance = rfq_service_instance.service
 
                 # dettach rfq from service
-                print("2--------------------")
                 rfq_service_instance.service = None
                 rfq_service_instance.save()
 
                 # copy the service
-                print("3--------------------")
                 copied_service_instance.pk = None
                 copied_service_instance.save()
 
                 # attach to vendor
-                print("4--------------------")
                 print(copied_service_instance.pk)
                 copied_service_instance.vendor_category = vendor_category_instance
                 copied_service_instance.save()
 
                 # assign
-                print("5--------------------")
                 rfq_service_instance.service = copied_service_instance
                 rfq_service_instance.save()
 

@@ -8,4 +8,5 @@ urlpatterns = [
     path("query_services/", QueryServicesAPI.as_view(), name="query_services"),
     # Rfq
     path("get_rfq/", RFQTypesAPI.as_view(), name="get_rfq"),
+    path("get_rfq/<int:rfq_id>", RFQTypesAPI.as_view(), name="get_rfq"),
 ]

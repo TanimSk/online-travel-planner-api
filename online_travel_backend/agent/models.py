@@ -38,6 +38,7 @@ class Rfq(models.Model):
     STATUS = (
         ("pending", "pending"),
         ("approved", "approved"),
+        ("confirmed", "confirmed"),
         ("declined", "declined"),
         ("completed", "completed"),
     )

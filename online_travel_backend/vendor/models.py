@@ -69,11 +69,13 @@ class Service(models.Model):
     image_urls = ArrayField(models.URLField(), default=list, blank=True, null=True)
     description = models.CharField(max_length=600, blank=True, null=True)
     
-    # price
+    # money
     infant_price = models.FloatField(default=0)
     child_price = models.FloatField(default=0)
     adult_price = models.FloatField(default=0)
     service_price = models.FloatField(default=0)
+    admin_commission = models.FloatField(default=0)
+
 
     # venue sourcing
     area_name = models.CharField(max_length=500, blank=True, null=True)

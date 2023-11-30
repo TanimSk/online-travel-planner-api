@@ -104,7 +104,7 @@ class NewTasksAPI(APIView):
                 RfqService.objects.filter(
                     # service__added_by_admin=True,
                     service__vendor_category__vendor__vendor=request.user,
-                    rfq_category__rfq__status="approved",
+                    rfq_category__rfq__status="confirmed",
                     service__vendor_category__vendor__isnull=False,
                 )
                 .values("rfq_category__rfq_id")
@@ -136,7 +136,7 @@ class NewTasksAPI(APIView):
                 RfqService.objects.filter(
                     id=rfq_id,
                     service__vendor_category__vendor__vendor=request.user,
-                    rfq_category__rfq__status="approved",
+                    rfq_category__rfq__status="confirmed",
                     service__vendor_category__vendor__isnull=False,
                 )
                 .values("rfq_category__rfq_id")
@@ -164,7 +164,7 @@ class NewTasksAPI(APIView):
             rfq_instance = (
                 Rfq.objects.filter(
                     rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
-                    status="approved",
+                    status="confirmed",
                 )
                 .filter(id=rfq_id)
                 .first()

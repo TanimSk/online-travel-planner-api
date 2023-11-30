@@ -47,11 +47,6 @@ urlpatterns = [
         ManageServicesAPI.as_view(),
         name="manage_admin_services",
     ),
-    path(
-        "manage_services/<int:service_id>",
-        ManageServicesAPI.as_view(),
-        name="manage_admin_services",
-    ),
     # assigning agents
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
     path(

@@ -109,6 +109,12 @@ class VendorListSerializer(serializers.ModelSerializer):
         model = Vendor
 
 
+
+class EditPriceSerializer(serializers.Serializer):
+    service_id = serializers.IntegerField()
+    service_price = serializers.FloatField()
+
+
 # assign vendor
 class BasicRfqSerializer(serializers.ModelSerializer):
     agent_info = AgentSerializer(read_only=True)
@@ -119,6 +125,11 @@ class BasicRfqSerializer(serializers.ModelSerializer):
             "approved_on",
         )
         model = Rfq
+
+
+# Update commission in services
+class UpdateCommissionSerializer(serializers.Serializer):
+    commission = serializers.FloatField(required=True)
 
 
 class AssignServiceSerializer(serializers.Serializer):

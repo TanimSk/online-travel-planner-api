@@ -77,7 +77,9 @@ class QueryServicesAPI(APIView):
                 **self.get_search_keys(serialized_copy),
             )
             serialized_services = QueryResultSerializer(
-                services_instances, many=True, context={'dictionary': serialized_data.data}
+                services_instances,
+                many=True,
+                context={"dictionary": serialized_data.data},
             )
             return Response(serialized_services.data)
 
@@ -96,3 +98,22 @@ class RFQTypesAPI(APIView):
 
         serialized_data = RfqSerializer(rfq_instances, many=True)
         return Response(serialized_data.data)
+
+    def post(self, request, rfq_id=None, format=None, *args, **kwargs):
+        if rfq_id is None:
+            return Response({"error": "RFQ ID is missing"})
+
+        rfq_instance = Rfq.objects.get(id=rfq_id)
+        rfq_instance.status = "confirmed"
+        rfq_instance.save()
+
+        return Response({"status": "Successfully confirmed RFQ"})
+
+    def delete(self, request, rfq_id=None, format=None, *args, **kwargs):
+        if rfq_id is None:
+            return Response({"error": "RFQ ID is missing"})
+
+        rfq_instance = Rfq.objects.get(id=rfq_id)
+        rfq_instance.delete()
+
+        return Response({"status": "Successfully deleted RFQ"})

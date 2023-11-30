@@ -5,6 +5,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from .serializers import (
@@ -15,6 +16,8 @@ from .serializers import (
     BasicRfqSerializer,
     AssignServiceSerializer,
     AdminDispatchBillSerializer,
+    UpdateCommissionSerializer,
+    EditPriceSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -78,25 +81,49 @@ class PendingRfqAPI(APIView):
         serialized_data = RfqSerializer(rfqs_instance)
         return Response(serialized_data.data)
 
+    # Approve or decline a RFQ
     def post(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
             return Response({"error": "RFQ ID missing"})
 
-        rfqs_instance = get_object_or_404(Rfq, id=rfq_id)
+        rfq_instance = get_object_or_404(Rfq, id=rfq_id)
         serialized_data = ApprovalSerializer(data=request.data)
 
         if serialized_data.is_valid(raise_exception=True):
             if serialized_data.data.get("approved"):
                 status = "approved"
+                service_instance = RfqService.objects.filter(
+                    rfq_category__rfq=rfq_instance
+                )
+                service_instance.update(
+                    admin_commission=F("service__admin_commission"),
+                    agent_commission=F("rfq_category__rfq__agent__agent__commission")
+                )
 
             else:
                 status = "declined"
 
-            rfqs_instance.status = status
-            rfqs_instance.approved_on = timezone.now()
-            rfqs_instance.save()
+            rfq_instance.status = status
+            rfq_instance.approved_on = timezone.now()
+            rfq_instance.save()
 
             return Response({"status": f"Successfully {status}"})
+
+    def put(self, request, rfq_id=None, format=None, *args, **kwargs):
+        if rfq_id is None:
+            return Response({"error": "RFQ ID missing"})
+
+        serialized_data = EditPriceSerializer(data=request.data)
+        if serialized_data.is_valid(raise_exception=True):
+            rfq_service = RfqService.objects.get(
+                id=serialized_data.data.get("service_id"),
+                rfq_category__rfq_id=rfq_id,
+            )
+
+            rfq_service.service_price = serialized_data.data.get("service_price")
+            rfq_service.save()
+
+            return Response({"status": "Successfully updated price"})
 
 
 # TODO:
@@ -229,6 +256,17 @@ class ManageVendorServicesAPI(APIView):
         instance.approved = True
         instance.save()
         return Response({"status": "Service has been approved"})
+
+    def put(self, request, service_id=None, format=None, *args, **kwargs):
+        if service_id is None:
+            return Response({"error": "Service id is missing"})
+
+        serialized_data = UpdateCommissionSerializer(data=request.data)
+        if serialized_data.is_valid(raise_exception=True):
+            instance = Service.objects.get(id=service_id, added_by_admin=False)
+            instance.admin_commission = serialized_data.data.get("commission")
+            instance.save()
+            return Response({"status": "Successfully updated commission"})
 
 
 # admin services
@@ -405,6 +443,5 @@ class UpdateOrderAPI(APIView):
 
         if serialized_data.is_valid(raise_exception=True):
             RfqService.objects.get(
-                id=serialized_data.data.get("id", None),
-                order_status="complete_admin"   
+                id=serialized_data.data.get("id", None), order_status="complete_admin"
             )

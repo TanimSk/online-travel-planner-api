@@ -72,7 +72,7 @@ class RfqSerializer(serializers.ModelSerializer):
     class Meta:
         exclude = (
             "agent",
-            "assigned_on",
+            "approved_on",
         )
         model = Rfq
 
@@ -124,3 +124,9 @@ class BasicRfqSerializer(serializers.ModelSerializer):
 class AssignServiceSerializer(serializers.Serializer):
     rfq_service_id = serializers.IntegerField(required=True)
     vendor_id = serializers.IntegerField(required=True)
+
+
+# Bill Request
+class AdminDispatchBillSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    commission = serializers.FloatField()

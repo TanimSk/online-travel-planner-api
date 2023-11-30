@@ -95,3 +95,22 @@ class RfqServiceUpdateSerializer(serializers.ModelSerializer):
             "service_price",
         )
         model = RfqService
+
+
+# Request Bill
+class BillServicesSerializer(serializers.ModelSerializer):
+    order_id = serializers.UUIDField(source="rfq_category.rfq.tracking_id")
+
+    class Meta:
+        model = RfqService
+        fields = (
+            "id",
+            "order_id",
+            "service_price",
+            "completed_on",
+            "date",
+        )
+
+
+class DispatchBillServiceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()

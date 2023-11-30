@@ -82,10 +82,35 @@ class RfqSerializer(serializers.ModelSerializer):
 
                 for rfq_service in rfq_services:
                     service_id = rfq_service.pop("service")
+
+                    try:
+                        rfq_service.pop("service_price")
+                    except KeyError:
+                        pass
+
+                    # price calculation
+                    service_instance = Service.objects.get(id=service_id)
+                    total_price = (
+                        (
+                            service_instance.infant_price
+                            * rfq_service.get("infant_members")
+                        )
+                        + (
+                            service_instance.child_price
+                            * rfq_service.get("child_members")
+                        )
+                        + (
+                            service_instance.adult_price
+                            * rfq_service.get("adult_members")
+                        )
+                        + (service_instance.service_price * rfq_service.get("members"))
+                    )
+
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
-                        service_id=service_id,
-                        **rfq_service
+                        service=service_instance,
+                        service_price=total_price,
+                        **rfq_service,
                     )
 
         return rfq_instance
@@ -152,25 +177,6 @@ class QueryServiceSerializer(serializers.Serializer):
 
 
 class QueryResultSerializer(serializers.ModelSerializer):
-    # def __init__(self, *args, **kwargs):
-    #     dictionary = kwargs.pop("dictionary", None)
-    #     print(dictionary)
-    #     super(QueryResultSerializer, self).__init__(*args, **kwargs)
-    #     self.dictionary = dictionary
-
-    # def calculate_total_price(self, instance):
-    #     total_price = (
-    #         (instance.infant_price * self.dictionary.get("infant_members", 0))
-    #         + (instance.child_price * self.dictionary.get("child_members", 0))
-    #         + (instance.adult_price * self.dictionary.get("adult_members", 0))
-    #         + (instance.service_price * self.dictionary.get("members", 0))
-    #     )
-    #     return total_price
-
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     data["total_price"] = self.calculate_total_price(instance)
-    #     return data
     total_price = serializers.SerializerMethodField(method_name="get_total_price")
     category_name = serializers.CharField(
         source="vendor_category.category.category_name", read_only=True

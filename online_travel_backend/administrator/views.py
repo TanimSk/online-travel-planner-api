@@ -7,8 +7,6 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.utils import timezone
 
-# from django.db.models import Count
-
 from .serializers import (
     AdminCustomRegistrationSerializer,
     RfqSerializer,
@@ -16,9 +14,14 @@ from .serializers import (
     VendorListSerializer,
     BasicRfqSerializer,
     AssignServiceSerializer,
+    AdminDispatchBillSerializer,
 )
 from commons.serializers import CategorySerializer
-from vendor.serializers import RfqServiceSerializer, ManageServicesSerializer
+from vendor.serializers import (
+    RfqServiceSerializer,
+    ManageServicesSerializer,
+    BillServicesSerializer,
+)
 
 from agent.models import Rfq, RfqService
 from commons.models import Category, User
@@ -114,17 +117,6 @@ class ApprovedRfqAPI(APIView):
         rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="approved")
         serialized_data = RfqSerializer(rfqs_instance)
         return Response(serialized_data.data)
-
-    # def post(self, request, rfq_id=None, format=None, *args, **kwargs):
-    #     if rfq_id is None:
-    #         return Response({"error": "RFQ ID missing"})
-
-    #     rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="approved")
-    #     rfqs_instance.status = "assigned"
-    #     rfqs_instance.assigned_on = timezone.now()
-    #     rfqs_instance.save()
-
-    #     return Response({"status": "Successfully assigned to agent"})
 
 
 # Manage Vendors
@@ -362,8 +354,10 @@ class AssignAgentAPI(APIView):
                     rfq_service_instance.service = service_instance
                     rfq_service_instance.save()
 
-                    return Response({"status": "Successfully assigned service to vendor"})
-                
+                    return Response(
+                        {"status": "Successfully assigned service to vendor"}
+                    )
+
                 vendor_category_instance = vendor_category_instance.first()
 
             else:
@@ -393,21 +387,24 @@ class AssignAgentAPI(APIView):
 
             return Response({"status": "Successfully assigned service to vendor"})
 
-            #     print("exits")
-            #     with transaction.atomic():
-            #         # shift services to existing category
-            #         rfq_service_instance.service.vendor_category.id = (
-            #             vendor_category_instance.first().id
-            #         )
-            #         rfq_service_instance.service.vendor_category.save()
 
-            #         # delete the new category if no products left
-            #         if not Service.objects.filter(
-            #             vendor_category=vendor_category
-            #         ).exists():
-            #             vendor_category.delete()
+# request bill
+class UpdateOrderAPI(APIView):
+    permission_classes = [AuthenticateOnlyAdmin]
 
-            # else:
-            #     print("!exits")
-            #     rfq_service_instance.service.vendor_category.vendor = vendor_instance
-            #     rfq_service_instance.service.vendor_category.vendor.save()
+    def get(self, request, format=None, *args, **kwargs):
+        services_instances = RfqService.objects.filter(
+            order_status="complete_admin",
+        ).order_by("-completed_on")
+
+        serialized_data = BillServicesSerializer(services_instances, many=True)
+        return Response(serialized_data.data)
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = AdminDispatchBillSerializer(data=request.data)
+
+        if serialized_data.is_valid(raise_exception=True):
+            RfqService.objects.get(
+                id=serialized_data.data.get("id", None),
+                order_status="complete_admin"   
+            )

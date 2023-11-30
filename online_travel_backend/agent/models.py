@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from commons.models import Category
 from vendor.models import Service
 import uuid
@@ -15,6 +17,9 @@ class Agent(models.Model):
     mobile_no = models.CharField(max_length=20)
     logo_url = models.URLField()
     trade_license_url = models.URLField()
+
+    # Money
+    commission = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return self.agency_name
@@ -33,8 +38,8 @@ class Rfq(models.Model):
     STATUS = (
         ("pending", "pending"),
         ("approved", "approved"),
-        ("updated", "updated"),
         ("declined", "declined"),
+        ("completed", "completed"),
     )
     status = models.CharField(choices=STATUS, max_length=20, default="pending")
 
@@ -89,15 +94,40 @@ class RfqService(models.Model):
         ("incomplete", "incomplete"),
         ("processing", "processing"),
         ("complete", "complete"),
+        ("complete_admin", "complete_admin"),
+        ("complete_agent", "complete_agent"),
     )
     order_status = models.CharField(max_length=40, default="incomplete")
+    completed_on = models.DateTimeField(blank=True, null=True)
 
     # Commons
     date = models.DateTimeField()
     infant_members = models.IntegerField(default=0)
     child_members = models.IntegerField(default=0)
-    adult_members = models.IntegerField(default=0)    
+    adult_members = models.IntegerField(default=0)
     members = models.IntegerField(default=1)
 
+    #  ---- Prices ----
     # Calculate price, when placing rfq order
     service_price = models.FloatField(default=0)
+    admin_commission = models.FloatField(default=0)
+    agent_commission = models.FloatField(default=0)
+
+
+@receiver(post_save, sender=RfqService)
+def update_rfq_status(sender, instance, **kwargs):
+    # Check if all services related to the Rfq are complete
+
+    services_instance = RfqService.objects.filter(
+        rfq_category__rfq=instance.rfq_category.rfq
+    )
+
+    all_services_complete = (
+        services_instance.count()
+        == services_instance.filter(order_status="complete").count()
+    )
+
+    # If all services are complete, update the Rfq status to 'completed'
+    if all_services_complete:
+        instance.rfq_category.rfq.status = "completed"
+        instance.rfq_category.rfq.save()

@@ -67,6 +67,24 @@ class RfqSerializer(serializers.ModelSerializer):
         exclude = ("agent",)
         model = Rfq
 
+    # pop keys with empty value
+    def to_internal_value(self, data):
+        copy_data = data.copy()
+
+        for dat_index, dat in enumerate(data["rfq_categories"]):
+            for ser_index, service in enumerate(dat["rfq_services"]):
+                keys_to_remove = []
+                for datapoint in service:
+                    if service[datapoint] == "":
+                        keys_to_remove.append(datapoint)
+
+                for key in keys_to_remove:
+                    copy_data["rfq_categories"][dat_index]["rfq_services"][
+                        ser_index
+                    ].pop(key)
+
+        return super(RfqSerializer, self).to_internal_value(copy_data)
+
     def create(self, validated_data):
         with transaction.atomic():
             rfq_categories = validated_data.pop("rfq_categories")
@@ -93,17 +111,20 @@ class RfqSerializer(serializers.ModelSerializer):
                     total_price = (
                         (
                             service_instance.infant_price
-                            * rfq_service.get("infant_members")
+                            * rfq_service.get("infant_members", 0)
                         )
                         + (
                             service_instance.child_price
-                            * rfq_service.get("child_members")
+                            * rfq_service.get("child_members", 0)
                         )
                         + (
                             service_instance.adult_price
-                            * rfq_service.get("adult_members")
+                            * rfq_service.get("adult_members", 0)
                         )
-                        + (service_instance.service_price * rfq_service.get("members"))
+                        + (
+                            service_instance.service_price
+                            * rfq_service.get("members", 0)
+                        )
                     )
 
                     RfqService.objects.create(
@@ -118,6 +139,15 @@ class RfqSerializer(serializers.ModelSerializer):
 
 # Query
 class QueryServiceSerializer(serializers.Serializer):
+    # pop keys with empty value
+    def to_internal_value(self, data):
+        copy_data = data.copy()
+        for dat in data:
+            if data[dat] == "":
+                copy_data.pop(dat)
+
+        return super(QueryServiceSerializer, self).to_internal_value(copy_data)
+
     category_id = serializers.IntegerField(required=True)
 
     # venue sourcing
@@ -185,11 +215,18 @@ class QueryResultSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, instance):
         dictionary = self.context["dictionary"]
+        copied_dict = dictionary.copy()
+
+        # Remove empty values
+        for dat in dictionary:
+            if dictionary[dat] == None:
+                copied_dict.pop(dat)
+
         total_price = (
-            (instance.infant_price * dictionary.get("infant_members", 0))
-            + (instance.child_price * dictionary.get("child_members", 0))
-            + (instance.adult_price * dictionary.get("adult_members", 0))
-            + (instance.service_price * dictionary.get("members", 0))
+            (instance.infant_price * copied_dict.get("infant_members", 0))
+            + (instance.child_price * copied_dict.get("child_members", 0))
+            + (instance.adult_price * copied_dict.get("adult_members", 0))
+            + (instance.service_price * copied_dict.get("members", 0))
         )
         return total_price
 

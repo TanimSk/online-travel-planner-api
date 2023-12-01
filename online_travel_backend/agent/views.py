@@ -86,6 +86,8 @@ class QueryServicesAPI(APIView):
 
 # RFQ Types
 class RFQTypesAPI(APIView):
+    permission_classes = [AuthenticateOnlyAgent]
+
     def get(self, request, format=None, *args, **kwargs):
         if request.GET.get("type") == "pending":
             rfq_instances = Rfq.objects.filter(agent=request.user, status="pending")
@@ -117,3 +119,19 @@ class RFQTypesAPI(APIView):
         rfq_instance.delete()
 
         return Response({"status": "Successfully deleted RFQ"})
+
+
+# Get Invoice
+class GetInvoiceAPI(APIView):
+    permission_classes = [AuthenticateOnlyAgent]
+
+    def get(self, request, rfq_id=None, format=None, *args, **kwargs):
+        if rfq_id is None:
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="confirmed")
+            serialized_data = RfqSerializer(rfq_instances, many=True)
+            return Response(serialized_data.data)
+
+        # Send Invoice
+        rfq_instances = Rfq.objects.get(agent=request.user, status="confirmed", id=rfq_id)
+        serialized_data = RfqSerializer(rfq_instances)
+        return Response(serialized_data.data)

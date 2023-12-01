@@ -5,7 +5,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db import transaction
-from django.db.models import F
+from django.db.models import Subquery, OuterRef
 from django.utils import timezone
 
 from .serializers import (
@@ -26,7 +26,7 @@ from vendor.serializers import (
     BillServicesSerializer,
 )
 
-from agent.models import Rfq, RfqService
+from agent.models import Rfq, RfqService, Agent
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
 
@@ -95,15 +95,25 @@ class PendingRfqAPI(APIView):
                 service_instance = RfqService.objects.filter(
                     rfq_category__rfq=rfq_instance
                 )
+
+                # Sub-queries
+                admin_commission_subquery = Service.objects.filter(
+                    pk=OuterRef("service_id")
+                ).values("admin_commission")[:1]
+
+                agent_commission_subquery = Agent.objects.filter(
+                    pk=OuterRef("rfq_category__rfq_id")
+                ).values("commission")[:1]
+
                 service_instance.update(
-                    admin_commission=F("service__admin_commission"),
-                    agent_commission=F("rfq_category__rfq__agent__agent__commission")
+                    admin_commission=Subquery(admin_commission_subquery),
+                    agent_commission=Subquery(agent_commission_subquery),
                 )
 
             else:
                 status = "declined"
 
-            rfq_instance.status = status
+            # rfq_instance.status = status
             rfq_instance.approved_on = timezone.now()
             rfq_instance.save()
 

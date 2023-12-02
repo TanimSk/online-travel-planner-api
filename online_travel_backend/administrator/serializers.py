@@ -4,7 +4,7 @@ from .models import Administrator
 from agent.models import Rfq, RfqCategory, RfqService, Agent
 
 # from django.conf import settings
-# from commons.models import Category, User
+from commons.models import Bill
 from vendor.models import Vendor, VendorCategory, Service
 
 
@@ -40,6 +40,8 @@ class AdminCustomRegistrationSerializer(RegisterSerializer):
 
 
 class AgentSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source="agent.email")
+
     class Meta:
         model = Agent
         exclude = (
@@ -109,7 +111,6 @@ class VendorListSerializer(serializers.ModelSerializer):
         model = Vendor
 
 
-
 class EditPriceSerializer(serializers.Serializer):
     service_id = serializers.IntegerField()
     service_price = serializers.FloatField()
@@ -138,6 +139,27 @@ class AssignServiceSerializer(serializers.Serializer):
 
 
 # Bill Request
-class AdminDispatchBillSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    commission = serializers.FloatField()
+class BillServicesSerializer(serializers.ModelSerializer):
+    total_bill = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "admin_billed_on",
+            "vendor_bill",
+            "admin_bill",
+            "total_bill",
+        )
+
+    def get_total_bill(self, obj):
+        return obj.vendor_bill + obj.admin_bill
+
+
+class BillPaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "vendor_payment_type",
+        )

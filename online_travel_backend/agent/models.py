@@ -95,11 +95,11 @@ class RfqService(models.Model):
         ("incomplete", "incomplete"),
         ("processing", "processing"),
         ("complete", "complete"),
-        ("complete_admin", "complete_admin"),
-        ("complete_agent", "complete_agent"),
+        ("dispatched", "dispatched"),
     )
     order_status = models.CharField(max_length=40, default="incomplete")
     completed_on = models.DateTimeField(blank=True, null=True)
+    tracing_id = models.UUIDField(default=uuid.uuid4, unique=True)
 
     # Commons
     date = models.DateTimeField()
@@ -125,7 +125,7 @@ def update_rfq_status(sender, instance, **kwargs):
 
     all_services_complete = (
         services_instance.count()
-        == services_instance.filter(order_status="complete").count()
+        == services_instance.filter(order_status="dispatched").count()
     )
 
     # If all services are complete, update the Rfq status to 'completed'

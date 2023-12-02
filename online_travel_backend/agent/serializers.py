@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Agent, Rfq, RfqCategory, RfqService
 from vendor.models import Service
 from django.db import transaction
+from commons.models import Bill
 
 
 class AgentCustomRegistrationSerializer(RegisterSerializer):
@@ -237,3 +238,31 @@ class QueryResultSerializer(serializers.ModelSerializer):
             "added_by_admin",
         )
         model = Service
+
+
+# Bill Request
+class BillServicesSerializer(serializers.ModelSerializer):
+    total_bill = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "admin_billed_on",
+            "vendor_bill",
+            "admin_bill",
+            "agent_bill",
+            "total_bill",
+        )
+
+    def get_total_bill(self, obj):
+        return obj.vendor_bill + obj.admin_bill + obj.agent_bill
+
+
+class BillPaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "admin_payment_type",
+        )

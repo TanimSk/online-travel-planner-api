@@ -72,6 +72,10 @@
       width: 80px;
     }
 
+    .address .label-table {
+      width: 110px;
+    }
+
     .title {
       text-decoration: underline;
       font-size: 2.5rem;
@@ -134,24 +138,24 @@
     <div class="flex between">
       <div class="flex">
         <img src="./images/logo.svg" alt="" />
-        <h1>Agency Name</h1>
+        <h1>{{ data.agent_info.agency_name }}</h1>
       </div>
       <div class="address_container">
         <div class="address">
           <p class="label">Address:</p>
-          <p>Banani, Rd-02, House No. 06, Dhaka, Bangladesh</p>
+          <p>{{ data.agent_info.agent_address }}</p>
         </div>
         <div class="address">
           <p class="label">Email:</p>
-          <p>agent_email@gmail.com</p>
+          <p>{{ data.agent_info.email }}</p>
         </div>
         <div class="address">
           <p class="label">Mobile:</p>
-          <p>+8801832122</p>
+          <p>{{ data.agent_info.mobile_no }}</p>
         </div>
         <div class="address">
           <p class="label">Date:</p>
-          <p>01-23-234</p>
+          <p>{{ today_date }}</p>
         </div>
       </div>
     </div>
@@ -160,113 +164,73 @@
       <h1 class="title">Customer Info:</h1>
       <div class="address_container">
         <div class="address">
-          <p class="label">Address:</p>
-          <p>Banani, Rd-02, House No. 06, Dhaka, Bangladesh</p>
+          <p class="label">Name:</p>
+          <p>{{ data.customer_name }}</p>
         </div>
         <div class="address">
-          <p class="label">Email:</p>
-          <p>agent_email@gmail.com</p>
+          <p class="label">Address:</p>
+          <p>{{ data.customer_address }}</p>
         </div>
         <div class="address">
           <p class="label">Mobile:</p>
-          <p>+8801832122</p>
+          <p>{{ data.contact_no }}</p>
         </div>
         <div class="address">
-          <p class="label">Date:</p>
-          <p>01-23-234</p>
+          <p class="label">Email:</p>
+          <p>{{ data.email_address }}</p>
         </div>
       </div>
     </div>
 
     <h1 class="title pt-3">Service Requested:</h1>
-
+    <p>
+      Order ID #{{ data.tracking_id }}
+    </p>
     <div class="table_container">
       <table id="customers">
         <tr>
           <th>SL</th>
-          <th>Services</th>
+          <th>Services Category</th>
           <th>Details</th>
-          <th>Price Range</th>
+          <th>Price</th>
         </tr>
 
+        {% for rfq_category in data.rfq_categories %}
+        {% for rfq_service in rfq_category.rfq_services %}
         <tr>
           <td>01</td>
-          <td>Venue Sourcing</td>
           <td>
+            {{ rfq_category.category.category_name }}
+          </td>
+
+          <td>
+            {% for key, val in rfq_service.items %}
+            {% if key == "infant_members" or key == "child_members" or key == "adult_members" or key == "members" %}
+            {% if val != None and val != "" and val != 0 %}
             <div class="address_container">
               <div class="address">
-                <p class="label">Address:</p>
-                <p>Banani, Rd-02, House No. 06, Dhaka, Bangladesh</p>
-              </div>
-              <div class="address">
-                <p class="label">Email:</p>
-                <p>agent_email@gmail.com</p>
-              </div>
-              <div class="address">
-                <p class="label">Mobile:</p>
-                <p>+8801832122</p>
-              </div>
-              <div class="address">
-                <p class="label">Date:</p>
-                <p>01-23-234</p>
+                <p class="label-table">{{ key }}:</p>
+                <p>
+                  {{ val }}
+                </p>
               </div>
             </div>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
           </td>
-          <td>11,000 BDT</td>
+
+          <td>{{ rfq_service.service_price }} BDT</td>
         </tr>
-        <tr>
-          <td>01</td>
-          <td>Venue Sourcing</td>
-          <td>
-            <div class="address_container">
-              <div class="address">
-                <p class="label">Address:</p>
-                <p>Banani, Rd-02, House No. 06, Dhaka, Bangladesh</p>
-              </div>
-              <div class="address">
-                <p class="label">Email:</p>
-                <p>agent_email@gmail.com</p>
-              </div>
-              <div class="address">
-                <p class="label">Mobile:</p>
-                <p>+8801832122</p>
-              </div>
-              <div class="address">
-                <p class="label">Date:</p>
-                <p>01-23-234</p>
-              </div>
-            </div>
-          </td>
-          <td>11,000 BDT</td>
-        </tr>
-        <tr>
-          <td>01</td>
-          <td>Venue Sourcing</td>
-          <td>
-            <div class="address_container">
-              <div class="address">
-                <p class="label">Address:</p>
-                <p>Banani, Rd-02, House No. 06, Dhaka, Bangladesh</p>
-              </div>
-              <div class="address">
-                <p class="label">Email:</p>
-                <p>agent_email@gmail.com</p>
-              </div>
-              <div class="address">
-                <p class="label">Mobile:</p>
-                <p>+8801832122</p>
-              </div>
-              <div class="address">
-                <p class="label">Date:</p>
-                <p>01-23-234</p>
-              </div>
-            </div>
-          </td>
-          <td>11,000 BDT</td>
-        </tr>
+        {% endfor %}
+        {% endfor %}
       </table>
     </div>
-    <p class="total">Total Price Range: <span> 98,000 BDT</span></p>
+    <p class="total">
+      Service Charge: &nbsp; <span> {{ extra_charge }} BDT</span>
+      <br><br>
+      Total Price Range: <span> {{ total_price }} BDT</span>
+    </p>
   </div>
 </body>
 

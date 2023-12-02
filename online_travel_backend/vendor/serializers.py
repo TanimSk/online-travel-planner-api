@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from .models import Vendor, Service
 from agent.models import RfqService, Rfq, Agent
-
+from commons.models import Bill
 
 class VendorCustomRegistrationSerializer(RegisterSerializer):
     vendor = serializers.PrimaryKeyRelatedField(
@@ -92,25 +92,20 @@ class RfqServiceUpdateSerializer(serializers.ModelSerializer):
         fields = (
             "service_id",
             "order_status",
-            "service_price",
         )
         model = RfqService
 
 
 # Request Bill
 class BillServicesSerializer(serializers.ModelSerializer):
-    order_id = serializers.UUIDField(source="rfq_category.rfq.tracking_id")
-
     class Meta:
-        model = RfqService
+        model = Bill
         fields = (
-            "id",
-            "order_id",
-            "service_price",
-            "completed_on",
-            "date",
+            "tracking_id",
+            "created_on",
+            "vendor_bill",
         )
 
 
 class DispatchBillServiceSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+    tracking_id = serializers.UUIDField()

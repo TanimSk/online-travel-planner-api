@@ -15,18 +15,20 @@ from .serializers import (
     VendorListSerializer,
     BasicRfqSerializer,
     AssignServiceSerializer,
-    AdminDispatchBillSerializer,
     UpdateCommissionSerializer,
     EditPriceSerializer,
+    BillServicesSerializer,
+    BillPaySerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
     RfqServiceSerializer,
     ManageServicesSerializer,
-    BillServicesSerializer,
+    DispatchBillServiceSerializer,
 )
 
-from agent.models import Rfq, RfqService, Agent
+from agent.models import Rfq, RfqService
+from commons.models import Bill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
 
@@ -101,10 +103,11 @@ class PendingRfqAPI(APIView):
                     pk=OuterRef("service_id")
                 ).values("admin_commission")[:1]
 
-                agent_commission_subquery = Agent.objects.filter(
-                    pk=OuterRef("rfq_category__rfq_id")
-                ).values("commission")[:1]
+                agent_commission_subquery = RfqService.objects.filter(
+                    pk=OuterRef("pk")
+                ).values("rfq_category__rfq__agent__agent__commission")[:1]
 
+                # Update
                 service_instance.update(
                     admin_commission=Subquery(admin_commission_subquery),
                     agent_commission=Subquery(agent_commission_subquery),
@@ -113,7 +116,7 @@ class PendingRfqAPI(APIView):
             else:
                 status = "declined"
 
-            # rfq_instance.status = status
+            rfq_instance.status = status
             rfq_instance.approved_on = timezone.now()
             rfq_instance.save()
 
@@ -437,21 +440,46 @@ class AssignAgentAPI(APIView):
 
 
 # request bill
-class UpdateOrderAPI(APIView):
+class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
-        services_instances = RfqService.objects.filter(
-            order_status="complete_admin",
-        ).order_by("-completed_on")
+        bills_instance = Bill.objects.filter(status="admin_bill")
 
-        serialized_data = BillServicesSerializer(services_instances, many=True)
+        serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
-        serialized_data = AdminDispatchBillSerializer(data=request.data)
+        serialized_data = DispatchBillServiceSerializer(data=request.data, many=True)
 
         if serialized_data.is_valid(raise_exception=True):
-            RfqService.objects.get(
-                id=serialized_data.data.get("id", None), order_status="complete_admin"
-            )
+            for service in serialized_data.data:
+                bill_instance = Bill.objects.get(
+                    tracking_id=service.get("tracking_id", None),
+                )
+                bill_instance.order_status = "agent_bill"
+                bill_instance.agent_billed_on = timezone.now()
+                bill_instance.save()
+
+            return Response({"status": "Successfully requested for bill"})
+
+
+class BillPayAPI(APIView):
+    permission_classes = [AuthenticateOnlyAdmin]
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = BillPaySerializer(data=request.data, many=True)
+
+        if serialized_data.is_valid(raise_exception=True):
+            for service in serialized_data.data:
+                bill_instance = Bill.objects.get(
+                    tracking_id=service.get("tracking_id", None),
+                )
+                bill_instance.vendor_payment_type = service.get(
+                    "vendor_payment_type", None
+                )
+                bill_instance.vendor_paid_on = timezone.now()
+                bill_instance.status = "vendor_paid"
+                bill_instance.save()
+
+                return Response({"status": "Successfully paid bills"})

@@ -6,8 +6,6 @@ from rest_framework.permissions import BasePermission
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-# from django.db.models import Count
-
 from .serializers import (
     ManageServicesSerializer,
     RfqServiceSerializer,
@@ -18,7 +16,7 @@ from .serializers import (
 from administrator.serializers import BasicRfqSerializer
 from .models import Service, VendorCategory, Vendor
 from agent.models import RfqService, Rfq
-from commons.models import Category
+from commons.models import Category, Bill
 
 
 # Authenticate Vendor Only Class
@@ -116,10 +114,14 @@ class NewTasksAPI(APIView):
                 data = {}
 
                 rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
-                rfq_service_instance = RfqService.objects.filter(
-                    rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
-                    # service__added_by_admin=True,
-                    service__vendor_category__vendor__isnull=False,
+                rfq_service_instance = (
+                    RfqService.objects.filter(
+                        rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                        # service__added_by_admin=True,
+                        service__vendor_category__vendor__isnull=False,
+                    )
+                    .exclude(order_status="complete")
+                    .exclude(order_status="dispatched")
                 )
 
                 data["rfq"] = BasicRfqSerializer(rfq).data
@@ -145,9 +147,15 @@ class NewTasksAPI(APIView):
 
             data = {}
             rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
-            rfq_service_instance = RfqService.objects.filter(
-                rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
-                service__vendor_category__vendor__isnull=False,
+
+            # Filtering
+            rfq_service_instance = (
+                RfqService.objects.filter(
+                    rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                    service__vendor_category__vendor__isnull=False,
+                )
+                .exclude(order_status="complete")
+                .exclude(order_status="dispatched")
             )
 
             data["rfq"] = BasicRfqSerializer(rfq).data
@@ -178,11 +186,24 @@ class NewTasksAPI(APIView):
 
                 # print(rfq_service_instance.order_status)
                 rfq_service_instance.order_status = service.get("order_status")
-                rfq_service_instance.service_price = service.get("service_price")
 
-                # Set completed on date, if completed
+                # Set completed on date & make bill, if completed
                 if service.get("order_status") == "complete":
                     rfq_service_instance.completed_on = timezone.now()
+
+                    # Calculate & Make Bill
+                    Bill.objects.create(
+                        vendor=request.user,
+                        agent=rfq_service_instance.rfq_category.rfq.agent,
+                        tracking_id=rfq_service_instance.tracing_id,
+                        vendor_bill=rfq_service_instance.service_price,
+                        admin_bill=rfq_service_instance.service_price
+                        * rfq_service_instance.admin_commission
+                        * 0.01,
+                        agent_bill=rfq_service_instance.service_price
+                        * rfq_service_instance.agent_commission
+                        * 0.01,
+                    )
 
                 rfq_service_instance.save()
 
@@ -193,12 +214,9 @@ class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, format=None, *args, **kwargs):
-        services_instances = RfqService.objects.filter(
-            order_status="complete",
-            service__vendor_category__vendor__vendor=request.user,
-        ).order_by("-completed_on")
+        bills_instance = Bill.objects.filter(vendor=request.user, status="vendor_bill")
 
-        serialized_data = BillServicesSerializer(services_instances, many=True)
+        serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
@@ -206,13 +224,11 @@ class RequestBillAPI(APIView):
 
         if serialized_data.is_valid(raise_exception=True):
             for service in serialized_data.data:
-                rfq_service_instance = RfqService.objects.get(
-                    id=service.get("id", None),
-                    order_status="complete",
-                    service__vendor_category__vendor__vendor=request.user,
+                bill_instance = Bill.objects.get(
+                    tracking_id=service.get("tracking_id", None),
                 )
-
-                rfq_service_instance.order_status = "complete_admin"
-                rfq_service_instance.save()
+                bill_instance.order_status = "admin_bill"
+                bill_instance.admin_bill = timezone.now()
+                bill_instance.save()
 
             return Response({"status": "Successfully requested for bill"})

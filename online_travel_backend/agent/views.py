@@ -4,11 +4,23 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
-from .serializers import RfqSerializer, QueryServiceSerializer, QueryResultSerializer
+from .serializers import (
+    RfqSerializer,
+    QueryServiceSerializer,
+    QueryResultSerializer,
+    BillServicesSerializer,
+    BillPaySerializer,
+)
+
+from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
 # from vendor.serializers import ManageServicesSerializer
-from .models import Rfq
+from commons.models import Bill
+from .models import Rfq, RfqService
 from vendor.models import Service
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Sum, F
 
 
 # Authenticate Agent Only Class
@@ -25,6 +37,35 @@ class AuthenticateOnlyAgent(BasePermission):
 # Agent Registration
 class AgentRegistrationView(RegisterView):
     serializer_class = AgentCustomRegistrationSerializer
+
+
+# Overview
+class OverviewAPI(APIView):
+    permission_classes = [AuthenticateOnlyAgent]
+
+    def get(self, request, format=None, *args, **kwargs):
+        rfqs_instance = Rfq.objects.filter(agent=request.user)
+
+        total_rfq = rfqs_instance.count()
+        sent_rfq = (
+            rfqs_instance.exclude(status="declined").exclude(status="completed").count()
+        )
+        cancelled_rfq = rfqs_instance.filter(status="declined").count()
+        pending_rfq = rfqs_instance.filter(status="pending").count()
+        confirmed_rfq = rfqs_instance.filter(status="confirmed").count()
+
+        completed_rfq = rfqs_instance.filter(status="completed").count()
+
+        return Response(
+            {
+                "sent_rfqs": sent_rfq,
+                "cancelled_rfqs": cancelled_rfq,
+                "pending_rfq": pending_rfq,
+                "confirmed_rfq": confirmed_rfq,
+                "total_rfq": total_rfq,
+                "chart": {"completed_rfq": completed_rfq, "incomplete_rfq": sent_rfq},
+            }
+        )
 
 
 # RFQ
@@ -98,6 +139,12 @@ class RFQTypesAPI(APIView):
         elif request.GET.get("type") == "declined":
             rfq_instances = Rfq.objects.filter(agent=request.user, status="declined")
 
+        elif request.GET.get("type") == "completed":
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="completed")
+
+        else:
+            return Response({"error": "Invalid params"})
+
         serialized_data = RfqSerializer(rfq_instances, many=True)
         return Response(serialized_data.data)
 
@@ -123,15 +170,83 @@ class RFQTypesAPI(APIView):
 
 # Get Invoice
 class GetInvoiceAPI(APIView):
-    permission_classes = [AuthenticateOnlyAgent]
+    def get(self, request, rfq_tracing_id=None, format=None, *args, **kwargs):
+        if rfq_tracing_id is None:
+            if request.user.is_authenticated:
+                rfq_instances = Rfq.objects.filter(
+                    agent=request.user, status="confirmed"
+                )
+                serialized_data = RfqSerializer(rfq_instances, many=True)
+                return Response(serialized_data.data)
 
-    def get(self, request, rfq_id=None, format=None, *args, **kwargs):
-        if rfq_id is None:
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="confirmed")
-            serialized_data = RfqSerializer(rfq_instances, many=True)
-            return Response(serialized_data.data)
+            else:
+                return Response({"error": "User is not authenticated"})
 
         # Send Invoice
-        rfq_instances = Rfq.objects.get(agent=request.user, status="confirmed", id=rfq_id)
-        serialized_data = RfqSerializer(rfq_instances)
+        rfq_instance = Rfq.objects.get(tracking_id=rfq_tracing_id)
+        services_instance = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
+
+        # Calculation
+        total_service_charge = services_instance.aggregate(Sum("service_price"))[
+            "service_price__sum"
+        ]
+        extra_charge_admin = services_instance.aggregate(
+            charge=Sum((F("service_price") * F("admin_commission")) / 100)
+        )["charge"]
+        extra_charge_agent = services_instance.aggregate(
+            charge=Sum((F("service_price") * F("admin_commission")) / 100)
+        )["charge"]
+
+        serialized_data = RfqInvoiceSerializer(rfq_instance)
+        return render(
+            request,
+            "invoice.html",
+            {
+                "data": serialized_data.data,
+                "today_date": timezone.now(),
+                "total_charge": total_service_charge,
+                "extra_charge": extra_charge_admin + extra_charge_agent,
+                "total_price": (
+                    total_service_charge + extra_charge_agent + extra_charge_admin
+                ),
+            },
+        )
+
+
+# request bill
+class RequestBillAPI(APIView):
+    permission_classes = [AuthenticateOnlyAgent]
+
+    def get(self, request, format=None, *args, **kwargs):
+        bills_instance = Bill.objects.filter(agent=request.user, status="admin_bill")
+
+        serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
+
+
+class BillPayAPI(APIView):
+    permission_classes = [AuthenticateOnlyAgent]
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = BillPaySerializer(data=request.data, many=True)
+
+        if serialized_data.is_valid(raise_exception=True):
+            for service in serialized_data.data:
+                bill_instance = Bill.objects.get(
+                    tracking_id=service.get("tracking_id", None),
+                )
+                bill_instance.admin_payment_type = service.get(
+                    "admin_payment_type", None
+                )
+                bill_instance.admin_paid_on = timezone.now()
+                bill_instance.status = "admin_paid"
+                bill_instance.save()
+
+                # completed order :)
+                rfq_service = RfqService.objects.get(
+                    tracing_id=service.get("tracking_id", None)
+                )
+                rfq_service.order_status = "dispatched"
+                rfq_service.save()
+
+                return Response({"status": "Successfully paid bills"})

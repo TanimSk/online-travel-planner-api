@@ -9,7 +9,8 @@ from .views import (
     ManageServicesAPI,
     ManageVendorServicesAPI,
     AssignAgentAPI,
-    UpdateOrderAPI,
+    RequestBillAPI,
+    BillPayAPI
 )
 
 urlpatterns = [
@@ -53,5 +54,6 @@ urlpatterns = [
         "assign_agents/<int:service_id>", AssignAgentAPI.as_view(), name="assign_agents"
     ),
     # update order api
-    path("update_order/", UpdateOrderAPI.as_view(), name="update_order"),
+    path("request_bill/", RequestBillAPI.as_view(), name="update_order"),
+    path("pay_bill/", BillPayAPI.as_view(), name="pay_bill_admin"),
 ]

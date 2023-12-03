@@ -218,7 +218,7 @@ class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyAgent]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(agent=request.user, status="admin_bill")
+        bills_instance = Bill.objects.filter(agent=request.user, status="agent_bill")
 
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
@@ -241,12 +241,5 @@ class BillPayAPI(APIView):
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status = "admin_paid"
                 bill_instance.save()
-
-                # completed order :)
-                rfq_service = RfqService.objects.get(
-                    tracing_id=service.get("tracking_id", None)
-                )
-                rfq_service.order_status = "dispatched"
-                rfq_service.save()
 
                 return Response({"status": "Successfully paid bills"})

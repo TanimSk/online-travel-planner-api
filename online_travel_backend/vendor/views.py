@@ -105,6 +105,8 @@ class NewTasksAPI(APIView):
                     rfq_category__rfq__status="confirmed",
                     service__vendor_category__vendor__isnull=False,
                 )
+                .exclude(order_status="dispatched")
+                .exclude(order_status="complete")
                 .values("rfq_category__rfq_id")
                 .distinct()
             )
@@ -134,25 +136,16 @@ class NewTasksAPI(APIView):
             return Response(response_array)
 
         else:
-            rfq_instance = (
-                RfqService.objects.filter(
-                    id=rfq_id,
-                    service__vendor_category__vendor__vendor=request.user,
-                    rfq_category__rfq__status="confirmed",
-                    service__vendor_category__vendor__isnull=False,
-                )
-                .values("rfq_category__rfq_id")
-                .distinct()
-            ).first()
 
             data = {}
-            rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
+            rfq = Rfq.objects.filter(
+                rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
+            ).distinct().get(id=rfq_id)
 
             # Filtering
             rfq_service_instance = (
                 RfqService.objects.filter(
-                    rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
-                    service__vendor_category__vendor__isnull=False,
+                    rfq_category__rfq=rfq,
                 )
                 .exclude(order_status="complete")
                 .exclude(order_status="dispatched")
@@ -225,10 +218,21 @@ class RequestBillAPI(APIView):
         if serialized_data.is_valid(raise_exception=True):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
-                    tracking_id=service.get("tracking_id", None),
+                    tracking_id=service.get("tracking_id"),
                 )
-                bill_instance.order_status = "admin_bill"
-                bill_instance.admin_bill = timezone.now()
+                bill_instance.status = "admin_bill"
+                bill_instance.admin_billed_on = timezone.now()
                 bill_instance.save()
 
             return Response({"status": "Successfully requested for bill"})
+
+
+
+class PayBillAPI(APIView):
+    permission_classes = [AuthenticateOnlyVendor]
+
+    def get(self, request, format=None, *args, **kwargs):
+        bills_instance = Bill.objects.filter(vendor=request.user, status="vendor_paid")
+
+        serialized_data = BillServicesSerializer(bills_instance, many=True)
+        return Response(serialized_data.data)

@@ -4,6 +4,7 @@ from .views import (
     ManageServicesAPI,
     NewTasksAPI,
     RequestBillAPI,
+    PayBillAPI,
 )
 
 urlpatterns = [
@@ -20,4 +21,6 @@ urlpatterns = [
     path("new_tasks/<int:rfq_id>", NewTasksAPI.as_view(), name="new_tasks"),
     # Acounts
     path("request_bill/", RequestBillAPI.as_view(), name="request_bill"),
+    path("paid_bills/", PayBillAPI.as_view(), name="paid_bills"),
+
 ]

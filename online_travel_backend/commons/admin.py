@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, User
+from .models import Category, User, Bill
 
 
 @admin.register(Category)
@@ -18,4 +18,10 @@ class UserAdmin(admin.ModelAdmin):
         "is_admin",
         "is_vendor",
         "is_agent",
+    )
+
+@admin.register(Bill)
+class BillAdmin(admin.ModelAdmin):
+    list_display = (
+        "tracking_id",
     )

@@ -44,7 +44,7 @@ class Bill(models.Model):
         ("admin_paid", "admin_paid"),
         ("vendor_paid", "vendor_paid"),
     )
-    status = models.CharField(choices=STATUS, default="vendor_bill")
+    status = models.CharField(choices=STATUS, default="vendor_bill", max_length=20)
 
     # dates
     created_on = models.DateTimeField(auto_now_add=True)

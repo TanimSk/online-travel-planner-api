@@ -339,7 +339,7 @@ class AssignAgentAPI(APIView):
         rfq_instances = (
             RfqService.objects.filter(
                 service__added_by_admin=True,
-                rfq_category__rfq__status="approved",
+                rfq_category__rfq__status="confirmed",
                 service__vendor_category__vendor__isnull=is_assigned,
             )
             .values("rfq_category__rfq_id")
@@ -374,7 +374,7 @@ class AssignAgentAPI(APIView):
             rfq_service_instance = RfqService.objects.get(
                 id=serialized_data.data.get("rfq_service_id"),
                 service__added_by_admin=True,
-                rfq_category__rfq__status="approved",
+                rfq_category__rfq__status="confirmed",
             )
 
             vendor_instance = Vendor.objects.get(
@@ -457,15 +457,20 @@ class RequestBillAPI(APIView):
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id", None),
                 )
-                bill_instance.order_status = "agent_bill"
+                bill_instance.status = "agent_bill"
                 bill_instance.agent_billed_on = timezone.now()
                 bill_instance.save()
 
-            return Response({"status": "Successfully requested for bill"})
+            return Response({"status": "Successfully requested for bill to agent"})
 
 
 class BillPayAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
+
+    def get(self, request, format=None, *args, **kwargs):
+        bills_instance = Bill.objects.filter(status="admin_paid")
+        serialized_data = BillServicesSerializer(bills_instance, many=True)
+        return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)
@@ -473,13 +478,18 @@ class BillPayAPI(APIView):
         if serialized_data.is_valid(raise_exception=True):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
-                    tracking_id=service.get("tracking_id", None),
+                    tracking_id=service.get("tracking_id"),
                 )
-                bill_instance.vendor_payment_type = service.get(
-                    "vendor_payment_type", None
-                )
+                bill_instance.vendor_payment_type = service.get("vendor_payment_type")
                 bill_instance.vendor_paid_on = timezone.now()
                 bill_instance.status = "vendor_paid"
                 bill_instance.save()
 
-                return Response({"status": "Successfully paid bills"})
+                # completed order :)
+                rfq_service = RfqService.objects.get(
+                    tracing_id=service.get("tracking_id", None)
+                )
+                rfq_service.order_status = "dispatched"
+                rfq_service.save()
+
+                return Response({"status": "Successfully paid bills to vendor"})

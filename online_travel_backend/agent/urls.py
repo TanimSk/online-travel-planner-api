@@ -6,7 +6,8 @@ from .views import (
     RFQTypesAPI,
     GetInvoiceAPI,
     RequestBillAPI,
-    OverviewAPI
+    OverviewAPI,
+    BillPayAPI
 )
 
 urlpatterns = [
@@ -28,6 +29,6 @@ urlpatterns = [
         "get_bill_requests/", RequestBillAPI.as_view(), name="bill_requests"
     ),
     path(
-        "pay_bill/", RequestBillAPI.as_view(), name="pay_bill"
+        "pay_bill/", BillPayAPI.as_view(), name="pay_bill"
     ),
 ]

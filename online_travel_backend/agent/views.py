@@ -79,8 +79,10 @@ class CreateRfqAPI(APIView):
         )
 
         if serialized_data.is_valid(raise_exception=True):
-            serialized_data.create(serialized_data.data)
+            if request.GET.get("get_price") == "true":
+                return Response(serialized_data.calc_total_price(serialized_data.data))
 
+            serialized_data.create(serialized_data.data)
             return Response({"status": "Successfully created RFQ"})
 
 

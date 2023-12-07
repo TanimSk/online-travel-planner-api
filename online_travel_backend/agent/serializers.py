@@ -86,6 +86,44 @@ class RfqSerializer(serializers.ModelSerializer):
 
         return super(RfqSerializer, self).to_internal_value(copy_data)
 
+    def calc_total_price(self, validated_data):
+        rfq_categories = validated_data.pop("rfq_categories")
+
+        total_price = 0
+        total_services = 0
+
+        for rfq_category in rfq_categories:
+            rfq_services = rfq_category.pop("rfq_services")
+
+            for rfq_service in rfq_services:
+                service_id = rfq_service.pop("service")
+
+                try:
+                    rfq_service.pop("service_price")
+                except KeyError:
+                    pass
+
+                # price calculation
+                service_instance = Service.objects.get(id=service_id)
+                total_services += 1
+                total_price += (
+                    (
+                        service_instance.infant_price
+                        * rfq_service.get("infant_members", 0)
+                    )
+                    + (
+                        service_instance.child_price
+                        * rfq_service.get("child_members", 0)
+                    )
+                    + (
+                        service_instance.adult_price
+                        * rfq_service.get("adult_members", 0)
+                    )
+                    + (service_instance.service_price * rfq_service.get("members", 0))
+                )
+
+        return {"total_price": total_price, "total_services": total_services}
+
     def create(self, validated_data):
         with transaction.atomic():
             rfq_categories = validated_data.pop("rfq_categories")

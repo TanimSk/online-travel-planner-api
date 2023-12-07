@@ -133,19 +133,20 @@ class RFQTypesAPI(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         if request.GET.get("type") == "pending":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="pending")
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="pending").order_by("-created_on")
 
         elif request.GET.get("type") == "approved":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="approved")
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="approved").order_by("-created_on")
 
         elif request.GET.get("type") == "declined":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="declined")
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="declined").order_by("-created_on")
 
         elif request.GET.get("type") == "completed":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="completed")
+            rfq_instances = Rfq.objects.filter(agent=request.user, status="completed").order_by("-created_on")
 
         else:
             return Response({"error": "Invalid params"})
+            
 
         serialized_data = RfqSerializer(rfq_instances, many=True)
         return Response(serialized_data.data)

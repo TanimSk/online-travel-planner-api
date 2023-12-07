@@ -4,7 +4,7 @@ from .models import Agent, Rfq, RfqCategory, RfqService
 from vendor.models import Service
 from django.db import transaction
 from commons.models import Bill
-
+from django.db.models import Sum
 
 class AgentCustomRegistrationSerializer(RegisterSerializer):
     agent = serializers.PrimaryKeyRelatedField(
@@ -63,10 +63,16 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
+    total_price = serializers.SerializerMethodField(method_name="get_total_price")
 
     class Meta:
         exclude = ("agent",)
         model = Rfq
+
+    def get_total_price(self, instance):
+        return RfqService.objects.filter(rfq_category__rfq=instance).aggregate(
+            price=Sum("service_price")
+        )["price"]
 
     # pop keys with empty value
     def to_internal_value(self, data):

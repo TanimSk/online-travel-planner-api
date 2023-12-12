@@ -132,23 +132,30 @@ class RFQTypesAPI(APIView):
     permission_classes = [AuthenticateOnlyAgent]
 
     def get(self, request, format=None, *args, **kwargs):
-        if request.GET.get("type") == "pending":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="pending").order_by("-created_on")
+        has_multiple = False
 
-        elif request.GET.get("type") == "approved":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="approved").order_by("-created_on")
+        if (
+            request.GET.get("type") == "pending"
+            or request.GET.get("type") == "approved"
+            or request.GET.get("type") == "declined"
+            or request.GET.get("type") == "completed"
+        ):
+            if request.GET.get("id") is not None:
+                rfq_instances = Rfq.objects.get(
+                    agent=request.user,
+                    status=request.GET.get("type"),
+                    id=int(request.GET.get("id")),
+                )
 
-        elif request.GET.get("type") == "declined":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="declined").order_by("-created_on")
-
-        elif request.GET.get("type") == "completed":
-            rfq_instances = Rfq.objects.filter(agent=request.user, status="completed").order_by("-created_on")
+            else:
+                rfq_instances = Rfq.objects.filter(
+                    agent=request.user, status=request.GET.get("type")
+                ).order_by("-created_on")
 
         else:
             return Response({"error": "Invalid params"})
-            
 
-        serialized_data = RfqSerializer(rfq_instances, many=True)
+        serialized_data = RfqSerializer(rfq_instances, many=has_multiple)
         return Response(serialized_data.data)
 
     def post(self, request, rfq_id=None, format=None, *args, **kwargs):

@@ -91,6 +91,29 @@ class ManageServicesAPI(APIView):
 
             return Response({"status": "Successfully created service"})
 
+    def put(self, request, service_id=None, format=None, *args, **kwargs):
+        serialized_data = self.serializer_class(data=request.data)
+
+        if serialized_data.is_valid(raise_exception=True):
+            service_data = serialized_data.data
+            service_data.pop("category_id")
+            category_id = serialized_data.data.get("category_id")
+
+            # Create category, if not exists
+            try:
+                vendor_category_instance = VendorCategory.objects.get(
+                    vendor__vendor=request.user, category_id=category_id
+                )
+                service_instance = Service.objects.filter(
+                    vendor_category=vendor_category_instance, id=service_id
+                )
+                service_instance.update(**service_data)
+
+            except VendorCategory.DoesNotExist:
+                return Response({"error": "Category doesn't exist!"})
+
+            return Response({"status": "Successfully created service"})
+
 
 # Managing Tasks
 class NewTasksAPI(APIView):
@@ -136,11 +159,14 @@ class NewTasksAPI(APIView):
             return Response(response_array)
 
         else:
-
             data = {}
-            rfq = Rfq.objects.filter(
-                rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
-            ).distinct().get(id=rfq_id)
+            rfq = (
+                Rfq.objects.filter(
+                    rfqcategory_rfq__rfqservice_rfqcategory__service__vendor_category__vendor__vendor=request.user,
+                )
+                .distinct()
+                .get(id=rfq_id)
+            )
 
             # Filtering
             rfq_service_instance = (
@@ -225,7 +251,6 @@ class RequestBillAPI(APIView):
                 bill_instance.save()
 
             return Response({"status": "Successfully requested for bill"})
-
 
 
 class PayBillAPI(APIView):

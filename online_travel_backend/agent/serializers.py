@@ -63,7 +63,7 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
-    total_price = serializers.SerializerMethodField(method_name="get_total_price")
+#    total_price = serializers.SerializerMethodField(method_name="get_total_price")
 
     class Meta:
         exclude = ("agent",)

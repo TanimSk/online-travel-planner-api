@@ -6,6 +6,7 @@ from django.db import transaction
 from commons.models import Bill
 from django.db.models import Sum
 
+
 class AgentCustomRegistrationSerializer(RegisterSerializer):
     agent = serializers.PrimaryKeyRelatedField(
         read_only=True,
@@ -63,7 +64,7 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
-#    total_price = serializers.SerializerMethodField(method_name="get_total_price")
+    #    total_price = serializers.SerializerMethodField(method_name="get_total_price")
 
     class Meta:
         exclude = ("agent",)

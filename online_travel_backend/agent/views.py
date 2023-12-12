@@ -151,6 +151,7 @@ class RFQTypesAPI(APIView):
                 rfq_instances = Rfq.objects.filter(
                     agent=request.user, status=request.GET.get("type")
                 ).order_by("-created_on")
+                has_multiple = True
 
         else:
             return Response({"error": "Invalid params"})

@@ -92,6 +92,9 @@ class ManageServicesAPI(APIView):
             return Response({"status": "Successfully created service"})
 
     def put(self, request, service_id=None, format=None, *args, **kwargs):
+        if service_id is None:
+            return Response({"error": "Service id missing"})
+
         serialized_data = self.serializer_class(data=request.data)
 
         if serialized_data.is_valid(raise_exception=True):
@@ -109,10 +112,10 @@ class ManageServicesAPI(APIView):
                 )
                 service_instance.update(**service_data)
 
+                return Response({"status": "Successfully updated service"})
+
             except VendorCategory.DoesNotExist:
                 return Response({"error": "Category doesn't exist!"})
-
-            return Response({"status": "Successfully created service"})
 
 
 # Managing Tasks

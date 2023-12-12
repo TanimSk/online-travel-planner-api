@@ -108,6 +108,32 @@ class RfqService(models.Model):
     adult_members = models.IntegerField(default=0)
     members = models.IntegerField(default=1)
 
+    # Hotel
+    hotel_name = models.CharField(max_length=300, blank=True, null=True)
+    room_type = models.CharField(max_length=300, blank=True, null=True)
+    bed_type = models.CharField(max_length=300, blank=True, null=True)
+
+    # Area
+    from_area = models.CharField(max_length=300, blank=True, null=True)
+    to_area = models.CharField(max_length=300, blank=True, null=True)
+
+    # Flight
+    flight_class = models.CharField(max_length=300, blank=True, null=True)
+    trip_type = models.CharField(max_length=300, blank=True, null=True)
+    depart_time = models.CharField(max_length=300, blank=True, null=True)
+    return_time = models.CharField(max_length=300, blank=True, null=True)
+
+    # Venue sourcing
+    event_type = models.CharField(max_length=300, blank=True, null=True)
+    event_venue = models.CharField(max_length=300, blank=True, null=True)
+
+    # Sight Seeing
+    day_type = models.CharField(max_length=300, blank=True, null=True)
+    transfer_type = models.CharField(max_length=300, blank=True, null=True)
+
+    # Transportation
+    car_type = models.CharField(max_length=300, blank=True, null=True)
+
     #  ---- Prices ----
     # Calculate price, when placing rfq order
     service_price = models.FloatField(default=0)

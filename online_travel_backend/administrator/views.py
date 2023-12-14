@@ -328,13 +328,35 @@ class ManageServicesAPI(APIView):
             return Response({"status": "Successfully created service"})
 
 
-
 # Assign Agent
 class AssignAgentAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
-    def get(self, request, service_id=None, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         is_assigned = False if request.GET.get("assigned") == "true" else True
+
+        # individual unassigned/assigned RFQ
+        if request.GET.get("id", None) is not None:
+            data = {}
+
+            rfq = Rfq.objects.get(
+                service__added_by_admin=True,
+                rfq_category__rfq__status="confirmed",
+                service__vendor_category__vendor__isnull=is_assigned,
+                id=int(request.GET.get("id")),
+            )
+            rfq_service_instance = RfqService.objects.filter(
+                rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                service__added_by_admin=True,
+                service__vendor_category__vendor__isnull=is_assigned,
+            )
+
+            data["rfq"] = BasicRfqSerializer(rfq).data
+            data["rfq_services"] = RfqServiceSerializer(
+                rfq_service_instance, many=True
+            ).data
+
+            return Response(data)
 
         # Get rfq ids with `added_by_admin=true` service value and assigned vendor is null/not null
         rfq_instances = (

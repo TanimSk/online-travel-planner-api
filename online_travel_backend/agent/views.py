@@ -21,6 +21,7 @@ from vendor.models import Service
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Sum, F
+import math
 
 
 # Authenticate Agent Only Class
@@ -215,9 +216,9 @@ class GetInvoiceAPI(APIView):
             {
                 "data": serialized_data.data,
                 "today_date": timezone.now(),
-                "total_charge": total_service_charge,
-                "extra_charge": extra_charge_admin + extra_charge_agent,
-                "total_price": (
+                "total_charge": math.ceil(total_service_charge),
+                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(
                     total_service_charge + extra_charge_agent + extra_charge_admin
                 ),
             },

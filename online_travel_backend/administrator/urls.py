@@ -50,9 +50,6 @@ urlpatterns = [
     ),
     # assigning agents
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
-    path(
-        "assign_agents/<int:service_id>", AssignAgentAPI.as_view(), name="assign_agents"
-    ),
 
     # update order api
     path("request_bill/", RequestBillAPI.as_view(), name="update_order"),

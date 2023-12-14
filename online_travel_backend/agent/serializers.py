@@ -137,6 +137,8 @@ class RfqSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         with transaction.atomic():
             rfq_categories = validated_data.pop("rfq_categories")
+            validated_data.pop("total_price")
+
             rfq_instance = Rfq.objects.create(
                 agent=self.context.get("request").user, **validated_data
             )

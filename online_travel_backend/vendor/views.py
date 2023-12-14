@@ -124,33 +124,59 @@ class NewTasksAPI(APIView):
 
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
-            rfq_instances = (
-                RfqService.objects.filter(
-                    # service__added_by_admin=True,
-                    service__vendor_category__vendor__vendor=request.user,
-                    rfq_category__rfq__status="confirmed",
-                    service__vendor_category__vendor__isnull=False,
+            # Get only completed tasks
+            if request.GET.get("completed", None) == "true":
+                rfq_instances = (
+                    RfqService.objects.filter(
+                        # service__added_by_admin=True,
+                        service__vendor_category__vendor__vendor=request.user,
+                        rfq_category__rfq__status="confirmed",
+                        service__vendor_category__vendor__isnull=False,
+                        order_status="complete",
+                    )
+                    .values("rfq_category__rfq_id")
+                    .distinct()
                 )
-                .exclude(order_status="dispatched")
-                .exclude(order_status="complete")
-                .values("rfq_category__rfq_id")
-                .distinct()
-            )
+            else:
+                # Get incompleted tasks
+                rfq_instances = (
+                    RfqService.objects.filter(
+                        # service__added_by_admin=True,
+                        service__vendor_category__vendor__vendor=request.user,
+                        rfq_category__rfq__status="confirmed",
+                        service__vendor_category__vendor__isnull=False,
+                    )
+                    .exclude(order_status="dispatched")
+                    .exclude(order_status="complete")
+                    .values("rfq_category__rfq_id")
+                    .distinct()
+                )
 
             response_array = []
             for rfq_instance in rfq_instances:
                 data = {}
 
                 rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
-                rfq_service_instance = (
-                    RfqService.objects.filter(
+
+                if request.GET.get("completed", None) == "true":
+                    # Get only completed tasks
+                    rfq_service_instance = RfqService.objects.filter(
                         rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
                         # service__added_by_admin=True,
                         service__vendor_category__vendor__isnull=False,
+                        order_status="complete",
+                    ).exclude(order_status="dispatched")
+                else:
+                    # Get only completed tasks
+                    rfq_service_instance = (
+                        RfqService.objects.filter(
+                            rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                            # service__added_by_admin=True,
+                            service__vendor_category__vendor__isnull=False,
+                        )
+                        .exclude(order_status="complete")
+                        .exclude(order_status="dispatched")
                     )
-                    .exclude(order_status="complete")
-                    .exclude(order_status="dispatched")
-                )
 
                 data["rfq"] = BasicRfqSerializer(rfq).data
                 data["rfq_services"] = RfqServiceSerializer(
@@ -172,13 +198,19 @@ class NewTasksAPI(APIView):
             )
 
             # Filtering
-            rfq_service_instance = (
-                RfqService.objects.filter(
-                    rfq_category__rfq=rfq,
+            if request.GET.get("completed", None) == "true":
+                # completed tasks
+                rfq_service_instance = RfqService.objects.filter(
+                    rfq_category__rfq=rfq, order_status="complete"
                 )
-                .exclude(order_status="complete")
-                .exclude(order_status="dispatched")
-            )
+            else:
+                rfq_service_instance = (
+                    RfqService.objects.filter(
+                        rfq_category__rfq=rfq,
+                    )
+                    .exclude(order_status="complete")
+                    .exclude(order_status="dispatched")
+                )
 
             data["rfq"] = BasicRfqSerializer(rfq).data
             data["rfq_services"] = RfqServiceSerializer(

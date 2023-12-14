@@ -328,13 +328,6 @@ class ManageServicesAPI(APIView):
             return Response({"status": "Successfully created service"})
 
 
-# Get Vendor List
-class VendorListAPI(APIView):
-    permission_classes = [AuthenticateOnlyAdmin]
-
-    def get(self, request, format=None, *args, **kwargs):
-        ...
-
 
 # Assign Agent
 class AssignAgentAPI(APIView):

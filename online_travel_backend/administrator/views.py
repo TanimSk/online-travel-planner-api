@@ -340,13 +340,10 @@ class AssignAgentAPI(APIView):
             data = {}
 
             rfq = Rfq.objects.get(
-                service__added_by_admin=True,
-                rfq_category__rfq__status="confirmed",
-                service__vendor_category__vendor__isnull=is_assigned,
                 id=int(request.GET.get("id")),
             )
             rfq_service_instance = RfqService.objects.filter(
-                rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                rfq_category__rfq_id=int(request.GET.get("id")),
                 service__added_by_admin=True,
                 service__vendor_category__vendor__isnull=is_assigned,
             )

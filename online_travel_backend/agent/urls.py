@@ -7,7 +7,8 @@ from .views import (
     GetInvoiceAPI,
     RequestBillAPI,
     OverviewAPI,
-    BillPayAPI
+    BillPayAPI, 
+    SetCommissionAPI,
 )
 
 urlpatterns = [
@@ -30,5 +31,8 @@ urlpatterns = [
     ),
     path(
         "pay_bill/", BillPayAPI.as_view(), name="pay_bill"
+    ),
+    path(
+        "set_commission/", SetCommissionAPI.as_view(), name="set_commission"
     ),
 ]

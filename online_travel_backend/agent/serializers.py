@@ -316,3 +316,7 @@ class BillPaySerializer(serializers.ModelSerializer):
             "tracking_id",
             "admin_payment_type",
         )
+
+
+class CommissionSerializer(serializers.Serializer):
+    commission = serializers.FloatField(required=True)

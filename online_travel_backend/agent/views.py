@@ -10,13 +10,14 @@ from .serializers import (
     QueryResultSerializer,
     BillServicesSerializer,
     BillPaySerializer,
+    CommissionSerializer,
 )
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
 # from vendor.serializers import ManageServicesSerializer
 from commons.models import Bill
-from .models import Rfq, RfqService
+from .models import Rfq, RfqService, Agent
 from vendor.models import Service
 from django.shortcuts import render
 from django.utils import timezone
@@ -262,3 +263,21 @@ class BillPayAPI(APIView):
                 bill_instance.save()
 
                 return Response({"status": "Successfully paid bills"})
+
+
+class SetCommissionAPI(APIView):
+    permission_classes = [AuthenticateOnlyAgent]
+
+    def put(self, request, format=None, *args, **kwargs):
+        serialized_data = CommissionSerializer(data=request.data, many=True)
+
+        if serialized_data.is_valid(raise_exception=True):
+            agent_instance = Agent.objects.get(agent=request.user)
+            agent_instance.commission = serialized_data.data.get("commission")
+            agent_instance.save()
+
+            return Response({"status": "Successfully Updated Commission"})
+
+    def get(self, request, format=None, *args, **kwargs):
+        agent_instance = Agent.objects.get(agent=request.user)
+        return Response({"commission": agent_instance.commission})

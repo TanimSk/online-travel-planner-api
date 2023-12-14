@@ -146,7 +146,7 @@ class RFQTypesAPI(APIView):
                     agent=request.user,
                 ).exclude(status="declined")
 
-        if (
+        elif (
             request.GET.get("type") == "pending"
             or request.GET.get("type") == "approved"
             or request.GET.get("type") == "declined"

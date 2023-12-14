@@ -12,7 +12,6 @@ from .serializers import (
     BillPaySerializer,
     CommissionSerializer,
 )
-from administrator.serializers import RfqSerializer as RfqDetailedSerializer
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
@@ -137,6 +136,16 @@ class RFQTypesAPI(APIView):
     def get(self, request, format=None, *args, **kwargs):
         has_multiple = False
 
+        if request.GET.get("type") == "order_updates":
+            if request.GET.get("id") is not None:
+                rfq_instances = Rfq.objects.get(
+                    agent=request.user, id=int(request.GET.get("id"))
+                ).exclude(status="declined")
+            else:
+                rfq_instances = Rfq.objects.get(
+                    agent=request.user,
+                ).exclude(status="declined")
+
         if (
             request.GET.get("type") == "pending"
             or request.GET.get("type") == "approved"
@@ -159,7 +168,7 @@ class RFQTypesAPI(APIView):
         else:
             return Response({"error": "Invalid params"})
 
-        serialized_data = RfqDetailedSerializer(rfq_instances, many=has_multiple)
+        serialized_data = RfqInvoiceSerializer(rfq_instances, many=has_multiple)
         return Response(serialized_data.data)
 
     def post(self, request, rfq_id=None, format=None, *args, **kwargs):

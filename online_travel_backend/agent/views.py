@@ -145,6 +145,7 @@ class RFQTypesAPI(APIView):
                 rfq_instances = Rfq.objects.filter(
                     agent=request.user,
                 ).exclude(status="declined")
+                has_multiple = True
 
         elif (
             request.GET.get("type") == "pending"

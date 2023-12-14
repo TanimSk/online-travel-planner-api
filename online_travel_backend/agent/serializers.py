@@ -64,13 +64,16 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
-    # total_price = serializers.SerializerMethodField(method_name="get_total_price")
+    total_price = serializers.SerializerMethodField(method_name="get_total_price")
 
     class Meta:
         exclude = ("agent",)
         model = Rfq
 
     def get_total_price(self, instance):
+        if not self.context.get("total_price", True):
+            return None
+
         return RfqService.objects.filter(rfq_category__rfq=instance).aggregate(
             price=Sum("service_price")
         )["price"]

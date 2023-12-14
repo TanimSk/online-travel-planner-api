@@ -75,7 +75,7 @@ class CreateRfqAPI(APIView):
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = self.serializer_class(
-            data=request.data, context={"request": request}
+            data=request.data, context={"request": request, "total_price": False}
         )
 
         if serialized_data.is_valid(raise_exception=True):

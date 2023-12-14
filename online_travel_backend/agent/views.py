@@ -12,6 +12,7 @@ from .serializers import (
     BillPaySerializer,
     CommissionSerializer,
 )
+from administrator import RfqSerializer as RfqDetailedSerializer
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
@@ -158,7 +159,7 @@ class RFQTypesAPI(APIView):
         else:
             return Response({"error": "Invalid params"})
 
-        serialized_data = RfqSerializer(rfq_instances, many=has_multiple)
+        serialized_data = RfqDetailedSerializer(rfq_instances, many=has_multiple)
         return Response(serialized_data.data)
 
     def post(self, request, rfq_id=None, format=None, *args, **kwargs):

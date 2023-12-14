@@ -29,6 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 
 
 # Application definition

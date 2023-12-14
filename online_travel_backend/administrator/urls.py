@@ -53,6 +53,11 @@ urlpatterns = [
     path(
         "assign_agents/<int:service_id>", AssignAgentAPI.as_view(), name="assign_agents"
     ),
+    path(
+        "get_vendor_list/", AssignAgentAPI.as_view(), name="assign_agents"
+    ),
+
+
     # update order api
     path("request_bill/", RequestBillAPI.as_view(), name="update_order"),
     path("pay_bill/", BillPayAPI.as_view(), name="pay_bill_admin"),

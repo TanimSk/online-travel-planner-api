@@ -12,7 +12,7 @@ from .serializers import (
     BillPaySerializer,
     CommissionSerializer,
 )
-from administrator import RfqSerializer as RfqDetailedSerializer
+from administrator.serializers import RfqSerializer as RfqDetailedSerializer
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 

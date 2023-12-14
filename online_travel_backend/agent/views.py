@@ -269,7 +269,7 @@ class SetCommissionAPI(APIView):
     permission_classes = [AuthenticateOnlyAgent]
 
     def put(self, request, format=None, *args, **kwargs):
-        serialized_data = CommissionSerializer(data=request.data, many=True)
+        serialized_data = CommissionSerializer(data=request.data)
 
         if serialized_data.is_valid(raise_exception=True):
             agent_instance = Agent.objects.get(agent=request.user)

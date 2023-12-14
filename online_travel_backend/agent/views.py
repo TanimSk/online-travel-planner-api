@@ -142,7 +142,7 @@ class RFQTypesAPI(APIView):
                     agent=request.user, id=int(request.GET.get("id"))
                 ).exclude(status="declined")
             else:
-                rfq_instances = Rfq.objects.get(
+                rfq_instances = Rfq.objects.filter(
                     agent=request.user,
                 ).exclude(status="declined")
 

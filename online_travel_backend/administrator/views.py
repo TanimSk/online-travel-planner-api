@@ -148,13 +148,22 @@ class ApprovedRfqAPI(APIView):
 
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
-            rfqs_instance = Rfq.objects.filter(status="approved").order_by(
-                "-created_on"
-            )
+            if request.GET.get("type") == "order":
+                rfqs_instance = Rfq.objects.filter(status="confirmed").order_by(
+                    "-created_on"
+                )
+            else:
+                rfqs_instance = Rfq.objects.filter(status="approved").order_by(
+                    "-created_on"
+                )
             serialized_data = RfqSerializer(rfqs_instance, many=True)
             return Response(serialized_data.data)
 
-        rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="approved")
+        if request.GET.get("type") == "order":
+            rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="confirmed")
+        else:
+            rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="approved")
+
         serialized_data = RfqSerializer(rfqs_instance)
         return Response(serialized_data.data)
 
@@ -223,6 +232,7 @@ class TaskListAPI(APIView):
         )
 
         response_arr = []
+
         for rfq_instance in rfq_instances:
             obj_data = {}
             obj_data["rfq_details"] = RfqSerializer(rfq_instance).data

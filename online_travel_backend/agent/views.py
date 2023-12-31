@@ -11,6 +11,7 @@ from .serializers import (
     BillServicesSerializer,
     BillPaySerializer,
     CommissionSerializer,
+    ServiceInfo,
 )
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
@@ -127,6 +128,13 @@ class QueryServicesAPI(APIView):
                 context={"dictionary": serialized_data.data},
             )
             return Response(serialized_services.data)
+
+    def get(self, request, service_id=None, format=None, *args, **kwargs):
+        if service_id is None:
+            return Response({"error": "Service id is missing"})
+
+        service_instance = Service.objects.get(id=service_id)
+        return Response(ServiceInfo(service_instance).data)
 
 
 # RFQ Types

@@ -320,3 +320,23 @@ class BillPaySerializer(serializers.ModelSerializer):
 
 class CommissionSerializer(serializers.Serializer):
     commission = serializers.FloatField(required=True)
+
+
+class ServiceInfo(serializers.ModelSerializer):
+    category_name = serializers.CharField(
+        source="vendor_category.category.category_name"
+    )
+    category_description = serializers.CharField(
+        source="vendor_category.category.category_name.description"
+    )
+
+    class Meta:
+        fields = (
+            "id",
+            "service_name",
+            "image_urls",
+            "description",
+            "category_name",
+            "category_description",
+        )
+        model = Service

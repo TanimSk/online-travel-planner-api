@@ -17,6 +17,7 @@ urlpatterns = [
     path("overview/", OverviewAPI.as_view(), name="overview_api"),
     # Query Services
     path("query_services/", QueryServicesAPI.as_view(), name="query_services"),
+    path("view_service/<int:service_id>", QueryServicesAPI.as_view(), name="view_service"),
     # Rfq
     path("get_rfq/", RFQTypesAPI.as_view(), name="get_rfq"),
     path("get_rfq/<int:rfq_id>", RFQTypesAPI.as_view(), name="get_rfq"),

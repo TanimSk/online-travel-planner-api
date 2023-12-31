@@ -34,6 +34,7 @@ class Rfq(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     approved_on = models.DateTimeField(blank=True, null=True)
     tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    total_price = models.FloatField(blank=True, null=True)
 
     STATUS = (
         ("pending", "pending"),

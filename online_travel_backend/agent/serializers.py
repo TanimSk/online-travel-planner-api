@@ -182,6 +182,7 @@ class RfqSerializer(serializers.ModelSerializer):
                         rfq_category=rfq_category_instance,
                         service=service_instance,
                         service_price=total_price,
+                        
                         **rfq_service,
                     )
 

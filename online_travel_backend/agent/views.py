@@ -85,7 +85,12 @@ class CreateRfqAPI(APIView):
             if request.GET.get("get_price") == "true":
                 return Response(serialized_data.calc_total_price(serialized_data.data))
 
-            serialized_data.create(serialized_data.data)
+            rfq_instance = serialized_data.create(serialized_data.data)
+            rfq_instance.total_price = serialized_data.calc_total_price(
+                serialized_data.data
+            )["total_price"]
+            rfq_instance.save()
+
             return Response({"status": "Successfully created RFQ"})
 
 

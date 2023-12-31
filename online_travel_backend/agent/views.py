@@ -155,9 +155,13 @@ class RFQTypesAPI(APIView):
                     agent=request.user, id=int(request.GET.get("id"))
                 )
             else:
-                rfq_instances = Rfq.objects.filter(
-                    agent=request.user,
-                ).exclude(status="declined")
+                rfq_instances = (
+                    Rfq.objects.filter(
+                        agent=request.user,
+                    )
+                    .exclude(status="declined")
+                    .order_by("-created_on")
+                )
                 has_multiple = True
 
         elif (
@@ -212,7 +216,7 @@ class GetInvoiceAPI(APIView):
             if request.user.is_authenticated:
                 rfq_instances = Rfq.objects.filter(
                     agent=request.user, status="confirmed"
-                )
+                ).order_by("-created_on")
                 serialized_data = RfqSerializer(rfq_instances, many=True)
                 return Response(serialized_data.data)
 

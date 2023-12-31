@@ -132,8 +132,9 @@ class NewTasksAPI(APIView):
                         service__vendor_category__vendor__vendor=request.user,
                         rfq_category__rfq__status="confirmed",
                         service__vendor_category__vendor__isnull=False,
-                        order_status="complete",
+                        order_status="dispatched",
                     )
+                    .order_by("-id")
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )
@@ -147,7 +148,8 @@ class NewTasksAPI(APIView):
                         service__vendor_category__vendor__isnull=False,
                     )
                     .exclude(order_status="dispatched")
-                    .exclude(order_status="complete")
+                    # .exclude(order_status="complete")
+                    .order_by("-id")
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )
@@ -160,12 +162,15 @@ class NewTasksAPI(APIView):
 
                 if request.GET.get("completed", None) == "true":
                     # Get only completed tasks
-                    rfq_service_instance = RfqService.objects.filter(
-                        rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
-                        # service__added_by_admin=True,
-                        service__vendor_category__vendor__isnull=False,
-                        order_status="complete",
-                    ).exclude(order_status="dispatched")
+                    rfq_service_instance = (
+                        RfqService.objects.filter(
+                            rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                            # service__added_by_admin=True,
+                            service__vendor_category__vendor__isnull=False,
+                            order_status="dispatched",
+                        )                        
+                        .order_by("-id")
+                    )
                 else:
                     # Get only completed tasks
                     rfq_service_instance = (
@@ -174,8 +179,9 @@ class NewTasksAPI(APIView):
                             # service__added_by_admin=True,
                             service__vendor_category__vendor__isnull=False,
                         )
-                        .exclude(order_status="complete")
+                        # .exclude(order_status="complete")
                         .exclude(order_status="dispatched")
+                        .order_by("-id")
                     )
 
                 data["rfq"] = BasicRfqSerializer(rfq).data
@@ -201,15 +207,16 @@ class NewTasksAPI(APIView):
             if request.GET.get("completed", None) == "true":
                 # completed tasks
                 rfq_service_instance = RfqService.objects.filter(
-                    rfq_category__rfq=rfq, order_status="complete"
-                )
+                    rfq_category__rfq=rfq, order_status="dispatched"
+                ).order_by("-id")
             else:
                 rfq_service_instance = (
                     RfqService.objects.filter(
                         rfq_category__rfq=rfq,
                     )
-                    .exclude(order_status="complete")
+                    # .exclude(order_status="complete")
                     .exclude(order_status="dispatched")
+                    .order_by("-id")
                 )
 
             data["rfq"] = BasicRfqSerializer(rfq).data

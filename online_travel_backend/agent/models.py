@@ -56,7 +56,7 @@ class Rfq(models.Model):
 
     @property
     def rfq_categories(self):
-        return self.rfqcategory_rfq.all()
+        return self.rfqcategory_rfq.all().order_by("-id")
 
     @property
     def agent_info(self):
@@ -76,7 +76,7 @@ class RfqCategory(models.Model):
 
     @property
     def rfq_services(self):
-        return self.rfqservice_rfqcategory.all()
+        return self.rfqservice_rfqcategory.all().order_by("-id")
 
 
 class RfqService(models.Model):

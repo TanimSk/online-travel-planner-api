@@ -327,7 +327,7 @@ class ServiceInfo(serializers.ModelSerializer):
         source="vendor_category.category.category_name"
     )
     category_description = serializers.CharField(
-        source="vendor_category.category.category_name.description"
+        source="vendor_category.category.description"
     )
 
     class Meta:

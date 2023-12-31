@@ -25,6 +25,17 @@ from django.db.models import Sum, F
 import math
 
 
+# template
+from django import template
+
+register = template.Library()
+
+
+@register.filter(name="replace")
+def replace(value, arg):
+    return value.replace(arg, " ")
+
+
 # Authenticate Agent Only Class
 class AuthenticateOnlyAgent(BasePermission):
     def has_permission(self, request, view):

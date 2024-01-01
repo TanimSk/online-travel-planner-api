@@ -217,7 +217,7 @@ class GetInvoiceAPI(APIView):
                 rfq_instances = Rfq.objects.filter(
                     agent=request.user, status="confirmed"
                 ).order_by("-created_on")
-                serialized_data = RfqSerializer(rfq_instances, many=True)
+                serialized_data = RfqInvoiceSerializer(rfq_instances, many=True)
                 return Response(serialized_data.data)
 
             else:

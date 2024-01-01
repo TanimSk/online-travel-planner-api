@@ -249,7 +249,7 @@ class NewTasksAPI(APIView):
                 rfq_service_instance.order_status = service.get("order_status")
 
                 # Set completed on date & make bill, if completed
-                if service.get("order_status") == "complete":
+                if service.get("order_status") == "dispatched":
                     rfq_service_instance.completed_on = timezone.now()
 
                     # Calculate & Make Bill

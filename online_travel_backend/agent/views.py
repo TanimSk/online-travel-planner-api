@@ -108,7 +108,7 @@ class SuggestionAPI(APIView):
             ] = serialized_data.data.get("field_content")
             suggestions = Service.objects.filter(**dict).values_list(
                 serialized_data.data.get("field_name"), flat=True
-            )
+            ).distinct()
             return Response(suggestions)
 
 

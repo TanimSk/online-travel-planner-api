@@ -344,4 +344,4 @@ class ServiceInfo(serializers.ModelSerializer):
 
 class SuggestionSerializer(serializers.Serializer):
     field_name = serializers.CharField()
-    field_content = serializers.CharField()
+    field_content = serializers.CharField(allow_blank=True)

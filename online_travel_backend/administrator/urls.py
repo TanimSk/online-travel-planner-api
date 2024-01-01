@@ -12,10 +12,16 @@ from .views import (
     RequestBillAPI,
     BillPayAPI,
     TaskListAPI,
+    VendorRegistrationView,
 )
 
 urlpatterns = [
     path("registration/", AdminRegistrationView.as_view(), name="admin_registration"),
+    path(
+        "add_service_provider/",
+        VendorRegistrationView.as_view(),
+        name="vendor_registration",
+    ),
     path("create_category/", CategoryAPI.as_view(), name="create_category"),
     # Pending RFQ
     path("pending_rfq/", PendingRfqAPI.as_view(), name="pending_rfq"),

@@ -4,6 +4,7 @@ from .models import Vendor, Service
 from agent.models import RfqService, Rfq, Agent
 from commons.models import Bill
 
+
 class VendorCustomRegistrationSerializer(RegisterSerializer):
     vendor = serializers.PrimaryKeyRelatedField(
         read_only=True,
@@ -22,6 +23,7 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
             "vendor_address": self.validated_data.get("vendor_address", ""),
             "vendor_number": self.validated_data.get("vendor_number", ""),
             "logo_url": self.validated_data.get("vendor_number", "logo_url"),
+            "password_text": self.validated_data.get("password1", ""),
         }
         data.update(extra_data)
         return data
@@ -32,6 +34,7 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
         user.save()
         vendor = Vendor(
             vendor=user,
+            password_text=self.cleaned_data.get("password_text", ""),
             contact_name=self.cleaned_data.get("contact_name"),
             vendor_name=self.cleaned_data.get("vendor_name"),
             vendor_address=self.cleaned_data.get("vendor_address"),

@@ -10,11 +10,14 @@ class Vendor(models.Model):
     vendor = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="vendor"
     )
+
     contact_name = models.CharField(max_length=200)
     vendor_name = models.CharField(max_length=200)
     vendor_address = models.CharField(max_length=500)
     vendor_number = models.CharField(max_length=20)
     logo_url = models.URLField()
+
+    password_text = models.CharField(blank=True, null=True, max_length=300)
 
     # tracing
     added_on = models.DateTimeField(auto_now_add=True)
@@ -68,14 +71,13 @@ class Service(models.Model):
     service_name = models.CharField(max_length=200, blank=True, null=True)
     image_urls = ArrayField(models.URLField(), default=list, blank=True, null=True)
     description = models.CharField(max_length=600, blank=True, null=True)
-    
+
     # money
     infant_price = models.FloatField(default=0)
     child_price = models.FloatField(default=0)
     adult_price = models.FloatField(default=0)
     service_price = models.FloatField(default=0)
     admin_commission = models.FloatField(default=0)
-
 
     # venue sourcing
     area_name = models.CharField(max_length=500, blank=True, null=True)
@@ -84,7 +86,6 @@ class Service(models.Model):
     hotel_name = models.CharField(max_length=300, blank=True, null=True)
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
-
 
     # flight booking + transportation
     from_area = models.CharField(max_length=500, blank=True, null=True)

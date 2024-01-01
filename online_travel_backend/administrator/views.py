@@ -19,6 +19,7 @@ from .serializers import (
     EditPriceSerializer,
     BillServicesSerializer,
     BillPaySerializer,
+    VendorCustomRegistrationSerializer
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -47,6 +48,10 @@ class AuthenticateOnlyAdmin(BasePermission):
 # Agent Registration
 class AdminRegistrationView(RegisterView):
     serializer_class = AdminCustomRegistrationSerializer
+
+# Vendor Registration
+class VendorRegistrationView(RegisterView):
+    serializer_class = VendorCustomRegistrationSerializer
 
 
 # Pagination Config

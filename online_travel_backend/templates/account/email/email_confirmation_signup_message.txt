@@ -1,0 +1,16 @@
+{% extends "account/email/base_message.txt" %}
+{% load account %}
+{% load i18n %}
+
+{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}You're receiving this email because user {{ user_display }} has given your email address to register an account on {{ site_domain }}.
+
+To confirm this is correct, go to 
+{% endblocktrans %}{% endautoescape %}
+{% if user.is_admin %}
+https://travel-planner.ongshak.com/admin_auth/{{ activate_url }}
+{% elif user.is_agent %}
+https://transendcrafts.com/user_agent/{{ activate_url }}
+{% else %}
+https://transendcrafts.com/user_vendor/{{ activate_url }}
+{% endif %}
+{% endblock %}

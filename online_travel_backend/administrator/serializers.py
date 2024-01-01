@@ -163,3 +163,45 @@ class BillPaySerializer(serializers.ModelSerializer):
             "tracking_id",
             "vendor_payment_type",
         )
+
+
+# Vendor Registration Serializer
+class VendorCustomRegistrationSerializer(RegisterSerializer):
+    vendor = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+    )  # by default allow_null = False
+    contact_name = serializers.CharField(required=True)
+    vendor_name = serializers.CharField(required=True)
+    vendor_address = serializers.CharField(required=True)
+    vendor_number = serializers.CharField(required=True)
+    logo_url = serializers.URLField(required=True)
+
+    def get_cleaned_data(self):
+        data = super(VendorCustomRegistrationSerializer, self).get_cleaned_data()
+        extra_data = {
+            "contact_name": self.validated_data.get("contact_name", ""),
+            "vendor_name": self.validated_data.get("vendor_name", ""),
+            "vendor_address": self.validated_data.get("vendor_address", ""),
+            "vendor_number": self.validated_data.get("vendor_number", ""),
+            "logo_url": self.validated_data.get("vendor_number", "logo_url"),
+            "password_text": self.validated_data.get("password1", ""),
+        }
+        data.update(extra_data)
+        return data
+
+    def save(self, request):
+        user = super(VendorCustomRegistrationSerializer, self).save(request)
+        user.is_vendor = True
+        user.approved = True
+        user.save()
+        vendor = Vendor(
+            vendor=user,
+            password_text=self.cleaned_data.get("password_text", ""),
+            contact_name=self.cleaned_data.get("contact_name"),
+            vendor_name=self.cleaned_data.get("vendor_name"),
+            vendor_address=self.cleaned_data.get("vendor_address"),
+            vendor_number=self.cleaned_data.get("vendor_number"),
+            logo_url=self.cleaned_data.get("logo_url"),
+        )
+        vendor.save()
+        return user

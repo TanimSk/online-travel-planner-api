@@ -1,5 +1,5 @@
 from dj_rest_auth.registration.views import RegisterView
-from .serializers import AgentCustomRegistrationSerializer
+from .serializers import AgentCustomRegistrationSerializer, SuggestionSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
@@ -92,6 +92,24 @@ class CreateRfqAPI(APIView):
             rfq_instance.save()
 
             return Response({"status": "Successfully created RFQ"})
+
+
+# Suggestion API
+class SuggestionAPI(APIView):
+    serializer_class = SuggestionSerializer
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = self.serializer_class(data=request.data)
+
+        if serialized_data.is_valid(raise_exception=True):
+            dict = {}
+            dict[
+                f"{serialized_data.data.get('field_name')}__icontains"
+            ] = serialized_data.data.get("field_content")
+            suggestions = Service.objects.filter(**dict).values_list(
+                serialized_data.data.get("field_name"), flat=True
+            )
+            return Response(suggestions)
 
 
 # Query Service

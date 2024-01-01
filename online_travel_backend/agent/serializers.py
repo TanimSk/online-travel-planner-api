@@ -182,7 +182,6 @@ class RfqSerializer(serializers.ModelSerializer):
                         rfq_category=rfq_category_instance,
                         service=service_instance,
                         service_price=total_price,
-                        
                         **rfq_service,
                     )
 
@@ -341,3 +340,8 @@ class ServiceInfo(serializers.ModelSerializer):
             "category_description",
         )
         model = Service
+
+
+class SuggestionSerializer(serializers.Serializer):
+    field_name = serializers.CharField()
+    field_content = serializers.CharField()

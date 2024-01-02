@@ -104,7 +104,12 @@ class SuggestionAPI(APIView):
                 f"{serialized_data.data.get('field_name')}__icontains"
             ] = serialized_data.data.get("field_content")
             suggestions = (
-                Service.objects.filter(**dict)[:6]
+                Service.objects.filter(
+                    vendor_category__category_id=serialized_data.data.get(
+                        "category_id"
+                    ),
+                    **dict,
+                )[:6]
                 .values_list(serialized_data.data.get("field_name"), flat=True)
                 .distinct()
             )

@@ -5,7 +5,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db import transaction
-from django.db.models import Subquery, OuterRef
+from django.db.models import Subquery, OuterRef, Sum
 from django.utils import timezone
 
 from .serializers import (
@@ -20,13 +20,13 @@ from .serializers import (
     BillServicesSerializer,
     BillPaySerializer,
     VendorCustomRegistrationSerializer,
-    BillServicesSerializerA
+    BillServicesSerializerA,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
     RfqServiceSerializer,
     ManageServicesSerializer,
-    DispatchBillServiceSerializer,
+    # DispatchBillServiceSerializer,
 )
 
 from agent.models import Rfq, RfqService
@@ -133,6 +133,8 @@ class PendingRfqAPI(APIView):
         if rfq_id is None:
             return Response({"error": "RFQ ID missing"})
 
+        total_price = 0
+
         serialized_data = EditPriceSerializer(data=request.data)
         if serialized_data.is_valid(raise_exception=True):
             rfq_service = RfqService.objects.get(
@@ -142,6 +144,17 @@ class PendingRfqAPI(APIView):
 
             rfq_service.service_price = serialized_data.data.get("service_price")
             rfq_service.save()
+
+            # get all services price and get the total amount
+            total_price = RfqService.objects.filter(
+                rfq_category__rfq=rfq_service.rfq_category.rfq
+            ).aggregate(service_price=Sum("service_price"))["service_price"]
+
+            rfq_instance = Rfq.objects.get(
+                id=rfq_service.rfq_category.rfq.id
+            )
+            rfq_instance.total_price = total_price
+            rfq_instance.save()
 
             return Response({"status": "Successfully updated price"})
 
@@ -514,8 +527,7 @@ class BillPayAPI(APIView):
         if serialized_data.is_valid(raise_exception=True):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
-                    tracking_id=service.get("tracking_id"),
-                    status_2="admin_bill"
+                    tracking_id=service.get("tracking_id"), status_2="admin_bill"
                 )
                 bill_instance.vendor_payment_type = service.get("vendor_payment_type")
                 bill_instance.vendor_paid_on = timezone.now()

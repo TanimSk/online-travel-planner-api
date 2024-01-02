@@ -179,14 +179,15 @@ class RfqSerializer(serializers.ModelSerializer):
                             service_instance.service_price
                             * rfq_service.get("members", 0)
                         )
-                    )
-                    rfq_total_price += total_price
+                    )                    
 
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
                         service=service_instance,
                         service_price=total_price,
                         **rfq_service,
+                        admin_commission=service_instance.admin_commission,
+                        agent_commission=rfq_instance.agent.rfq_agent.commission
                     )
         
             rfq_instance.total_price = rfq_total_price

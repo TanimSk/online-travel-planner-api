@@ -111,7 +111,7 @@ class SuggestionAPI(APIView):
                     **dict,
                 )
                 .values_list(serialized_data.data.get("field_name"), flat=True)
-                .distinct()[:6]
+                .distinct()[:15]
             )
             return Response(suggestions)
 

@@ -187,7 +187,7 @@ class RfqSerializer(serializers.ModelSerializer):
                         service_price=total_price,
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
-                        agent_commission=rfq_instance.agent.rfq_agent.commission
+                        agent_commission=Agent.objects.get(agent=self.context.get("request").user).commission
                     )
         
             rfq_instance.total_price = rfq_total_price

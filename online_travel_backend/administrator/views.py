@@ -500,7 +500,9 @@ class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(status_1="admin_paid")
+        bills_instance = Bill.objects.filter(status_1="admin_paid").order_by(
+            "-admin_paid_on"
+        )
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
@@ -523,7 +525,9 @@ class BillPayAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(status_2="admin_bill")
+        bills_instance = Bill.objects.filter(status_2="admin_bill").order_by(
+            "-admin_billed_on"
+        )
         serialized_data = BillServicesSerializerA(bills_instance, many=True)
         return Response(serialized_data.data)
 

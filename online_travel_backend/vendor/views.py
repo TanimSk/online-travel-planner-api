@@ -126,8 +126,6 @@ class NewTasksAPI(APIView):
         if rfq_id is None:
             # Get only completed tasks
             if request.GET.get("completed", None) == "true":
-                print("------")
-
                 rfq_instances = (
                     RfqService.objects.filter(
                         # service__added_by_admin=True,
@@ -140,7 +138,6 @@ class NewTasksAPI(APIView):
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )
-                print(rfq_instances.count())
             else:
                 # Get incompleted tasks
                 rfq_instances = (
@@ -163,17 +160,14 @@ class NewTasksAPI(APIView):
 
                 rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
 
-                if request.GET.get("completed", None) == "true":                    
+                if request.GET.get("completed", None) == "true":
                     # Get only completed tasks
-                    rfq_service_instance = (
-                        RfqService.objects.filter(
-                            rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
-                            # service__added_by_admin=True,
-                            service__vendor_category__vendor__isnull=False,
-                            order_status="dispatched",
-                        )                        
-                        .order_by("-id")
-                    )
+                    rfq_service_instance = RfqService.objects.filter(
+                        rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                        # service__added_by_admin=True,
+                        service__vendor_category__vendor__isnull=False,
+                        order_status="dispatched",
+                    ).order_by("-id")
                 else:
                     # Get only completed tasks
                     rfq_service_instance = (
@@ -183,8 +177,7 @@ class NewTasksAPI(APIView):
                             service__vendor_category__vendor__isnull=False,
                         )
                         # .exclude(order_status="complete")
-                        .exclude(order_status="dispatched")
-                        .order_by("-id")
+                        .exclude(order_status="dispatched").order_by("-id")
                     )
 
                 data["rfq"] = BasicRfqSerializer(rfq).data
@@ -218,8 +211,7 @@ class NewTasksAPI(APIView):
                         rfq_category__rfq=rfq,
                     )
                     # .exclude(order_status="complete")
-                    .exclude(order_status="dispatched")
-                    .order_by("-id")
+                    .exclude(order_status="dispatched").order_by("-id")
                 )
 
             data["rfq"] = BasicRfqSerializer(rfq).data
@@ -278,7 +270,9 @@ class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(vendor=request.user, status_2="vendor_bill").order_by("-created_on")
+        bills_instance = Bill.objects.filter(
+            vendor=request.user, status_2="vendor_bill"
+        ).order_by("-created_on")
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
@@ -289,7 +283,7 @@ class RequestBillAPI(APIView):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id"),
-                )                
+                )
                 bill_instance.status_2 = "admin_bill"
                 bill_instance.admin_billed_on = timezone.now()
                 bill_instance.save()
@@ -301,6 +295,8 @@ class PayBillAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(vendor=request.user, status_2="vendor_paid")
+        bills_instance = Bill.objects.filter(
+            vendor=request.user, status_2="vendor_paid"
+        ).order_by("-vendor_paid_on")
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)

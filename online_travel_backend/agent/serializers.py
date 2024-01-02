@@ -135,6 +135,9 @@ class RfqSerializer(serializers.ModelSerializer):
         return {"total_price": total_price, "total_services": total_services}
 
     def create(self, validated_data):
+
+        rfq_total_price = 0
+
         with transaction.atomic():
             rfq_categories = validated_data.pop("rfq_categories")
             validated_data.pop("total_price")
@@ -177,6 +180,7 @@ class RfqSerializer(serializers.ModelSerializer):
                             * rfq_service.get("members", 0)
                         )
                     )
+                    rfq_total_price += total_price
 
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
@@ -184,6 +188,10 @@ class RfqSerializer(serializers.ModelSerializer):
                         service_price=total_price,
                         **rfq_service,
                     )
+        
+            rfq_instance.total_price = rfq_total_price
+            rfq_instance.save()
+
 
         return rfq_instance
 
@@ -293,16 +301,28 @@ class QueryResultSerializer(serializers.ModelSerializer):
 # Bill Request
 class BillServicesSerializer(serializers.ModelSerializer):
     total_bill = serializers.SerializerMethodField()
+    customer_name = serializers.CharField(
+        source="service.rfq_category.rfq.customer_name"
+    )
+    customer_address = serializers.CharField(
+        source="service.rfq_category.rfq.customer_address"
+    )
+    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    service_name = serializers.CharField(source="service.service.service_name")
 
     class Meta:
         model = Bill
         fields = (
             "tracking_id",
-            "admin_billed_on",
-            "vendor_bill",
-            "admin_bill",
+            # "admin_billed_on",
+            # "vendor_bill",
+            # "admin_bill",
             "agent_bill",
             "total_bill",
+            "customer_name",
+            "customer_address",
+            "contact_no",
+            "service_name",
         )
 
     def get_total_bill(self, obj):
@@ -310,6 +330,8 @@ class BillServicesSerializer(serializers.ModelSerializer):
 
 
 class BillPaySerializer(serializers.ModelSerializer):
+    tracking_id = serializers.UUIDField()
+
     class Meta:
         model = Bill
         fields = (

@@ -86,9 +86,6 @@ class CreateRfqAPI(APIView):
                 return Response(serialized_data.calc_total_price(serialized_data.data))
 
             rfq_instance = serialized_data.create(serialized_data.data)
-            rfq_instance.total_price = serialized_data.calc_total_price(
-                serialized_data.data
-            )["total_price"]
             rfq_instance.save()
 
             return Response({"status": "Successfully created RFQ"})
@@ -106,9 +103,11 @@ class SuggestionAPI(APIView):
             dict[
                 f"{serialized_data.data.get('field_name')}__icontains"
             ] = serialized_data.data.get("field_content")
-            suggestions = Service.objects.filter(**dict).values_list(
-                serialized_data.data.get("field_name"), flat=True
-            ).distinct()
+            suggestions = (
+                Service.objects.filter(**dict)[:6]
+                .values_list(serialized_data.data.get("field_name"), flat=True)
+                .distinct()
+            )
             return Response(suggestions)
 
 
@@ -122,6 +121,7 @@ class QueryServicesAPI(APIView):
         for key, value in data.items():
             if not (value == "" or value is None):
                 dict[f"{key}__icontains"] = value
+
         return dict
 
     def post(self, request, format=None, *args, **kwargs):
@@ -211,9 +211,28 @@ class RFQTypesAPI(APIView):
         if rfq_id is None:
             return Response({"error": "RFQ ID is missing"})
 
-        rfq_instance = Rfq.objects.get(id=rfq_id)
+        rfq_instance = Rfq.objects.get(id=rfq_id, agent=request.user)
         rfq_instance.status = "confirmed"
         rfq_instance.save()
+
+        rfq_service_instances = RfqService.objects.filter(
+            rfq_category__rfq=rfq_instance
+        )
+
+        # Calculate & Make Bill for each rfq_services after confirming RFQ
+        for rfq_service_instance in rfq_service_instances:
+            Bill.objects.create(
+                vendor=rfq_service_instance.service.vendor_category.vendor.vendor,
+                agent=rfq_service_instance.rfq_category.rfq.agent,
+                vendor_bill=rfq_service_instance.service_price,
+                admin_bill=rfq_service_instance.service_price
+                * rfq_service_instance.admin_commission
+                * 0.01,
+                agent_bill=rfq_service_instance.service_price
+                * rfq_service_instance.agent_commission
+                * 0.01,
+                service=rfq_service_instance,
+            )
 
         return Response({"status": "Successfully confirmed RFQ"})
 
@@ -279,11 +298,11 @@ class RequestBillAPI(APIView):
     def get(self, request, format=None, *args, **kwargs):
         if request.GET.get("paid") == "true":
             bills_instance = Bill.objects.filter(
-                agent=request.user, status="admin_paid"
+                agent=request.user, status_1="admin_paid"
             )
         else:
             bills_instance = Bill.objects.filter(
-                agent=request.user, status="agent_bill"
+                agent=request.user, status_1="agent_paid"
             )
 
         serialized_data = BillServicesSerializer(bills_instance, many=True)
@@ -305,7 +324,7 @@ class BillPayAPI(APIView):
                     "admin_payment_type", None
                 )
                 bill_instance.admin_paid_on = timezone.now()
-                bill_instance.status = "admin_paid"
+                bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
 
                 return Response({"status": "Successfully paid bills"})

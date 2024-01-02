@@ -113,6 +113,8 @@ class RfqService(models.Model):
     hotel_name = models.CharField(max_length=300, blank=True, null=True)
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
+    check_in_date = models.DateTimeField(blank=True, null=True)
+    check_out_date = models.DateTimeField(blank=True, null=True)
 
     # Area
     from_area = models.CharField(max_length=300, blank=True, null=True)

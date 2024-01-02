@@ -126,11 +126,13 @@ class NewTasksAPI(APIView):
         if rfq_id is None:
             # Get only completed tasks
             if request.GET.get("completed", None) == "true":
+                print("------")
+
                 rfq_instances = (
                     RfqService.objects.filter(
                         # service__added_by_admin=True,
                         service__vendor_category__vendor__vendor=request.user,
-                        rfq_category__rfq__status="confirmed",
+                        # rfq_category__rfq__status="completed",
                         service__vendor_category__vendor__isnull=False,
                         order_status="dispatched",
                     )
@@ -138,6 +140,7 @@ class NewTasksAPI(APIView):
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )
+                print(rfq_instances.count())
             else:
                 # Get incompleted tasks
                 rfq_instances = (
@@ -160,7 +163,7 @@ class NewTasksAPI(APIView):
 
                 rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
 
-                if request.GET.get("completed", None) == "true":
+                if request.GET.get("completed", None) == "true":                    
                     # Get only completed tasks
                     rfq_service_instance = (
                         RfqService.objects.filter(
@@ -252,19 +255,19 @@ class NewTasksAPI(APIView):
                 if service.get("order_status") == "dispatched":
                     rfq_service_instance.completed_on = timezone.now()
 
-                    # Calculate & Make Bill
-                    Bill.objects.create(
-                        vendor=request.user,
-                        agent=rfq_service_instance.rfq_category.rfq.agent,
-                        tracking_id=rfq_service_instance.tracing_id,
-                        vendor_bill=rfq_service_instance.service_price,
-                        admin_bill=rfq_service_instance.service_price
-                        * rfq_service_instance.admin_commission
-                        * 0.01,
-                        agent_bill=rfq_service_instance.service_price
-                        * rfq_service_instance.agent_commission
-                        * 0.01,
-                    )
+                    # # Calculate & Make Bill
+                    # Bill.objects.create(
+                    #     vendor=request.user,
+                    #     agent=rfq_service_instance.rfq_category.rfq.agent,
+                    #     tracking_id=rfq_service_instance.tracing_id,
+                    #     vendor_bill=rfq_service_instance.service_price,
+                    #     admin_bill=rfq_service_instance.service_price
+                    #     * rfq_service_instance.admin_commission
+                    #     * 0.01,
+                    #     agent_bill=rfq_service_instance.service_price
+                    #     * rfq_service_instance.agent_commission
+                    #     * 0.01,
+                    # )
 
                 rfq_service_instance.save()
 
@@ -275,8 +278,7 @@ class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(vendor=request.user, status="vendor_bill")
-
+        bills_instance = Bill.objects.filter(vendor=request.user, status_2="vendor_bill").order_by("-created_on")
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
@@ -287,19 +289,18 @@ class RequestBillAPI(APIView):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id"),
-                )
-                bill_instance.status = "admin_bill"
+                )                
+                bill_instance.status_2 = "admin_bill"
                 bill_instance.admin_billed_on = timezone.now()
                 bill_instance.save()
 
-            return Response({"status": "Successfully requested for bill"})
+            return Response({"status": "Successfully requested for bill to admin"})
 
 
 class PayBillAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(vendor=request.user, status="vendor_paid")
-
+        bills_instance = Bill.objects.filter(vendor=request.user, status_2="vendor_paid")
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)

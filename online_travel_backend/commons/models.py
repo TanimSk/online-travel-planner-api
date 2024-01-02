@@ -2,6 +2,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+import uuid
 
 
 class User(AbstractUser):
@@ -25,7 +26,7 @@ class Category(models.Model):
 
 class Bill(models.Model):
     # pointed to RfqService
-    tracking_id = models.UUIDField()
+    tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     # bill owners
     vendor = models.ForeignKey(
@@ -34,22 +35,29 @@ class Bill(models.Model):
     agent = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bill_agent"
     )
+    service = models.OneToOneField(
+        "agent.RfqService", on_delete=models.CASCADE, related_name="bill_service"
+    )
 
     # status
-    STATUS = (
+    STATUS_1 = (
+        ("agent_paid", "agent_paid"),
+        ("admin_paid", "admin_paid"),
+    )
+
+    STATUS_2 = (
         ("vendor_bill", "vendor_bill"),
         ("admin_bill", "admin_bill"),
-        ("agent_bill", "agent_bill"),
-        # ("agent_paid", "agent_paid"),
-        ("admin_paid", "admin_paid"),
         ("vendor_paid", "vendor_paid"),
     )
-    status = models.CharField(choices=STATUS, default="vendor_bill", max_length=20)
+
+    status_1 = models.CharField(choices=STATUS_1, default="agent_paid", max_length=20)
+    status_2 = models.CharField(choices=STATUS_2, default="vendor_bill", max_length=20)
 
     # dates
     created_on = models.DateTimeField(auto_now_add=True)
     admin_billed_on = models.DateTimeField(blank=True, null=True)
-    agent_billed_on = models.DateTimeField(blank=True, null=True)
+    # agent_billed_on = models.DateTimeField(blank=True, null=True)
 
     admin_paid_on = models.DateTimeField(blank=True, null=True)
     vendor_paid_on = models.DateTimeField(blank=True, null=True)

@@ -142,6 +142,45 @@ class AssignServiceSerializer(serializers.Serializer):
 class BillServicesSerializer(serializers.ModelSerializer):
     total_bill = serializers.SerializerMethodField()
 
+    customer_name = serializers.CharField(
+        source="service.rfq_category.rfq.customer_name"
+    )
+    customer_address = serializers.CharField(
+        source="service.rfq_category.rfq.customer_address"
+    )
+    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    service_name = serializers.CharField(source="service.service.service_name")
+
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "admin_paid_on",
+            "vendor_bill",
+            "admin_bill",
+            "total_bill",
+            "customer_name",
+            "customer_address",
+            "contact_no",
+            "service_name",
+        )
+
+    def get_total_bill(self, obj):
+        return obj.vendor_bill + obj.admin_bill
+
+
+class BillServicesSerializerA(serializers.ModelSerializer):
+    total_bill = serializers.SerializerMethodField()
+
+    customer_name = serializers.CharField(
+        source="service.rfq_category.rfq.customer_name"
+    )
+    customer_address = serializers.CharField(
+        source="service.rfq_category.rfq.customer_address"
+    )
+    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    service_name = serializers.CharField(source="service.service.service_name")
+
     class Meta:
         model = Bill
         fields = (
@@ -150,6 +189,10 @@ class BillServicesSerializer(serializers.ModelSerializer):
             "vendor_bill",
             "admin_bill",
             "total_bill",
+            "customer_name",
+            "customer_address",
+            "contact_no",
+            "service_name",
         )
 
     def get_total_bill(self, obj):
@@ -157,6 +200,8 @@ class BillServicesSerializer(serializers.ModelSerializer):
 
 
 class BillPaySerializer(serializers.ModelSerializer):
+    tracking_id = serializers.UUIDField()
+
     class Meta:
         model = Bill
         fields = (
@@ -192,7 +237,6 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
     def save(self, request):
         user = super(VendorCustomRegistrationSerializer, self).save(request)
         user.is_vendor = True
-        user.approved = True
         user.save()
         vendor = Vendor(
             vendor=user,
@@ -202,6 +246,7 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
             vendor_address=self.cleaned_data.get("vendor_address"),
             vendor_number=self.cleaned_data.get("vendor_number"),
             logo_url=self.cleaned_data.get("logo_url"),
+            approved=True,
         )
         vendor.save()
         return user

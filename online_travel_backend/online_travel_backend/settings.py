@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,8 +31,7 @@ ALLOWED_HOSTS = ["*"]
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
 # Update this in production
-X_FRAME_OPTIONS = 'ALLOWALL'
-
+X_FRAME_OPTIONS = "ALLOWALL"
 
 
 # Application definition
@@ -80,7 +80,9 @@ ROOT_URLCONF = "online_travel_backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -188,7 +190,6 @@ EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "noreply.service.tanimsk@gmail.com"
 EMAIL_HOST_PASSWORD = "igcosdywfsqodffg"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 

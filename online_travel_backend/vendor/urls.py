@@ -20,7 +20,7 @@ urlpatterns = [
     path("new_tasks/", NewTasksAPI.as_view(), name="new_tasks"),
     path("new_tasks/<int:rfq_id>", NewTasksAPI.as_view(), name="new_tasks"),
     # Acounts
-    path("request_bill/", RequestBillAPI.as_view(), name="request_bill"),
-    path("paid_bills/", PayBillAPI.as_view(), name="paid_bills"),
+    path("get_bills/", RequestBillAPI.as_view(), name="paid_bills"),
+    path("received_payments/", PayBillAPI.as_view(), name="request_bill"),
 
 ]

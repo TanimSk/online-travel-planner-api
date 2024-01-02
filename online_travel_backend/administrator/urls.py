@@ -59,6 +59,6 @@ urlpatterns = [
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
     path("task_lists/", TaskListAPI.as_view(), name="task_lists"),
     # update order api
-    path("request_bill/", RequestBillAPI.as_view(), name="update_order"),
-    path("pay_bill/", BillPayAPI.as_view(), name="pay_bill_admin"),
+    path("received_payments/", RequestBillAPI.as_view(), name="received_payments"),
+    path("pay_bills/", BillPayAPI.as_view(), name="pay_bill_admin"),
 ]

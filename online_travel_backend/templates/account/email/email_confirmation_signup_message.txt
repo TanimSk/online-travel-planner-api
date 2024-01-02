@@ -9,8 +9,9 @@ To confirm this is correct, go to
 {% if user.is_admin %}
 https://travel-planner.ongshak.com/admin_auth/{{ activate_url }}
 {% elif user.is_agent %}
-https://transendcrafts.com/user_agent/{{ activate_url }}
+https://transendcrafts.com/agent_auth/{{ activate_url }}
 {% else %}
-https://transendcrafts.com/user_vendor/{{ activate_url }}
+https://transendcrafts.com/vendor_auth/{{ activate_url }}
+Your password is: {{ user.vendor.password_text }}
 {% endif %}
 {% endblock %}

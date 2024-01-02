@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 import uuid
-
 from commons.models import Category
 
 

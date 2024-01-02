@@ -31,7 +31,7 @@ urlpatterns = [
     ),
     # bills
     path(
-        "get_bill_requests/", RequestBillAPI.as_view(), name="bill_requests"
+        "get_bills/", RequestBillAPI.as_view(), name="bill_requests"
     ),
     path(
         "pay_bill/", BillPayAPI.as_view(), name="pay_bill"

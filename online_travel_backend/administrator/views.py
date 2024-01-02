@@ -19,7 +19,8 @@ from .serializers import (
     EditPriceSerializer,
     BillServicesSerializer,
     BillPaySerializer,
-    VendorCustomRegistrationSerializer
+    VendorCustomRegistrationSerializer,
+    BillServicesSerializerA
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -48,6 +49,7 @@ class AuthenticateOnlyAdmin(BasePermission):
 # Agent Registration
 class AdminRegistrationView(RegisterView):
     serializer_class = AdminCustomRegistrationSerializer
+
 
 # Vendor Registration
 class VendorRegistrationView(RegisterView):
@@ -474,37 +476,36 @@ class AssignAgentAPI(APIView):
             return Response({"status": "Successfully assigned service to vendor"})
 
 
-# request bill
+# recieved payments
 class RequestBillAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(status="admin_bill")
-
+        bills_instance = Bill.objects.filter(status_1="admin_paid")
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
-    def post(self, request, format=None, *args, **kwargs):
-        serialized_data = DispatchBillServiceSerializer(data=request.data, many=True)
+    # def post(self, request, format=None, *args, **kwargs):
+    #     serialized_data = DispatchBillServiceSerializer(data=request.data, many=True)
 
-        if serialized_data.is_valid(raise_exception=True):
-            for service in serialized_data.data:
-                bill_instance = Bill.objects.get(
-                    tracking_id=service.get("tracking_id", None),
-                )
-                bill_instance.status = "agent_bill"
-                bill_instance.agent_billed_on = timezone.now()
-                bill_instance.save()
+    #     if serialized_data.is_valid(raise_exception=True):
+    #         for service in serialized_data.data:
+    #             bill_instance = Bill.objects.get(
+    #                 tracking_id=service.get("tracking_id", None),
+    #             )
+    #             bill_instance.status = "agent_bill"
+    #             bill_instance.agent_billed_on = timezone.now()
+    #             bill_instance.save()
 
-            return Response({"status": "Successfully requested for bill to agent"})
+    #         return Response({"status": "Successfully requested for bill to agent"})
 
 
 class BillPayAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(status="admin_paid")
-        serialized_data = BillServicesSerializer(bills_instance, many=True)
+        bills_instance = Bill.objects.filter(status_2="admin_bill")
+        serialized_data = BillServicesSerializerA(bills_instance, many=True)
         return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
@@ -514,17 +515,11 @@ class BillPayAPI(APIView):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id"),
+                    status_2="admin_bill"
                 )
                 bill_instance.vendor_payment_type = service.get("vendor_payment_type")
                 bill_instance.vendor_paid_on = timezone.now()
-                bill_instance.status = "vendor_paid"
+                bill_instance.status_2 = "vendor_paid"
                 bill_instance.save()
-
-                # completed order :)
-                rfq_service = RfqService.objects.get(
-                    tracing_id=service.get("tracking_id", None)
-                )
-                rfq_service.order_status = "dispatched"
-                rfq_service.save()
 
                 return Response({"status": "Successfully paid bills to vendor"})

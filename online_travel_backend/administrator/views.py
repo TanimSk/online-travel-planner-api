@@ -5,7 +5,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db import transaction
-from django.db.models import Subquery, OuterRef, Sum
+from django.db.models import Subquery, OuterRef, Sum, F
 from django.utils import timezone
 
 from .serializers import (
@@ -148,11 +148,17 @@ class PendingRfqAPI(APIView):
             # get all services price and get the total amount
             total_price = RfqService.objects.filter(
                 rfq_category__rfq=rfq_service.rfq_category.rfq
-            ).aggregate(service_price=Sum("service_price"))["service_price"]
+            ).aggregate(
+                service_price=Sum(
+                    F("service_price")
+                    + (F("admin_commission") * F("service_price") * 0.01)
+                    + (F("agent_commission") * F("service_price") * 0.01)
+                )
+            )[
+                "service_price"
+            ]
 
-            rfq_instance = Rfq.objects.get(
-                id=rfq_service.rfq_category.rfq.id
-            )
+            rfq_instance = Rfq.objects.get(id=rfq_service.rfq_category.rfq.id)
             rfq_instance.total_price = total_price
             rfq_instance.save()
 

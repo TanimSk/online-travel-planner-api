@@ -135,7 +135,6 @@ class RfqSerializer(serializers.ModelSerializer):
         return {"total_price": total_price, "total_services": total_services}
 
     def create(self, validated_data):
-
         rfq_total_price = 0
 
         with transaction.atomic():
@@ -179,7 +178,17 @@ class RfqSerializer(serializers.ModelSerializer):
                             service_instance.service_price
                             * rfq_service.get("members", 0)
                         )
-                    )                    
+                    )
+
+                    agent_commission = Agent.objects.get(
+                        agent=self.context.get("request").user
+                    ).commission
+
+                    rfq_total_price += (
+                        total_price
+                        + (total_price * service_instance.admin_commission * 0.01)
+                        + (total_price * agent_commission * 0.01)
+                    )
 
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
@@ -187,12 +196,11 @@ class RfqSerializer(serializers.ModelSerializer):
                         service_price=total_price,
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
-                        agent_commission=Agent.objects.get(agent=self.context.get("request").user).commission
+                        agent_commission=agent_commission
                     )
-        
+
             rfq_instance.total_price = rfq_total_price
             rfq_instance.save()
-
 
         return rfq_instance
 

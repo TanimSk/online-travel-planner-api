@@ -304,11 +304,11 @@ class RequestBillAPI(APIView):
         if request.GET.get("paid") == "true":
             bills_instance = Bill.objects.filter(
                 agent=request.user, status_1="admin_paid"
-            )
+            ).order_by("-admin_paid_on")
         else:
             bills_instance = Bill.objects.filter(
                 agent=request.user, status_1="agent_paid"
-            )
+            ).order_by("-id")
 
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)

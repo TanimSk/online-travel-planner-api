@@ -42,7 +42,7 @@ class ManageServicesAPI(APIView):
         if service_id is None:
             instance = Service.objects.filter(
                 vendor_category__vendor__vendor=request.user
-            )
+            ).order_by("-created_on")
             serialized_data = self.serializer_class(instance, many=True)
             return Response(serialized_data.data)
 

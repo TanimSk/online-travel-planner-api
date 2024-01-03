@@ -54,5 +54,6 @@ urlpatterns = [
     path("administrator/", include("administrator.urls")),
     path("agent/", include("agent.urls")),
     path("vendor/", include("vendor.urls")),
+    path("customer/", include("customer.urls")),
     path("commons/", include("commons.urls")),
 ]

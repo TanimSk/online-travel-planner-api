@@ -10,6 +10,7 @@ class User(AbstractUser):
     is_admin = models.BooleanField(default=False)
     is_agent = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
+    is_customer = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.email

@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "agent.apps.AgentConfig",
     "administrator.apps.AdministratorConfig",
     "commons.apps.CommonsConfig",
+    "customer.apps.CustomerConfig",
 ]
 
 MIDDLEWARE = [
@@ -197,7 +198,7 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 AUTHENTICATION_BACKENDS = (
     # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
-    # `allauth` specific authentication methods, such as login by e-mail
+    # `allauth` specific    authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 

@@ -21,6 +21,12 @@ class LoginWthPermission(LoginView):
             else:
                 return Response({"error": "Your account has not been approved"})
 
+        elif self.user.is_customer:
+            if self.user.customer.confirmed:
+                django_login(self.request, self.user)
+            else:
+                return Response({"error": "Your account is not verified"})
+
         return self.get_response()
 
 

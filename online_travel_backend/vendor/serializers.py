@@ -82,9 +82,9 @@ class RfqSerializer(serializers.ModelSerializer):
 
 class RfqServiceSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = "__all__"
+        exclude = ("rfq_category",)
         model = RfqService
-        depth = 1
+        depth = 2
 
 
 

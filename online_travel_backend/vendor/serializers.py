@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from .models import Vendor, Service
 from agent.models import RfqService, Rfq, Agent
-from commons.models import Bill
+from commons.models import Bill, Category
 
 
 class VendorCustomRegistrationSerializer(RegisterSerializer):
@@ -80,11 +80,19 @@ class RfqSerializer(serializers.ModelSerializer):
         model = Rfq
 
 
+class RfqCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = Category
+
+
 class RfqServiceSerializer(serializers.ModelSerializer):
+    category = RfqCategorySerializer(source="rfq_category.category")
+
     class Meta:
         exclude = ("rfq_category",)
         model = RfqService
-        depth = 2
+        depth = 1
 
 
 

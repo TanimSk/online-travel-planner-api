@@ -281,7 +281,7 @@ class ManageServicesAPI(APIView):
 class AssignAgentAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
-    def get(self, request, service_id=None, format=None, *args, **kwargs):
+    def get(self, request, format=None, *args, **kwargs):
         is_assigned = False if request.GET.get("assigned") == "true" else True
 
         # Get rfq ids with `added_by_admin=true` service value and assigned vendor is null/not null
@@ -315,7 +315,7 @@ class AssignAgentAPI(APIView):
 
         return Response(response_array)
 
-    def post(self, request, service_id=None, format=None, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         serialized_data = AssignServiceSerializer(data=request.data)
 
         if serialized_data.is_valid(raise_exception=True):
@@ -351,7 +351,7 @@ class AssignAgentAPI(APIView):
 
                 if service_instance.exists():
                     # shift
-                    rfq_service_instance.service = service_instance
+                    rfq_service_instance.service = service_instance.first()
                     rfq_service_instance.save()
 
                     return Response(
@@ -405,6 +405,5 @@ class UpdateOrderAPI(APIView):
 
         if serialized_data.is_valid(raise_exception=True):
             RfqService.objects.get(
-                id=serialized_data.data.get("id", None),
-                order_status="complete_admin"   
+                id=serialized_data.data.get("id", None), order_status="complete_admin"
             )

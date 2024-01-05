@@ -458,7 +458,7 @@ class AssignAgentAPI(APIView):
 
                 if service_instance.exists():
                     # shift
-                    rfq_service_instance.service = service_instance
+                    rfq_service_instance.service = service_instance.first()
                     rfq_service_instance.save()
 
                     return Response(

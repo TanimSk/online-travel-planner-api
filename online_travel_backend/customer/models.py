@@ -9,11 +9,11 @@ class Customer(models.Model):
 
     customer_name = models.CharField(max_length=200)
     customer_address = models.CharField(max_length=500)
-    customer_number = models.CharField(max_length=20, unique=True)
+    customer_number = models.CharField(max_length=20)
 
     # tracing
     added_on = models.DateTimeField(auto_now_add=True)
-    confirmed = models.BooleanField(default=False)
+    confirmed = models.BooleanField(default=True)  # set to False, if OTP is implemented
 
     def __str__(self) -> str:
-        return self.vendor_name
+        return self.customer_name

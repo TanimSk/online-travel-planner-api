@@ -341,6 +341,7 @@ class AssignAgentAPI(APIView):
                 vendor=vendor_instance, category_id=category_id
             )
 
+
             if vendor_category_instance.exists():
                 # Check if the service already exists
                 # if does then only update

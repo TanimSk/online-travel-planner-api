@@ -117,7 +117,7 @@ class RfqService(models.Model):
     tracing_id = models.UUIDField(default=uuid.uuid4, unique=True)
 
     # Commons
-    date = models.DateTimeField()
+    travel_time = models.DateTimeField()
     infant_members = models.IntegerField(default=0)
     child_members = models.IntegerField(default=0)
     adult_members = models.IntegerField(default=0)
@@ -137,8 +137,8 @@ class RfqService(models.Model):
     # Flight
     flight_class = models.CharField(max_length=300, blank=True, null=True)
     trip_type = models.CharField(max_length=300, blank=True, null=True)
-    depart_time = models.CharField(max_length=300, blank=True, null=True)
-    return_time = models.CharField(max_length=300, blank=True, null=True)
+    depart_time = models.DateTimeField(blank=True, null=True)
+    return_time = models.DateTimeField(blank=True, null=True)
 
     # Venue sourcing
     event_type = models.CharField(max_length=300, blank=True, null=True)

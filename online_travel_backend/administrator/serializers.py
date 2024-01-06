@@ -250,3 +250,4 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
         )
         vendor.save()
         return user
+

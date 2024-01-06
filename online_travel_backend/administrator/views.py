@@ -21,6 +21,7 @@ from .serializers import (
     BillPaySerializer,
     VendorCustomRegistrationSerializer,
     BillServicesSerializerA,
+    AgentSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -29,7 +30,7 @@ from vendor.serializers import (
     # DispatchBillServiceSerializer,
 )
 
-from agent.models import Rfq, RfqService
+from agent.models import Rfq, RfqService, Agent
 from commons.models import Bill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
@@ -545,3 +546,14 @@ class BillPayAPI(APIView):
                 bill_instance.save()
 
                 return Response({"status": "Successfully paid bills to vendor"})
+
+
+# Agent List
+class AgentListAPI(APIView):
+    permission_classes = [AuthenticateOnlyAdmin]
+    serializer_class = AgentSerializer
+
+    def get(self, request, format=None, *args, **kwargs):
+        agents_instance = Agent.objects.filter(agent__emailaddress__verified=True)
+        serialized_data = self.serializer_class(agents_instance, many=True)
+        return Response(serialized_data.data)

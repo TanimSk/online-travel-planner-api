@@ -13,6 +13,7 @@ from .views import (
     BillPayAPI,
     TaskListAPI,
     VendorRegistrationView,
+    AgentListAPI
 )
 
 urlpatterns = [
@@ -55,7 +56,10 @@ urlpatterns = [
         ManageServicesAPI.as_view(),
         name="manage_admin_services",
     ),
-    # assigning agents
+    # list of agents
+    path("agent_list/", AgentListAPI.as_view(), name="agent_list"),
+
+    # assigning vendors
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
     path("task_lists/", TaskListAPI.as_view(), name="task_lists"),
     # update order api

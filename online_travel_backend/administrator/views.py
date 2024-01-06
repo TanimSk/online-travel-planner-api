@@ -82,7 +82,7 @@ class OverviewAPI(APIView):
         }
 
         serialized_data_table = RfqSerializer(
-            Rfq.objects.all().exclude(status="declined").order_by("-created_on")
+            Rfq.objects.all().exclude(status="declined").order_by("-created_on"), many=True
         )
 
         return Response(

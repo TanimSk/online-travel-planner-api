@@ -13,11 +13,13 @@ from .views import (
     BillPayAPI,
     TaskListAPI,
     VendorRegistrationView,
-    AgentListAPI
+    AgentListAPI,
+    OverviewAPI
 )
 
 urlpatterns = [
     path("registration/", AdminRegistrationView.as_view(), name="admin_registration"),
+    path("overview/", OverviewAPI.as_view(), name="overview_api"),
     path(
         "add_service_provider/",
         VendorRegistrationView.as_view(),
@@ -58,7 +60,6 @@ urlpatterns = [
     ),
     # list of agents
     path("agents/", AgentListAPI.as_view(), name="agent_list"),
-
     # assigning vendors
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
     path("task_lists/", TaskListAPI.as_view(), name="task_lists"),

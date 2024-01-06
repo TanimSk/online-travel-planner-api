@@ -65,6 +65,37 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_query_param = "p"
 
 
+class OverviewAPI(APIView):
+    permission_classes = [AuthenticateOnlyAdmin]
+
+    def get(self, request, rfq_id=None, format=None, *args, **kwargs):
+        quotes_reqs = Rfq.objects.filter(status="pending").count()
+        list_orders = Rfq.objects.filter(status="confirmed").count()
+        total_services = Service.objects.all().count()
+
+        # pie chart
+        completed_rfq = Rfq.objects.filter(status="completed").count()
+        pie_chart = {
+            "completed_rfq": completed_rfq,
+            "requested_rfq": quotes_reqs,
+            "confirmed_rfq": list_orders,
+        }
+
+        serialized_data_table = RfqSerializer(
+            Rfq.objects.all().exclude(status="declined").order_by("-created_on")
+        )
+
+        return Response(
+            {
+                "quotation_requests": quotes_reqs,
+                "list_of_orders": list_orders,
+                "total_services": total_services,
+                "pie_chart": pie_chart,
+                "rfq_status_table": serialized_data_table.data,
+            }
+        )
+
+
 class CategoryAPI(APIView):
     serializer_class = CategorySerializer
     permission_classes = [AuthenticateOnlyAdmin]

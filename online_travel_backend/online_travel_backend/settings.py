@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import socket
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -186,7 +187,7 @@ REST_USE_JWT = True
 ############################ All Auth Config ############################
 
 EMAIL_USE_TLS = True
-EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST = socket.gethostbyname("smtp.gmail.com")
 EMAIL_PORT = 587
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "noreply.service.tanimsk@gmail.com"
 EMAIL_HOST_PASSWORD = "igcosdywfsqodffg"

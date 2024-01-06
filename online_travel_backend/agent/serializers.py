@@ -222,9 +222,9 @@ class QueryServiceSerializer(serializers.Serializer):
     area_name = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     # hotel booking
-    hotel_name = serializers.CharField(
-        required=False, allow_null=True, allow_blank=True
-    )
+    # hotel_name = serializers.CharField(
+    #     required=False, allow_null=True, allow_blank=True
+    # )
     room_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     bed_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 

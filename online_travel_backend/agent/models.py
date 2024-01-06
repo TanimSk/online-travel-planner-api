@@ -110,7 +110,7 @@ class RfqService(models.Model):
     members = models.IntegerField(default=1)
 
     # Hotel
-    hotel_name = models.CharField(max_length=300, blank=True, null=True)
+    # hotel_name = models.CharField(max_length=300, blank=True, null=True)
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
     check_in_date = models.DateTimeField(blank=True, null=True)

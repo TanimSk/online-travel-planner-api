@@ -69,7 +69,10 @@ class Service(models.Model):
     # Commons
     service_name = models.CharField(max_length=200, blank=True, null=True)
     image_urls = ArrayField(models.URLField(), default=list, blank=True, null=True)
-    description = models.CharField(max_length=600, blank=True, null=True)
+    description = models.CharField(max_length=1000, blank=True, null=True)
+    overview = models.CharField(max_length=1000, blank=True, null=True)
+    itinerary = models.CharField(max_length=1000, blank=True, null=True)
+    rates = models.CharField(max_length=1000, blank=True, null=True)
 
     # money
     infant_price = models.FloatField(default=0)
@@ -82,7 +85,7 @@ class Service(models.Model):
     area_name = models.CharField(max_length=500, blank=True, null=True)
 
     # hotel booking
-    hotel_name = models.CharField(max_length=300, blank=True, null=True)
+    # hotel_name = models.CharField(max_length=300, blank=True, null=True)
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
 

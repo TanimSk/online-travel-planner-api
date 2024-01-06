@@ -57,7 +57,7 @@ urlpatterns = [
         name="manage_admin_services",
     ),
     # list of agents
-    path("agent_list/", AgentListAPI.as_view(), name="agent_list"),
+    path("agents/", AgentListAPI.as_view(), name="agent_list"),
 
     # assigning vendors
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),

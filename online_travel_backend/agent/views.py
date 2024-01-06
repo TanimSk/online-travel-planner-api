@@ -1,17 +1,14 @@
 from dj_rest_auth.registration.views import RegisterView
-from .serializers import AgentCustomRegistrationSerializer, SuggestionSerializer
+from .serializers import AgentCustomRegistrationSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 
 from .serializers import (
     RfqSerializer,
-    QueryServiceSerializer,
-    QueryResultSerializer,
     BillServicesSerializer,
     BillPaySerializer,
     CommissionSerializer,
-    ServiceInfo,
 )
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
@@ -19,7 +16,7 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 # from vendor.serializers import ManageServicesSerializer
 from commons.models import Bill
 from .models import Rfq, RfqService, Agent
-from vendor.models import Service
+# from vendor.models import Service
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Sum, F
@@ -89,80 +86,6 @@ class CreateRfqAPI(APIView):
             rfq_instance.save()
 
             return Response({"status": "Successfully created RFQ"})
-
-
-# Suggestion API
-class SuggestionAPI(APIView):
-    serializer_class = SuggestionSerializer
-
-    def post(self, request, format=None, *args, **kwargs):
-        serialized_data = self.serializer_class(data=request.data)
-
-        if serialized_data.is_valid(raise_exception=True):
-            dict = {}
-            dict[
-                f"{serialized_data.data.get('field_name')}__icontains"
-            ] = serialized_data.data.get("field_content")
-            suggestions = (
-                Service.objects.filter(
-                    vendor_category__category_id=serialized_data.data.get(
-                        "category_id"
-                    ),
-                    **dict,
-                )
-                .values_list(serialized_data.data.get("field_name"), flat=True)
-                .distinct()[:15]
-            )
-            return Response(suggestions)
-
-
-# Query Service
-class QueryServicesAPI(APIView):
-    permission_classes = [AuthenticateOnlyAgent]
-    serializer_class = QueryServiceSerializer
-
-    def get_search_keys(self, data):
-        dict = {}
-        for key, value in data.items():
-            if not (value == "" or value is None):
-                dict[f"{key}__icontains"] = value
-
-        return dict
-
-    def post(self, request, format=None, *args, **kwargs):
-        serialized_data = self.serializer_class(data=request.data)
-
-        if serialized_data.is_valid(raise_exception=True):
-            # keeping all keys instead of non-search params, for searching
-            serialized_copy = serialized_data.data
-
-            for key in [
-                "category_id",
-                "infant_members",
-                "child_members",
-                "adult_members",
-                "members",
-            ]:
-                serialized_copy.pop(key)
-
-            services_instances = Service.objects.filter(
-                vendor_category__category__id=serialized_data.data.get("category_id"),
-                approved=True,
-                **self.get_search_keys(serialized_copy),
-            )
-            serialized_services = QueryResultSerializer(
-                services_instances,
-                many=True,
-                context={"dictionary": serialized_data.data},
-            )
-            return Response(serialized_services.data)
-
-    def get(self, request, service_id=None, format=None, *args, **kwargs):
-        if service_id is None:
-            return Response({"error": "Service id is missing"})
-
-        service_instance = Service.objects.get(id=service_id)
-        return Response(ServiceInfo(service_instance).data)
 
 
 # RFQ Types

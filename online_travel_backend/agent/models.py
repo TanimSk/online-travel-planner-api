@@ -26,8 +26,22 @@ class Agent(models.Model):
 
 
 class Rfq(models.Model):
+    # For Agent
     agent = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="rfq_agent"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="rfq_agent",
+        null=True,
+        blank=True,
+    )
+
+    # For Customer
+    customer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="rfq_customer",
+        null=True,
+        blank=True,
     )
 
     # tracing

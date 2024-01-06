@@ -44,10 +44,7 @@ class AgentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Agent
-        exclude = (
-            "id",
-            "agent",
-        )
+        exclude = ("agent",)
 
 
 # RFQ
@@ -250,4 +247,3 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
         )
         vendor.save()
         return user
-

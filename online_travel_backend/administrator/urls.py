@@ -14,7 +14,7 @@ from .views import (
     TaskListAPI,
     VendorRegistrationView,
     AgentListAPI,
-    OverviewAPI
+    OverviewAPI,
 )
 
 urlpatterns = [
@@ -60,6 +60,7 @@ urlpatterns = [
     ),
     # list of agents
     path("agents/", AgentListAPI.as_view(), name="agent_list"),
+    path("agents/<int:agent_id>", AgentListAPI.as_view(), name="agent_list"),
     # assigning vendors
     path("assign_agents/", AssignAgentAPI.as_view(), name="assign_agents"),
     path("task_lists/", TaskListAPI.as_view(), name="task_lists"),

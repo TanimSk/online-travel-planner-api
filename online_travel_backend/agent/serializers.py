@@ -96,6 +96,38 @@ class RfqSerializer(serializers.ModelSerializer):
 
         return super(RfqSerializer, self).to_internal_value(copy_data)
 
+    # get total price
+    def calc_total_price_value(self, service_instance, rfq_service_instance):
+        total_price = (
+            (
+                service_instance.infant_price
+                * rfq_service_instance.get("infant_members", 0)
+            )
+            + (
+                service_instance.child_price
+                * rfq_service_instance.get("child_members", 0)
+            )
+            + (
+                service_instance.adult_price
+                * rfq_service_instance.get("adult_members", 0)
+            )
+            + (service_instance.service_price * rfq_service_instance.get("members", 0))
+        )
+
+        agent_commission = Agent.objects.get(
+            agent=self.context.get("request").user
+        ).commission
+
+        # appending commissions
+        total_price = (
+            total_price
+            + (total_price * service_instance.admin_commission * 0.01)
+            + (total_price * agent_commission * 0.01)
+        )
+
+        return total_price
+
+    # get json
     def calc_total_price(self, validated_data):
         rfq_categories = validated_data.pop("rfq_categories")
 
@@ -116,22 +148,9 @@ class RfqSerializer(serializers.ModelSerializer):
                 # price calculation
                 service_instance = Service.objects.get(id=service_id)
                 total_services += 1
-                total_price += (
-                    (
-                        service_instance.infant_price
-                        * rfq_service.get("infant_members", 0)
-                    )
-                    + (
-                        service_instance.child_price
-                        * rfq_service.get("child_members", 0)
-                    )
-                    + (
-                        service_instance.adult_price
-                        * rfq_service.get("adult_members", 0)
-                    )
-                    + (service_instance.service_price * rfq_service.get("members", 0))
+                total_price += self.calc_total_price_value(
+                    service_instance, rfq_service
                 )
-
         return {"total_price": total_price, "total_services": total_services}
 
     def create(self, validated_data):
@@ -161,34 +180,14 @@ class RfqSerializer(serializers.ModelSerializer):
 
                     # price calculation
                     service_instance = Service.objects.get(id=service_id)
-                    total_price = (
-                        (
-                            service_instance.infant_price
-                            * rfq_service.get("infant_members", 0)
-                        )
-                        + (
-                            service_instance.child_price
-                            * rfq_service.get("child_members", 0)
-                        )
-                        + (
-                            service_instance.adult_price
-                            * rfq_service.get("adult_members", 0)
-                        )
-                        + (
-                            service_instance.service_price
-                            * rfq_service.get("members", 0)
-                        )
+                    total_price = self.calc_total_price_value(
+                        service_instance, rfq_service
                     )
+                    rfq_total_price += total_price
 
                     agent_commission = Agent.objects.get(
                         agent=self.context.get("request").user
                     ).commission
-
-                    rfq_total_price += (
-                        total_price
-                        + (total_price * service_instance.admin_commission * 0.01)
-                        + (total_price * agent_commission * 0.01)
-                    )
 
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,

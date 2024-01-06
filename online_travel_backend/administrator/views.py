@@ -584,7 +584,14 @@ class AgentListAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
     serializer_class = AgentSerializer
 
-    def get(self, request, format=None, *args, **kwargs):
-        agents_instance = Agent.objects.filter(agent__emailaddress__verified=True)
-        serialized_data = self.serializer_class(agents_instance, many=True)
+    def get(self, request, agent_id=None, format=None, *args, **kwargs):
+        if agent_id is None:
+            agents_instance = Agent.objects.filter(agent__emailaddress__verified=True)
+            serialized_data = self.serializer_class(agents_instance, many=True)
+            return Response(serialized_data.data)
+        
+        agents_instance = Agent.objects.filter(agent__emailaddress__verified=True, id=agent_id)
+        serialized_data = self.serializer_class(agents_instance)
         return Response(serialized_data.data)
+    
+

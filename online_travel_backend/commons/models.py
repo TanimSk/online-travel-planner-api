@@ -68,6 +68,10 @@ class Bill(models.Model):
     admin_bill = models.FloatField()
     agent_bill = models.FloatField()
 
+    # due
+    agent_due = models.FloatField(default=0)
+    admin_due = models.FloatField(default=0)
+
     # payment type
     PAYMENT_TYPE = (
         ("cash", "cash"),

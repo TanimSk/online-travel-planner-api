@@ -590,7 +590,7 @@ class AgentListAPI(APIView):
             serialized_data = self.serializer_class(agents_instance, many=True)
             return Response(serialized_data.data)
         
-        agents_instance = Agent.objects.filter(agent__emailaddress__verified=True, id=agent_id)
+        agents_instance = Agent.objects.get(agent__emailaddress__verified=True, id=agent_id)
         serialized_data = self.serializer_class(agents_instance)
         return Response(serialized_data.data)
     

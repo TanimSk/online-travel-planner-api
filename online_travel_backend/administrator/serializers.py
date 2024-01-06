@@ -151,8 +151,7 @@ class BillServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
         fields = (
-            "tracking_id",
-            "admin_paid_on",
+            "tracking_id",            
             "vendor_bill",
             "admin_bill",
             "total_bill",

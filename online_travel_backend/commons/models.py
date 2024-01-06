@@ -42,7 +42,8 @@ class Bill(models.Model):
 
     # status
     STATUS_1 = (
-        ("agent_paid", "agent_paid"),
+        ("admin_bill", "admin_bill"),
+        ("agent_bill", "agent_bill"),
         ("admin_paid", "admin_paid"),
     )
 
@@ -52,7 +53,7 @@ class Bill(models.Model):
         ("vendor_paid", "vendor_paid"),
     )
 
-    status_1 = models.CharField(choices=STATUS_1, default="agent_paid", max_length=20)
+    status_1 = models.CharField(choices=STATUS_1, default="admin_bill", max_length=20)
     status_2 = models.CharField(choices=STATUS_2, default="vendor_bill", max_length=20)
 
     # dates

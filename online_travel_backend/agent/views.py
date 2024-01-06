@@ -16,6 +16,7 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 # from vendor.serializers import ManageServicesSerializer
 from commons.models import Bill
 from .models import Rfq, RfqService, Agent
+
 # from vendor.models import Service
 from django.shortcuts import render
 from django.utils import timezone
@@ -159,6 +160,10 @@ class RFQTypesAPI(APIView):
                 agent_bill=rfq_service_instance.service_price
                 * rfq_service_instance.agent_commission
                 * 0.01,
+                agent_due=rfq_service_instance.service_price
+                * rfq_service_instance.admin_commission
+                * 0.01,
+                admin_due=rfq_service_instance.service_price,
                 service=rfq_service_instance,
             )
 

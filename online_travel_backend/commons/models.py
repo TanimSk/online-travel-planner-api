@@ -31,7 +31,11 @@ class Bill(models.Model):
 
     # bill owners
     vendor = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bill_vendor"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="bill_vendor",
+        blank=True,
+        null=True,
     )
     agent = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bill_agent"

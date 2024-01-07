@@ -253,12 +253,17 @@ class RequestedVendorAPI(APIView):
 
     def get(self, request, vendor_id=None, format=None, *args, **kwargs):
         if vendor_id is None:
-            vendor_instances = Vendor.objects.filter(approved=False, vendor__emailaddress__verified=True).order_by(
-                "-added_on"
-            )
+            vendor_instances = Vendor.objects.filter(
+                approved=False, vendor__emailaddress__verified=True
+            ).order_by("-added_on")
             serialized_data = VendorListSerializer(vendor_instances, many=True)
         else:
-            vendor_instances = get_object_or_404(Vendor, id=vendor_id, approved=False, vendor__emailaddress__verified=True)
+            vendor_instances = get_object_or_404(
+                Vendor,
+                id=vendor_id,
+                approved=False,
+                vendor__emailaddress__verified=True,
+            )
             serialized_data = VendorListSerializer(vendor_instances)
 
         return Response(serialized_data.data)
@@ -320,7 +325,9 @@ class ManageVendorServicesAPI(APIView):
     def get(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:
             approved = True if request.GET.get("approved") == "true" else False
-            instance = Service.objects.filter(approved=approved, added_by_admin=False).order_by("-created_on")
+            instance = Service.objects.filter(
+                approved=approved, added_by_admin=False
+            ).order_by("-created_on")
             serialized_data = self.serializer_class(instance, many=True)
             return Response(serialized_data.data)
 
@@ -361,7 +368,9 @@ class ManageServicesAPI(APIView):
 
     def get(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:
-            instance = Service.objects.filter(added_by_admin=True).order_by("-created_on")
+            instance = Service.objects.filter(added_by_admin=True).order_by(
+                "-created_on"
+            )
             serialized_data = self.serializer_class(instance, many=True)
             return Response(serialized_data.data)
         try:
@@ -529,6 +538,9 @@ class AssignAgentAPI(APIView):
                 rfq_service_instance.service = copied_service_instance
                 rfq_service_instance.save()
 
+                # Assign Bill to Vendor
+                Bill.objects.get(service=rfq_service_instance).vendor = vendor_instance
+
             return Response({"status": "Successfully assigned service to vendor"})
 
 
@@ -586,8 +598,6 @@ class VendorBillAPI(APIView):
         serialized_data = BillRequestSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 
-        
-
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)
 
@@ -596,10 +606,7 @@ class VendorBillAPI(APIView):
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id", None),
                 )
-                due_amount = (
-                    bill_instance.vendor_bill                    
-                    - service.get("paid_amount")
-                )
+                due_amount = bill_instance.vendor_bill - service.get("paid_amount")
 
                 if due_amount < 0:
                     return Response(
@@ -615,8 +622,6 @@ class VendorBillAPI(APIView):
                 bill_instance.save()
 
                 return Response({"status": "Successfully paid bills"})
-
-
 
 
 # Agent List

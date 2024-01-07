@@ -114,10 +114,6 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days)
 
-            print(delta_days)
-
-        print(delta_days)
-
         total_price = (
             (
                 service_instance.infant_price
@@ -302,21 +298,52 @@ class QueryResultSerializer(serializers.ModelSerializer):
     )
     category_id = serializers.IntegerField(source="vendor_category.category.id")
 
-    def get_total_price(self, instance):
+    def get_total_price(self, service_instance):
         dictionary = self.context["dictionary"]
-        copied_dict = dictionary.copy()
+        rfq_service_instance = dictionary.copy()
 
         # Remove empty values
         for dat in dictionary:
             if dictionary[dat] == None:
-                copied_dict.pop(dat)
+                rfq_service_instance.pop(dat)
+
+        # get days difference
+        delta_days = 1
+
+        if not (rfq_service_instance.get("check_in_date", None) is None) and (
+            rfq_service_instance.get("check_out_date", None) is None
+        ):
+            date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+            date1 = datetime.strptime(
+                rfq_service_instance.get("check_in_date", None), date_format
+            )
+            date2 = datetime.strptime(
+                rfq_service_instance.get("check_out_date", None), date_format
+            )
+            delta_days = abs((date2 - date1).days)
+
+            print(delta_days)
+
+        print(delta_days)
 
         total_price = (
-            (instance.infant_price * copied_dict.get("infant_members", 0))
-            + (instance.child_price * copied_dict.get("child_members", 0))
-            + (instance.adult_price * copied_dict.get("adult_members", 0))
-            + (instance.service_price * copied_dict.get("members", 0))
+            (
+                service_instance.infant_price
+                * rfq_service_instance.get("infant_members", 0)
+            )
+            + (
+                service_instance.child_price
+                * rfq_service_instance.get("child_members", 0)
+            )
+            + (
+                service_instance.adult_price
+                * rfq_service_instance.get("adult_members", 0)
+            )
+            + (service_instance.service_price * rfq_service_instance.get("members", 0))
+            * delta_days
+            + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
         )
+
         return total_price
 
     class Meta:

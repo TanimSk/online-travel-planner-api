@@ -102,7 +102,7 @@ class RfqSerializer(serializers.ModelSerializer):
         delta_days = 1
 
         # get days difference
-        if (rfq_service_instance.get("check_in_date", None) is None) and (
+        if not (rfq_service_instance.get("check_in_date", None) is None) and (
             rfq_service_instance.get("check_out_date", None) is None
         ):
             date_format = "%Y-%m-%dT%H:%M:%S.%fZ"

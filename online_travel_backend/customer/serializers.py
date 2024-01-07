@@ -173,7 +173,7 @@ class RfqSerializer(serializers.ModelSerializer):
             rfq_categories = validated_data.pop("rfq_categories")
 
             # pop unnecessary data for creating rfq
-            validated_data.pop("total_price")
+            # validated_data.pop("total_price")
             # validated_data.pop("customer_name")
             # validated_data.pop("customer_address")
             # validated_data.pop("email_address")
@@ -193,7 +193,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 customer_address=customer_instance.customer_address,
                 email_address=self.context.get("request").user.email,
                 contact_no=customer_instance.customer_number,
-                **validated_data,
+                travel_date=validated_data.get("travel_date"),
             )
 
             for rfq_category in rfq_categories:

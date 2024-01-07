@@ -65,7 +65,7 @@ class QueryServicesAPI(APIView):
 
         if serialized_data.is_valid(raise_exception=True):
             # keeping all keys instead of non-search params, for searching
-            serialized_copy = serialized_data.data
+            serialized_copy = serialized_data.data.copy()
 
             for key in [
                 "category_id",
@@ -73,6 +73,7 @@ class QueryServicesAPI(APIView):
                 "child_members",
                 "adult_members",
                 "members",
+
             ]:
                 serialized_copy.pop(key)
 

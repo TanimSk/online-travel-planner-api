@@ -5,6 +5,7 @@ from vendor.models import Service
 from django.db import transaction
 from commons.models import Bill
 from django.db.models import Sum
+from datetime import datetime
 
 
 class AgentCustomRegistrationSerializer(RegisterSerializer):
@@ -98,6 +99,21 @@ class RfqSerializer(serializers.ModelSerializer):
 
     # get total price
     def calc_total_price_value(self, service_instance, rfq_service_instance):
+        delta_days = 1
+
+        # get days difference
+        if (rfq_service_instance.get("check_in_date", None) is None) and (
+            rfq_service_instance.get("check_out_date", None) is None
+        ):
+            date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+            date1 = datetime.strptime(
+                rfq_service_instance.get("check_in_date", None), date_format
+            )
+            date2 = datetime.strptime(
+                rfq_service_instance.get("check_out_date", None), date_format
+            )
+            delta_days = abs((date2 - date1).days)
+
         total_price = (
             (
                 service_instance.infant_price
@@ -112,6 +128,8 @@ class RfqSerializer(serializers.ModelSerializer):
                 * rfq_service_instance.get("adult_members", 0)
             )
             + (service_instance.service_price * rfq_service_instance.get("members", 0))
+            * delta_days
+            + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
         )
 
         agent_commission = Agent.objects.get(

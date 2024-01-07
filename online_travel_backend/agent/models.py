@@ -117,7 +117,7 @@ class RfqService(models.Model):
     tracing_id = models.UUIDField(default=uuid.uuid4, unique=True)
 
     # Commons
-    travel_time = models.DateTimeField()
+    travel_time = models.DateTimeField(blank=True, null=True)
     infant_members = models.IntegerField(default=0)
     child_members = models.IntegerField(default=0)
     adult_members = models.IntegerField(default=0)
@@ -150,6 +150,9 @@ class RfqService(models.Model):
 
     # Transportation
     car_type = models.CharField(max_length=300, blank=True, null=True)
+
+    # AV production
+    duration = models.IntegerField(default=0)
 
     #  ---- Prices ----
     # Calculate price, when placing rfq order

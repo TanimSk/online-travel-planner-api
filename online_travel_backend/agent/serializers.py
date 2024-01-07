@@ -102,10 +102,11 @@ class RfqSerializer(serializers.ModelSerializer):
         delta_days = 1
 
         # get days difference
-        if not (rfq_service_instance.get("check_in_date", None) is None) and (
-            rfq_service_instance.get("check_out_date", None) is None
+        if not (
+            (rfq_service_instance.get("check_in_date", None) is None)
+            and (rfq_service_instance.get("check_out_date", None) is None)
         ):
-            date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+            date_format = "%Y-%m-%d"
             date1 = datetime.strptime(
                 rfq_service_instance.get("check_in_date", None), date_format
             )
@@ -316,7 +317,6 @@ class QueryResultSerializer(serializers.ModelSerializer):
         # get days difference
         delta_days = 1
 
-        print(rfq_service_instance.get("check_in_date", None), rfq_service_instance)
 
         if not (
             (rfq_service_instance.get("check_in_date", None) is None)

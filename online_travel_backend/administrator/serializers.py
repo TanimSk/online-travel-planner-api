@@ -271,7 +271,7 @@ class BillPaySerializer(serializers.ModelSerializer):
         model = Bill
         fields = (
             "tracking_id",
-            "vendor_payment_type",
+            "admin_payment_type",
             "paid_amount",
         )
 

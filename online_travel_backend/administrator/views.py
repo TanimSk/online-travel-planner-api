@@ -615,10 +615,6 @@ class VendorBillAPI(APIView):
                         {"error": "Paid amount cannot be greater than bill!"}
                     )
 
-                print(service.get(
-                    "admin_payment_type", None
-                ))
-
                 bill_instance.admin_payment_type = service.get(
                     "admin_payment_type", None
                 )

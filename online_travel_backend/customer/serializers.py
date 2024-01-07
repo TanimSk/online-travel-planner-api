@@ -183,6 +183,8 @@ class RfqSerializer(serializers.ModelSerializer):
                 customer=self.context.get("request").user
             )
 
+            print(validated_data)
+
             # setting customer data to itself
             rfq_instance = Rfq.objects.create(
                 agent=self.context.get("agent").agent,

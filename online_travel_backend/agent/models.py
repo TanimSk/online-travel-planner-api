@@ -18,6 +18,9 @@ class Agent(models.Model):
     logo_url = models.URLField()
     trade_license_url = models.URLField()
 
+    # For customers
+    pseudo_agent = models.BooleanField(default=False)
+
     # Money
     commission = models.FloatField(default=0)
 

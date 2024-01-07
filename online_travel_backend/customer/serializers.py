@@ -7,6 +7,7 @@ from .models import Customer
 
 from django.db.models import Sum
 from django.db import transaction
+from datetime import datetime
 
 
 class CustomerCustomRegistrationSerializer(RegisterSerializer):
@@ -95,43 +96,50 @@ class RfqSerializer(serializers.ModelSerializer):
 
         return super(RfqSerializer, self).to_internal_value(copy_data)
 
-    def calc_total_price(self, validated_data):
-        rfq_categories = validated_data.pop("rfq_categories")
+    def get_total_price(self, service_instance):
+        dictionary = self.context["dictionary"]
+        rfq_service_instance = dictionary.copy()
 
-        total_price = 0
-        total_services = 0
+        # Remove empty values
+        for dat in dictionary:
+            if dictionary[dat] == None:
+                rfq_service_instance.pop(dat)
 
-        for rfq_category in rfq_categories:
-            rfq_services = rfq_category.pop("rfq_services")
+        # get days difference
+        delta_days = 1
 
-            for rfq_service in rfq_services:
-                service_id = rfq_service.pop("service")
+        if not (
+            (rfq_service_instance.get("check_in_date", None) is None)
+            and (rfq_service_instance.get("check_out_date", None) is None)
+        ):
+            date_format = "%Y-%m-%d"
+            date1 = datetime.strptime(
+                rfq_service_instance.get("check_in_date", None), date_format
+            )
+            date2 = datetime.strptime(
+                rfq_service_instance.get("check_out_date", None), date_format
+            )
+            delta_days = abs((date2 - date1).days) + 1
 
-                try:
-                    rfq_service.pop("service_price")
-                except KeyError:
-                    pass
+        total_price = (
+            (
+                service_instance.infant_price
+                * rfq_service_instance.get("infant_members", 0)
+            )
+            + (
+                service_instance.child_price
+                * rfq_service_instance.get("child_members", 0)
+            )
+            + (
+                service_instance.adult_price
+                * rfq_service_instance.get("adult_members", 0)
+            )
+            + (service_instance.service_price * rfq_service_instance.get("members", 0))
+            * delta_days
+            + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
+        )
 
-                # price calculation
-                service_instance = Service.objects.get(id=service_id)
-                total_services += 1
-                total_price += (
-                    (
-                        service_instance.infant_price
-                        * rfq_service.get("infant_members", 0)
-                    )
-                    + (
-                        service_instance.child_price
-                        * rfq_service.get("child_members", 0)
-                    )
-                    + (
-                        service_instance.adult_price
-                        * rfq_service.get("adult_members", 0)
-                    )
-                    + (service_instance.service_price * rfq_service.get("members", 0))
-                )
-
-        return {"total_price": total_price, "total_services": total_services}
+        return total_price
 
     def create(self, validated_data):
         rfq_total_price = 0
@@ -146,7 +154,9 @@ class RfqSerializer(serializers.ModelSerializer):
             # validated_data.pop("email_address")
             # validated_data.pop("contact_no")
 
+            # setting customer data to itself
             rfq_instance = Rfq.objects.create(
+                agent=self.context.get("agent").agent,
                 customer=self.context.get("request").user,
                 customer_name=self.context.get("request").user.customer.customer_name,
                 customer_address=self.context.get(

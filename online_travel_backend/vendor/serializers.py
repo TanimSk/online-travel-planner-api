@@ -50,6 +50,16 @@ class ManageServicesSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(
         source="vendor_category.category.category_name", read_only=True
     )
+    vendor_name = serializers.CharField(
+        source="vendor_category.vendor_name", read_only=True
+    )
+
+    vendor_number = serializers.CharField(
+        source="vendor_category.vendor.vendor_number", read_only=True
+    )
+    vendor_email = serializers.CharField(
+        source="vendor_category.vendor.vendor.email", read_only=True
+    )
 
     category_id = serializers.IntegerField(source="vendor_category.category.id")
 
@@ -129,7 +139,7 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
             "customer_address",
             "contact_no",
             "service_name",
-            "received_money"
+            "received_money",
         )
 
     def get_received_money(self, obj):

@@ -253,12 +253,12 @@ class RequestedVendorAPI(APIView):
 
     def get(self, request, vendor_id=None, format=None, *args, **kwargs):
         if vendor_id is None:
-            vendor_instances = Vendor.objects.filter(approved=False).order_by(
+            vendor_instances = Vendor.objects.filter(approved=False, vendor__emailaddress__verified=True).order_by(
                 "-added_on"
             )
             serialized_data = VendorListSerializer(vendor_instances, many=True)
         else:
-            vendor_instances = get_object_or_404(Vendor, id=vendor_id, approved=False)
+            vendor_instances = get_object_or_404(Vendor, id=vendor_id, approved=False, vendor__emailaddress__verified=True)
             serialized_data = VendorListSerializer(vendor_instances)
 
         return Response(serialized_data.data)

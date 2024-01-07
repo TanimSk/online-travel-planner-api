@@ -263,9 +263,9 @@ class AgentBillsAPI(APIView):
                     tracking_id=service.get("tracking_id", None),
                 )
                 due_amount = (
-                    bill_instance.vendor_bill
+                    # bill_instance.vendor_bill
                     # + bill_instance.agent_bill
-                    + bill_instance.admin_bill
+                    + bill_instance.agent_due
                     - service.get("paid_amount")
                 )
 

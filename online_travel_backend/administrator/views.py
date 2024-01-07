@@ -539,7 +539,7 @@ class AssignAgentAPI(APIView):
                 rfq_service_instance.save()
 
                 # Assign Bill to Vendor
-                Bill.objects.get(service=rfq_service_instance).vendor = vendor_instance
+                Bill.objects.get(service=rfq_service_instance).vendor = vendor_instance.vendor
 
             return Response({"status": "Successfully assigned service to vendor"})
 

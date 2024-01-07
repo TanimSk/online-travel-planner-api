@@ -114,6 +114,10 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days)
 
+            print(delta_days)
+
+        print(delta_days)
+
         total_price = (
             (
                 service_instance.infant_price

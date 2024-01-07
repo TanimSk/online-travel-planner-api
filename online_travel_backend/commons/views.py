@@ -73,7 +73,8 @@ class QueryServicesAPI(APIView):
                 "child_members",
                 "adult_members",
                 "members",
-
+                "check_in_date",
+                "check_out_date",
             ]:
                 serialized_copy.pop(key)
 

@@ -3,7 +3,7 @@ from .serializers import AgentCustomRegistrationSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
-
+from django.db import transaction
 from .serializers import (
     RfqSerializer,
     PaidBillSerializer,
@@ -141,39 +141,40 @@ class RFQTypesAPI(APIView):
         if rfq_id is None:
             return Response({"error": "RFQ ID is missing"})
 
-        rfq_instance = Rfq.objects.get(id=rfq_id, agent=request.user)
-        rfq_instance.status = "confirmed"
-        rfq_instance.save()
+        with transaction.atomic():
+            rfq_instance = Rfq.objects.get(id=rfq_id, agent=request.user)
+            rfq_instance.status = "confirmed"
+            rfq_instance.save()
 
-        rfq_service_instances = RfqService.objects.filter(
-            rfq_category__rfq=rfq_instance
-        )
-
-        # Calculate & Make Bill for each rfq_services after confirming RFQ
-        for rfq_service_instance in rfq_service_instances:
-            vendor_ref = {}
-
-            if not rfq_service_instance.service.added_by_admin:
-                vendor_ref = {
-                    "vendor_ref": rfq_service_instance.service.vendor_category.vendor.vendor
-                }
-
-            Bill.objects.create(
-                **vendor_ref,
-                agent=rfq_service_instance.rfq_category.rfq.agent,
-                vendor_bill=rfq_service_instance.service_price,
-                admin_bill=rfq_service_instance.service_price
-                * rfq_service_instance.admin_commission
-                * 0.01,
-                agent_bill=rfq_service_instance.service_price
-                * rfq_service_instance.agent_commission
-                * 0.01,
-                agent_due=rfq_service_instance.service_price
-                * rfq_service_instance.admin_commission
-                * 0.01,
-                admin_due=rfq_service_instance.service_price,
-                service=rfq_service_instance,
+            rfq_service_instances = RfqService.objects.filter(
+                rfq_category__rfq=rfq_instance
             )
+
+            # Calculate & Make Bill for each rfq_services after confirming RFQ
+            for rfq_service_instance in rfq_service_instances:
+                vendor_ref = {}
+
+                if not rfq_service_instance.service.added_by_admin:
+                    vendor_ref = {
+                        "vendor": rfq_service_instance.service.vendor_category.vendor.vendor
+                    }
+
+                Bill.objects.create(
+                    **vendor_ref,
+                    agent=rfq_service_instance.rfq_category.rfq.agent,
+                    vendor_bill=rfq_service_instance.service_price,
+                    admin_bill=rfq_service_instance.service_price
+                    * rfq_service_instance.admin_commission
+                    * 0.01,
+                    agent_bill=rfq_service_instance.service_price
+                    * rfq_service_instance.agent_commission
+                    * 0.01,
+                    agent_due=rfq_service_instance.service_price
+                    * rfq_service_instance.admin_commission
+                    * 0.01,
+                    admin_due=rfq_service_instance.service_price,
+                    service=rfq_service_instance,
+                )
 
         return Response({"status": "Successfully confirmed RFQ"})
 

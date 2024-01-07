@@ -159,19 +159,18 @@ class RFQTypesAPI(APIView):
                         "vendor": rfq_service_instance.service.vendor_category.vendor.vendor
                     }
 
+                # making bills
+                admin_commission = rfq_service_instance.admin_commission * 0.01
+                agent_commission = rfq_service_instance.agent_commission * 0.01
+
                 Bill.objects.create(
                     **vendor_ref,
                     agent=rfq_service_instance.rfq_category.rfq.agent,
                     vendor_bill=rfq_service_instance.service_price,
-                    admin_bill=rfq_service_instance.service_price
-                    * rfq_service_instance.admin_commission
-                    * 0.01,
-                    agent_bill=rfq_service_instance.service_price
-                    * rfq_service_instance.agent_commission
-                    * 0.01,
-                    agent_due=rfq_service_instance.service_price
-                    * rfq_service_instance.admin_commission
-                    * 0.01,
+                    admin_bill=rfq_service_instance.service_price * admin_commission,
+                    agent_bill=rfq_service_instance.service_price * agent_commission,
+                    agent_due=(rfq_service_instance.service_price * admin_commission)
+                    + rfq_service_instance.service_price,
                     admin_due=rfq_service_instance.service_price,
                     service=rfq_service_instance,
                 )

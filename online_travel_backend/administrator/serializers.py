@@ -135,6 +135,40 @@ class AssignServiceSerializer(serializers.Serializer):
     vendor_id = serializers.IntegerField(required=True)
 
 
+# Received Payments
+class ReceivedPaymentSerializer(serializers.ModelSerializer):
+    total_bill = serializers.SerializerMethodField()
+    received_money = serializers.SerializerMethodField()
+
+    customer_name = serializers.CharField(
+        source="service.rfq_category.rfq.customer_name"
+    )
+    customer_address = serializers.CharField(
+        source="service.rfq_category.rfq.customer_address"
+    )
+    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    service_name = serializers.CharField(source="service.service.service_name")
+
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "vendor_bill",
+            "admin_bill",
+            "total_bill",
+            "customer_name",
+            "customer_address",
+            "contact_no",
+            "service_name",
+        )
+
+    def get_total_bill(self, obj):
+        return obj.vendor_bill + obj.admin_bill
+
+    def get_received_money(self, obj):
+        return obj.vendor_bill + obj.admin_bill - obj.agent_due
+
+
 # Bill Request
 class BillServicesSerializer(serializers.ModelSerializer):
     total_bill = serializers.SerializerMethodField()
@@ -151,7 +185,7 @@ class BillServicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
         fields = (
-            "tracking_id",            
+            "tracking_id",
             "vendor_bill",
             "admin_bill",
             "total_bill",
@@ -165,9 +199,8 @@ class BillServicesSerializer(serializers.ModelSerializer):
         return obj.vendor_bill + obj.admin_bill
 
 
-class BillServicesSerializerA(serializers.ModelSerializer):
+class BillRequestSerializer(serializers.ModelSerializer):
     total_bill = serializers.SerializerMethodField()
-
     customer_name = serializers.CharField(
         source="service.rfq_category.rfq.customer_name"
     )
@@ -182,8 +215,8 @@ class BillServicesSerializerA(serializers.ModelSerializer):
         fields = (
             "tracking_id",
             "admin_billed_on",
-            "vendor_bill",
             "admin_bill",
+            "admin_due",
             "total_bill",
             "customer_name",
             "customer_address",
@@ -195,14 +228,51 @@ class BillServicesSerializerA(serializers.ModelSerializer):
         return obj.vendor_bill + obj.admin_bill
 
 
+# Bill Request
+class PaidBillSerializer(serializers.ModelSerializer):
+    total_bill = serializers.SerializerMethodField()
+    customer_name = serializers.CharField(
+        source="service.rfq_category.rfq.customer_name"
+    )
+    customer_address = serializers.CharField(
+        source="service.rfq_category.rfq.customer_address"
+    )
+    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    service_name = serializers.CharField(source="service.service.service_name")
+
+    paid_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "vendor_paid_on",
+            "admin_bill",
+            "total_bill",
+            "customer_name",
+            "customer_address",
+            "contact_no",
+            "service_name",
+            "paid_amount",
+        )
+
+    def get_total_bill(self, obj):
+        return obj.vendor_bill + obj.admin_bill
+
+    def get_paid_amount(self, obj):
+        return obj.vendor_bill + obj.admin_bill - obj.agent_due
+
+
 class BillPaySerializer(serializers.ModelSerializer):
     tracking_id = serializers.UUIDField()
+    paid_amount = serializers.FloatField()
 
     class Meta:
         model = Bill
         fields = (
             "tracking_id",
             "vendor_payment_type",
+            "paid_amount",
         )
 
 

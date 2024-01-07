@@ -20,8 +20,9 @@ from .serializers import (
     BillServicesSerializer,
     BillPaySerializer,
     VendorCustomRegistrationSerializer,
-    BillServicesSerializerA,
     AgentSerializer,
+    BillRequestSerializer,
+    PaidBillSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -517,7 +518,7 @@ class AssignAgentAPI(APIView):
                 copied_service_instance.save()
 
                 # attach to vendor
-                print(copied_service_instance.pk)
+                # print(copied_service_instance.pk)
                 copied_service_instance.vendor_category = vendor_category_instance
                 copied_service_instance.save()
 
@@ -528,11 +529,18 @@ class AssignAgentAPI(APIView):
             return Response({"status": "Successfully assigned service to vendor"})
 
 
-# recieved payments
+# Agent Bills
 class AgentBillAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
+        if request.GET.get("received") == "true":
+            bills_instance = Bill.objects.filter(status_1="admin_paid").order_by(
+                "-admin_paid_on"
+            )
+            serialized_data = BillServicesSerializer(bills_instance, many=True)
+            return Response(serialized_data.data)
+
         bills_instance = Bill.objects.filter(status_1="admin_bill").order_by(
             "-created_on"
         )
@@ -547,22 +555,35 @@ class AgentBillAPI(APIView):
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id", None),
                 )
-                bill_instance.status = "agent_bill"
+                bill_instance.status_1 = "agent_bill"
                 bill_instance.agent_billed_on = timezone.now()
                 bill_instance.save()
 
             return Response({"status": "Successfully requested for bill to agent"})
 
 
-class BillPayAPI(APIView):
+class VendorBillAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(status_2="admin_bill").order_by(
-            "-admin_billed_on"
+        if request.GET.get("paid") == "true":
+            # list of paid bills
+            bills_instance = Bill.objects.filter(
+                agent=request.user, status_2="vendor_paid"
+            ).order_by("-vendor_paid_on")
+            serialized_data = PaidBillSerializer(bills_instance, many=True)
+            return Response(serialized_data.data)
+
+        # list of bill requests with due payment
+        bills_instance = (
+            Bill.objects.filter(admin_due__gt=0)
+            .exclude(status_2="admin_bill")
+            .order_by("-admin_billed_on")
         )
-        serialized_data = BillServicesSerializerA(bills_instance, many=True)
+        serialized_data = BillRequestSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
+
+        
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)
@@ -570,14 +591,29 @@ class BillPayAPI(APIView):
         if serialized_data.is_valid(raise_exception=True):
             for service in serialized_data.data:
                 bill_instance = Bill.objects.get(
-                    tracking_id=service.get("tracking_id"), status_2="admin_bill"
+                    tracking_id=service.get("tracking_id", None),
                 )
-                bill_instance.vendor_payment_type = service.get("vendor_payment_type")
+                due_amount = (
+                    bill_instance.vendor_bill                    
+                    - service.get("paid_amount")
+                )
+
+                if due_amount < 0:
+                    return Response(
+                        {"error": "Paid amount cannot be greater than bill!"}
+                    )
+
+                bill_instance.admin_payment_type = service.get(
+                    "admin_payment_type", None
+                )
+                bill_instance.admin_due = due_amount
                 bill_instance.vendor_paid_on = timezone.now()
                 bill_instance.status_2 = "vendor_paid"
                 bill_instance.save()
 
-                return Response({"status": "Successfully paid bills to vendor"})
+                return Response({"status": "Successfully paid bills"})
+
+
 
 
 # Agent List

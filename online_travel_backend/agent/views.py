@@ -6,9 +6,10 @@ from rest_framework.permissions import BasePermission
 
 from .serializers import (
     RfqSerializer,
-    BillServicesSerializer,
-    BillPaySerializer,
+    PaidBillSerializer,
     CommissionSerializer,
+    BillRequestSerializer,
+    BillPaySerializer,
 )
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
@@ -224,26 +225,27 @@ class GetInvoiceAPI(APIView):
         )
 
 
-# request bill
-class RequestBillAPI(APIView):
+# requested bill
+class AgentBillsAPI(APIView):
     permission_classes = [AuthenticateOnlyAgent]
 
     def get(self, request, format=None, *args, **kwargs):
         if request.GET.get("paid") == "true":
-            bills_instance = Bill.objects.filter(
-                agent=request.user, status_1="admin_paid"
-            ).order_by("-admin_paid_on")
-        else:
+            # list of paid bills
             bills_instance = Bill.objects.filter(
                 agent=request.user, status_1="agent_paid"
-            ).order_by("-id")
+            ).order_by("-admin_paid_on")
+            serialized_data = PaidBillSerializer(bills_instance, many=True)
+            return Response(serialized_data.data)
 
-        serialized_data = BillServicesSerializer(bills_instance, many=True)
+        # list of bill requests with due payment
+        bills_instance = (
+            Bill.objects.filter(agent=request.user, agent_due__gt=0)
+            .exclude(status_1="admin_bill")
+            .order_by("-agent_billed_on")
+        )
+        serialized_data = BillRequestSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
-
-
-class BillPayAPI(APIView):
-    permission_classes = [AuthenticateOnlyAgent]
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)
@@ -253,14 +255,48 @@ class BillPayAPI(APIView):
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id", None),
                 )
+                due_amount = (
+                    bill_instance.vendor_bill
+                    # + bill_instance.agent_bill
+                    + bill_instance.admin_bill
+                    - service.get("paid_amount")
+                )
+
+                if due_amount < 0:
+                    return Response(
+                        {"error": "Paid amount cannot be greater than bill!"}
+                    )
+
                 bill_instance.admin_payment_type = service.get(
                     "admin_payment_type", None
                 )
+                bill_instance.agent_due = due_amount
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
 
                 return Response({"status": "Successfully paid bills"})
+
+
+# class BillPayAPI(APIView):
+#     permission_classes = [AuthenticateOnlyAgent]
+
+#     def post(self, request, format=None, *args, **kwargs):
+#         serialized_data = BillPaySerializer(data=request.data, many=True)
+
+#         if serialized_data.is_valid(raise_exception=True):
+#             for service in serialized_data.data:
+#                 bill_instance = Bill.objects.get(
+#                     tracking_id=service.get("tracking_id", None),
+#                 )
+#                 bill_instance.admin_payment_type = service.get(
+#                     "admin_payment_type", None
+#                 )
+#                 bill_instance.admin_paid_on = timezone.now()
+#                 bill_instance.status_1 = "admin_paid"
+#                 bill_instance.save()
+
+#                 return Response({"status": "Successfully paid bills"})
 
 
 class SetCommissionAPI(APIView):

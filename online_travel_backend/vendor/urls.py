@@ -3,8 +3,7 @@ from .views import (
     VendorRegistrationView,
     ManageServicesAPI,
     NewTasksAPI,
-    RequestBillAPI,
-    PayBillAPI,
+    AdminBillAPI,
 )
 
 urlpatterns = [
@@ -20,7 +19,6 @@ urlpatterns = [
     path("new_tasks/", NewTasksAPI.as_view(), name="new_tasks"),
     path("new_tasks/<int:rfq_id>", NewTasksAPI.as_view(), name="new_tasks"),
     # Acounts
-    path("get_bills/", RequestBillAPI.as_view(), name="paid_bills"),
-    path("received_payments/", PayBillAPI.as_view(), name="request_bill"),
-
+    path("admin_bills/", AdminBillAPI.as_view(), name="admin_bills"),
+    # path("received_payments/", PayBillAPI.as_view(), name="request_bill"),
 ]

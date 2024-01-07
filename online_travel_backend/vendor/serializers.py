@@ -95,7 +95,6 @@ class RfqServiceSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-
 # vendor update
 class RfqServiceUpdateSerializer(serializers.ModelSerializer):
     service_id = serializers.IntegerField(source="id")
@@ -108,7 +107,36 @@ class RfqServiceUpdateSerializer(serializers.ModelSerializer):
         model = RfqService
 
 
-# Request Bill
+# Received Payments
+class ReceivedPaymentSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(
+        source="service.rfq_category.rfq.customer_name"
+    )
+    customer_address = serializers.CharField(
+        source="service.rfq_category.rfq.customer_address"
+    )
+    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    service_name = serializers.CharField(source="service.service.service_name")
+    received_money = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Bill
+        fields = (
+            "tracking_id",
+            "created_on",
+            "vendor_bill",
+            "customer_name",
+            "customer_address",
+            "contact_no",
+            "service_name",
+            "received_money"
+        )
+
+    def get_received_money(self, obj):
+        return obj.vendor_bill - obj.agent_due
+
+
+# Bills
 class BillServicesSerializer(serializers.ModelSerializer):
     customer_name = serializers.CharField(
         source="service.rfq_category.rfq.customer_name"

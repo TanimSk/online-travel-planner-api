@@ -79,7 +79,9 @@ class Service(models.Model):
     child_price = models.FloatField(default=0)
     adult_price = models.FloatField(default=0)
     service_price = models.FloatField(default=0)
+    cost_per_hour = models.FloatField(default=0)
     admin_commission = models.FloatField(default=0)
+
 
     # venue sourcing
     area_name = models.CharField(max_length=500, blank=True, null=True)

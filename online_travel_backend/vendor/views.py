@@ -266,10 +266,19 @@ class NewTasksAPI(APIView):
             return Response({"status": "Successfully updated services"})
 
 
-class RequestBillAPI(APIView):
+class AdminBillAPI(APIView):
     permission_classes = [AuthenticateOnlyVendor]
 
     def get(self, request, format=None, *args, **kwargs):
+        if request.GET.get("received") == "true":
+            # Getting received payments
+            bills_instance = Bill.objects.filter(status_2="vendor_paid").order_by(
+                "-vendor_paid_on"
+            )
+            serialized_data = BillServicesSerializer(bills_instance, many=True)
+            return Response(serialized_data.data)
+
+        # getting bills
         bills_instance = Bill.objects.filter(
             vendor=request.user, status_2="vendor_bill"
         ).order_by("-created_on")
@@ -291,12 +300,12 @@ class RequestBillAPI(APIView):
             return Response({"status": "Successfully requested for bill to admin"})
 
 
-class PayBillAPI(APIView):
-    permission_classes = [AuthenticateOnlyVendor]
+# class PayBillAPI(APIView):
+#     permission_classes = [AuthenticateOnlyVendor]
 
-    def get(self, request, format=None, *args, **kwargs):
-        bills_instance = Bill.objects.filter(
-            vendor=request.user, status_2="vendor_paid"
-        ).order_by("-vendor_paid_on")
-        serialized_data = BillServicesSerializer(bills_instance, many=True)
-        return Response(serialized_data.data)
+#     def get(self, request, format=None, *args, **kwargs):
+#         bills_instance = Bill.objects.filter(
+#             vendor=request.user, status_2="vendor_paid"
+#         ).order_by("-vendor_paid_on")
+#         serialized_data = BillServicesSerializer(bills_instance, many=True)
+#         return Response(serialized_data.data)

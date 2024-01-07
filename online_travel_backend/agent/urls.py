@@ -4,9 +4,9 @@ from .views import (
     CreateRfqAPI,
     RFQTypesAPI,
     GetInvoiceAPI,
-    RequestBillAPI,
+    AgentBillsAPI,
     OverviewAPI,
-    BillPayAPI,
+    # BillPayAPI,
     SetCommissionAPI,
 )
 
@@ -23,7 +23,7 @@ urlpatterns = [
         "get_invoice/<uuid:rfq_tracing_id>", GetInvoiceAPI.as_view(), name="get_invoice"
     ),
     # bills
-    path("get_bills/", RequestBillAPI.as_view(), name="bill_requests"),
-    path("pay_bill/", BillPayAPI.as_view(), name="pay_bill"),
+    path("bill_requests/", AgentBillsAPI.as_view(), name="bill_requests"),
+    # path("pay_bill/", BillPayAPI.as_view(), name="pay_bill"),
     path("set_commission/", SetCommissionAPI.as_view(), name="set_commission"),
 ]

@@ -59,7 +59,7 @@ class Bill(models.Model):
     # dates
     created_on = models.DateTimeField(auto_now_add=True)
     admin_billed_on = models.DateTimeField(blank=True, null=True)
-    # agent_billed_on = models.DateTimeField(blank=True, null=True)
+    agent_billed_on = models.DateTimeField(blank=True, null=True)
 
     admin_paid_on = models.DateTimeField(blank=True, null=True)
     vendor_paid_on = models.DateTimeField(blank=True, null=True)

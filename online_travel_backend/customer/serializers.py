@@ -96,23 +96,17 @@ class RfqSerializer(serializers.ModelSerializer):
 
         return super(RfqSerializer, self).to_internal_value(copy_data)
 
-    def get_total_price(self, service_instance):
-        dictionary = self.context["dictionary"]
-        rfq_service_instance = dictionary.copy()
+        # get total price
 
-        # Remove empty values
-        for dat in dictionary:
-            if dictionary[dat] == None:
-                rfq_service_instance.pop(dat)
-
-        # get days difference
+    def calc_total_price_value(self, service_instance, rfq_service_instance):
         delta_days = 1
 
+        # get days diff
         if not (
             (rfq_service_instance.get("check_in_date", None) is None)
             and (rfq_service_instance.get("check_out_date", None) is None)
         ):
-            date_format = "%Y-%m-%d"
+            date_format = "%Y-%m-%dT%H:%M:%S"
             date1 = datetime.strptime(
                 rfq_service_instance.get("check_in_date", None), date_format
             )
@@ -139,7 +133,39 @@ class RfqSerializer(serializers.ModelSerializer):
             + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
         )
 
+        # appending commissions || No Agent commissions in customers
+        total_price = (
+            total_price
+            + (total_price * service_instance.admin_commission * 0.01)
+        )
+
         return total_price
+
+    # get json
+    def calc_total_price(self, validated_data):
+        rfq_categories = validated_data.pop("rfq_categories")
+
+        total_price = 0
+        total_services = 0
+
+        for rfq_category in rfq_categories:
+            rfq_services = rfq_category.pop("rfq_services")
+
+            for rfq_service in rfq_services:
+                service_id = rfq_service.pop("service")
+
+                try:
+                    rfq_service.pop("service_price")
+                except KeyError:
+                    pass
+
+                # price calculation
+                service_instance = Service.objects.get(id=service_id)
+                total_services += 1
+                total_price += self.calc_total_price_value(
+                    service_instance, rfq_service
+                )
+        return {"total_price": total_price, "total_services": total_services}
 
     def create(self, validated_data):
         rfq_total_price = 0

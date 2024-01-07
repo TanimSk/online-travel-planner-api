@@ -114,6 +114,7 @@ class PendingRfqAPI(APIView):
     serializer_class = RfqSerializer
     permission_classes = [AuthenticateOnlyAdmin]
 
+    # Quotation Serializer
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
             rfqs_instance = Rfq.objects.filter(status="pending").order_by("-created_on")
@@ -318,7 +319,7 @@ class ManageVendorServicesAPI(APIView):
     def get(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:
             approved = True if request.GET.get("approved") == "true" else False
-            instance = Service.objects.filter(approved=approved, added_by_admin=False)
+            instance = Service.objects.filter(approved=approved, added_by_admin=False).order_by("-created_on")
             serialized_data = self.serializer_class(instance, many=True)
             return Response(serialized_data.data)
 
@@ -359,7 +360,7 @@ class ManageServicesAPI(APIView):
 
     def get(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:
-            instance = Service.objects.filter(added_by_admin=True)
+            instance = Service.objects.filter(added_by_admin=True).order_by("-created_on")
             serialized_data = self.serializer_class(instance, many=True)
             return Response(serialized_data.data)
         try:

@@ -329,11 +329,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
             date2 = datetime.strptime(
                 rfq_service_instance.get("check_out_date", None), date_format
             )
-            delta_days = abs((date2 - date1).days)
-
-            print(delta_days, "------")
-
-        print(delta_days)
+            delta_days = abs((date2 - date1).days) + 1
 
         total_price = (
             (

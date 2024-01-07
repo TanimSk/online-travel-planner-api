@@ -134,9 +134,8 @@ class RfqSerializer(serializers.ModelSerializer):
         )
 
         # appending commissions || No Agent commissions in customers
-        total_price = (
-            total_price
-            + (total_price * service_instance.admin_commission * 0.01)
+        total_price = total_price + (
+            total_price * service_instance.admin_commission * 0.01
         )
 
         return total_price
@@ -180,16 +179,18 @@ class RfqSerializer(serializers.ModelSerializer):
             # validated_data.pop("email_address")
             # validated_data.pop("contact_no")
 
+            customer_instance = Customer.objects.get(
+                customer=self.context.get("request").user
+            )
+
             # setting customer data to itself
             rfq_instance = Rfq.objects.create(
                 agent=self.context.get("agent").agent,
                 customer=self.context.get("request").user,
-                customer_name=self.context.get("request").user.customer.customer_name,
-                customer_address=self.context.get(
-                    "request"
-                ).user.customer.customer_address,
+                customer_name=customer_instance.customer_name,
+                customer_address=customer_instance.customer_address,
                 email_address=self.context.get("request").user.email,
-                contact_no=self.context.get("request").user.customer.customer_number,
+                contact_no=customer_instance.customer_number,
                 **validated_data,
             )
 

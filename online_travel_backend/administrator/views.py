@@ -608,7 +608,7 @@ class VendorBillAPI(APIView):
                 bill_instance = Bill.objects.get(
                     tracking_id=service.get("tracking_id", None),
                 )
-                due_amount = bill_instance.vendor_bill - service.get("paid_amount")
+                due_amount = bill_instance.admin_due - service.get("paid_amount")
 
                 if due_amount < 0:
                     return Response(

@@ -2,9 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 from dj_rest_auth.registration.views import RegisterView
-from agent.models import Agent, Rfq
+from agent.models import Agent, Rfq, RfqService
+from commons.models import Bill
+
 from .serializers import CustomerCustomRegistrationSerializer, RfqSerializer
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
+from django.db import transaction
 
 
 # Authenticate Agent Only Class
@@ -99,3 +102,52 @@ class RFQTypesAPI(APIView):
 
         serialized_data = RfqInvoiceSerializer(rfq_instances, many=has_multiple)
         return Response(serialized_data.data)
+
+    def post(self, request, rfq_id=None, format=None, *args, **kwargs):
+        if rfq_id is None:
+            return Response({"error": "RFQ ID is missing"})
+
+        with transaction.atomic():
+            rfq_instance = Rfq.objects.get(id=rfq_id, customer=request.user)
+            rfq_instance.status = "confirmed"
+            rfq_instance.save()
+
+            rfq_service_instances = RfqService.objects.filter(
+                rfq_category__rfq=rfq_instance
+            )
+
+            # Calculate & Make Bill for each rfq_services after confirming RFQ
+            for rfq_service_instance in rfq_service_instances:
+                vendor_ref = {}
+
+                if not rfq_service_instance.service.added_by_admin:
+                    vendor_ref = {
+                        "vendor": rfq_service_instance.service.vendor_category.vendor.vendor
+                    }
+
+                # making bills
+                admin_commission = rfq_service_instance.admin_commission * 0.01
+                agent_commission = rfq_service_instance.agent_commission * 0.01
+
+                Bill.objects.create(
+                    **vendor_ref,
+                    agent=rfq_service_instance.rfq_category.rfq.agent,
+                    vendor_bill=rfq_service_instance.service_price,
+                    admin_bill=rfq_service_instance.service_price * admin_commission,
+                    agent_bill=rfq_service_instance.service_price * agent_commission,
+                    agent_due=(rfq_service_instance.service_price * admin_commission)
+                    + rfq_service_instance.service_price,
+                    admin_due=rfq_service_instance.service_price,
+                    service=rfq_service_instance,
+                )
+
+        return Response({"status": "Successfully confirmed RFQ"})
+
+    def delete(self, request, rfq_id=None, format=None, *args, **kwargs):
+        if rfq_id is None:
+            return Response({"error": "RFQ ID is missing"})
+
+        rfq_instance = Rfq.objects.get(id=rfq_id, customer=request.user)
+        rfq_instance.delete()
+
+        return Response({"status": "Successfully deleted RFQ"})

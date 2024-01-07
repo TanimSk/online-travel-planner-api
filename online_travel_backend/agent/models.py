@@ -11,12 +11,12 @@ class Agent(models.Model):
     agent = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="agent"
     )
-    agent_name = models.CharField(max_length=200)
-    agency_name = models.CharField(max_length=200)
-    agent_address = models.CharField(max_length=500)
-    mobile_no = models.CharField(max_length=20)
-    logo_url = models.URLField()
-    trade_license_url = models.URLField()
+    agent_name = models.CharField(max_length=200, blank=True, null=True)
+    agency_name = models.CharField(max_length=200, blank=True, null=True)
+    agent_address = models.CharField(max_length=500, blank=True, null=True)
+    mobile_no = models.CharField(max_length=20, blank=True, null=True)
+    logo_url = models.URLField(blank=True, null=True)
+    trade_license_url = models.URLField(blank=True, null=True)
 
     # For customers
     pseudo_agent = models.BooleanField(default=False)

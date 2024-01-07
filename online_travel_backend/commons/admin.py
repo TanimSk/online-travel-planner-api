@@ -20,8 +20,11 @@ class UserAdmin(admin.ModelAdmin):
         "is_agent",
     )
 
+
 @admin.register(Bill)
 class BillAdmin(admin.ModelAdmin):
     list_display = (
         "tracking_id",
+        "vendor",
+        "agent",
     )

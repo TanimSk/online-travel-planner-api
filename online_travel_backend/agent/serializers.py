@@ -267,14 +267,14 @@ class QueryServiceSerializer(serializers.Serializer):
         required=False, allow_null=True, allow_blank=True
     )
     trip_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    depart_time = serializers.DateTimeField(
-        required=False,
-        allow_null=True,
-    )
-    return_time = serializers.DateTimeField(
-        required=False,
-        allow_null=True,
-    )
+    # depart_time = serializers.DateTimeField(
+    #     required=False,
+    #     allow_null=True,
+    # )
+    # return_time = serializers.DateTimeField(
+    #     required=False,
+    #     allow_null=True,
+    # )
 
     # entertainment - v
     # meeting and event management - v

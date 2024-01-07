@@ -326,7 +326,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days)
 
-            print(delta_days)
+            print(delta_days, "------")
 
         print(delta_days)
 

@@ -151,7 +151,9 @@ class RFQTypesAPI(APIView):
 
         # Calculate & Make Bill for each rfq_services after confirming RFQ
         for rfq_service_instance in rfq_service_instances:
-            Bill.objects.create(
+            print(rfq_service_instance.service.vendor_category.vendor.vendor)
+
+            Bill.objects.create(                
                 vendor=rfq_service_instance.service.vendor_category.vendor.vendor,
                 agent=rfq_service_instance.rfq_category.rfq.agent,
                 vendor_bill=rfq_service_instance.service_price,

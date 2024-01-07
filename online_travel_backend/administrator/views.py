@@ -103,10 +103,11 @@ class CategoryAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
     def post(self, request, format=None, *args, **kwargs):
-        serialized_data = CategorySerializer(data=request.data)
+        serialized_data = CategorySerializer(data=request.data, many=True)
 
         if serialized_data.is_valid(raise_exception=True):
-            Category.objects.create(**serialized_data.data)
+            for data in serialized_data.data:
+                Category.objects.create(**data)
             return Response({"status": "Successfully created category"})
 
 

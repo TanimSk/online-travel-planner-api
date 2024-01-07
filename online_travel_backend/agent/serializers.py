@@ -244,8 +244,12 @@ class QueryServiceSerializer(serializers.Serializer):
     # )
     room_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     bed_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    check_in_date = serializers.CharField(required=False, allow_null=True, allow_blank=True)
-    check_out_date = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    check_in_date = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+    check_out_date = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
 
     # members
     infant_members = serializers.IntegerField(required=False, allow_null=True)
@@ -314,8 +318,9 @@ class QueryResultSerializer(serializers.ModelSerializer):
 
         print(rfq_service_instance.get("check_in_date", None), rfq_service_instance)
 
-        if not (rfq_service_instance.get("check_in_date", None) is None) and (
-            rfq_service_instance.get("check_out_date", None) is None
+        if not (
+            (rfq_service_instance.get("check_in_date", None) is None)
+            and (rfq_service_instance.get("check_out_date", None) is None)
         ):
             date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
             date1 = datetime.strptime(

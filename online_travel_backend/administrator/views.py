@@ -433,6 +433,7 @@ class AssignAgentAPI(APIView):
                 rfq_category__rfq__status="confirmed",
                 service__vendor_category__vendor__isnull=is_assigned,
             )
+            .order_by("-id")
             .values("rfq_category__rfq_id")
             .distinct()
         )

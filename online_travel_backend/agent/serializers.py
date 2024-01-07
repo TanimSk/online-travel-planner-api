@@ -101,8 +101,6 @@ class RfqSerializer(serializers.ModelSerializer):
     def calc_total_price_value(self, service_instance, rfq_service_instance):
         delta_days = 1
 
-        # print(rfq_service_instance.get("check_in_date", None))
-
         # get days diff
         if not (
             (rfq_service_instance.get("check_in_date", None) is None)

@@ -146,7 +146,7 @@ def rfq_confirmed_admin(rfq_instance):
     )
 
     html_content = render_to_string(
-        "email_notifications/rfq_confirmed.html",
+        "email_notifications/rfq_confirmed_admin.html",
         {
             "customer_name": rfq_instance.customer_name,
             "customer_address": rfq_instance.customer_address,
@@ -164,3 +164,30 @@ def rfq_confirmed_admin(rfq_instance):
     )
 
     send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)
+
+    # send email to all vendors
+    for service in rfq_services:
+        if not service.service.vendor_category.vendor is None:
+            html_content = render_to_string(
+                "email_notifications/rfq_confirmed_vendor.html",
+                {
+                    "agent_name": agent_instance.agent_name,
+                    "agency_name": agent_instance.agency_name,
+                    "agent_num": agent_instance.mobile_no,
+                    "travel_date": datetime.fromisoformat(
+                        str(rfq_instance.travel_date)
+                    ).strftime("%d/%m/%Y %I:%M %p"),
+                    "created_on": rfq_instance.created_on,
+                    "tracking_id": rfq_instance.tracking_id,
+                    "service_category": service.rfq_category.category.category_name,
+                    "service_name": service.service.service_name,
+                    "service_price": service.service_price,
+                },
+            )
+
+            send_html_mail(
+                "RFQ Confirmed",
+                html_content,
+                [service.service.vendor_category.vendor.vendor.email],
+                DEFAULT_FROM_EMAIL,
+            )

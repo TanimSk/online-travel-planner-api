@@ -178,7 +178,9 @@ class GetInvoiceAPI(APIView):
                 return Response({"error": "User is not authenticated"})
 
         # Send Invoice
-        rfq_instance = Rfq.objects.get(tracking_id=rfq_tracing_id)
+        rfq_instance = Rfq.objects.get(
+            tracking_id=rfq_tracing_id, customer=request.user
+        )
         services_instance = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
 
         # Calculation
@@ -195,7 +197,7 @@ class GetInvoiceAPI(APIView):
         serialized_data = RfqInvoiceSerializer(rfq_instance)
         return render(
             request,
-            "invoice.html",
+            "customer/invoice.html",
             {
                 "data": serialized_data.data,
                 "today_date": timezone.now(),

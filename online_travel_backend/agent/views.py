@@ -219,7 +219,7 @@ class GetInvoiceAPI(APIView):
         serialized_data = RfqInvoiceSerializer(rfq_instance)
         return render(
             request,
-            "invoice.html",
+            "agent/invoice.html",
             {
                 "data": serialized_data.data,
                 "today_date": timezone.now(),

@@ -1,2 +1,13 @@
 venv/
 
+administrator/migrations/*
+agent/migrations/*
+commons/migrations/*
+customer/migrations/*
+vendor/migrations/*
+
+!administrator/migrations/__init__.py
+!agent/migrations/__init__.py
+!commons/migrations/__init__.py
+!customer/migrations/__init__.py
+!vendor/migrations/__init__.py

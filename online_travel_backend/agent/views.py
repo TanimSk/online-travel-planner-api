@@ -18,6 +18,8 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from commons.models import Bill
 from .models import Rfq, RfqService, Agent
 
+from commons.send_email import rfq_created_admin
+
 # from vendor.models import Service
 from django.shortcuts import render
 from django.utils import timezone
@@ -86,6 +88,7 @@ class CreateRfqAPI(APIView):
 
             rfq_instance = serialized_data.create(serialized_data.data)
             rfq_instance.save()
+            rfq_created_admin(rfq_instance=rfq_instance)
 
             return Response({"status": "Successfully created RFQ"})
 
@@ -265,7 +268,7 @@ class AgentBillsAPI(APIView):
                 due_amount = (
                     # bill_instance.vendor_bill
                     # + bill_instance.agent_bill
-                    + bill_instance.agent_due
+                    +bill_instance.agent_due
                     - service.get("paid_amount")
                 )
 

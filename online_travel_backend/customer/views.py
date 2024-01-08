@@ -6,8 +6,18 @@ from agent.models import Agent, Rfq, RfqService
 from commons.models import Bill
 
 from .serializers import CustomerCustomRegistrationSerializer, RfqSerializer
+from agent.serializers import (
+    PaidBillSerializer,
+    BillRequestSerializer,
+    BillPaySerializer,
+)
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from django.db import transaction
+
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Sum, F
+import math
 
 
 # Authenticate Agent Only Class
@@ -151,3 +161,115 @@ class RFQTypesAPI(APIView):
         rfq_instance.delete()
 
         return Response({"status": "Successfully deleted RFQ"})
+
+
+# Get Invoice
+class GetInvoiceAPI(APIView):
+    def get(self, request, rfq_tracing_id=None, format=None, *args, **kwargs):
+        if rfq_tracing_id is None:
+            if request.user.is_authenticated:
+                rfq_instances = Rfq.objects.filter(
+                    customer=request.user, status="confirmed"
+                ).order_by("-created_on")
+                serialized_data = RfqInvoiceSerializer(rfq_instances, many=True)
+                return Response(serialized_data.data)
+
+            else:
+                return Response({"error": "User is not authenticated"})
+
+        # Send Invoice
+        rfq_instance = Rfq.objects.get(tracking_id=rfq_tracing_id)
+        services_instance = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
+
+        # Calculation
+        total_service_charge = services_instance.aggregate(Sum("service_price"))[
+            "service_price__sum"
+        ]
+        extra_charge_admin = services_instance.aggregate(
+            charge=Sum((F("service_price") * F("admin_commission")) / 100)
+        )["charge"]
+        extra_charge_agent = services_instance.aggregate(
+            charge=Sum((F("service_price") * F("admin_commission")) / 100)
+        )["charge"]
+
+        serialized_data = RfqInvoiceSerializer(rfq_instance)
+        return render(
+            request,
+            "invoice.html",
+            {
+                "data": serialized_data.data,
+                "today_date": timezone.now(),
+                "total_charge": math.ceil(total_service_charge),
+                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(
+                    total_service_charge + extra_charge_agent + extra_charge_admin
+                ),
+            },
+        )
+
+
+class AgentBillsAPI(APIView):
+    permission_classes = [AuthenticateOnlyCustomer]
+
+    def get(self, request, format=None, *args, **kwargs):
+        agent_instance = Agent.objects.filter(pseudo_agent=True).order_by("id").first()
+
+        if agent_instance is None:
+            return Response(
+                {
+                    "error": "Customer pseudo agent not created, please contact the developers"
+                }
+            )
+
+        if request.GET.get("paid") == "true":
+            # list of paid bills
+            bills_instance = Bill.objects.filter(
+                agent=agent_instance.agent,
+                status_1="admin_paid",
+                service__rfq_category__rfq__customer=request.user,
+            ).order_by("-admin_paid_on")
+            serialized_data = PaidBillSerializer(bills_instance, many=True)
+            return Response(serialized_data.data)
+
+        # list of bill requests with due payment
+        bills_instance = (
+            Bill.objects.filter(
+                agent=agent_instance.agent,
+                agent_due__gt=0,
+                service__rfq_category__rfq__customer=request.user,
+            )
+            .exclude(status_1="admin_bill")
+            .order_by("-agent_billed_on")
+        )
+        serialized_data = BillRequestSerializer(bills_instance, many=True)
+        return Response(serialized_data.data)
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = BillPaySerializer(data=request.data, many=True)
+
+        if serialized_data.is_valid(raise_exception=True):
+            for service in serialized_data.data:
+                bill_instance = Bill.objects.get(
+                    tracking_id=service.get("tracking_id", None),
+                )
+                due_amount = (
+                    # bill_instance.vendor_bill
+                    # + bill_instance.agent_bill
+                    +bill_instance.agent_due
+                    - service.get("paid_amount")
+                )
+
+                if due_amount < 0:
+                    return Response(
+                        {"error": "Paid amount cannot be greater than bill!"}
+                    )
+
+                bill_instance.admin_payment_type = service.get(
+                    "admin_payment_type", None
+                )
+                bill_instance.agent_due = due_amount
+                bill_instance.admin_paid_on = timezone.now()
+                bill_instance.status_1 = "admin_paid"
+                bill_instance.save()
+
+                return Response({"status": "Successfully paid bills"})

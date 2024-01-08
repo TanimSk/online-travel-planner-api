@@ -163,4 +163,4 @@ def rfq_confirmed_admin(rfq_instance):
         },
     )
 
-    send_html_mail("RFQ Declined", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)

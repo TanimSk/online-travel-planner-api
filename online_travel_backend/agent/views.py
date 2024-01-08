@@ -17,8 +17,9 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 # from vendor.serializers import ManageServicesSerializer
 from commons.models import Bill
 from .models import Rfq, RfqService, Agent
-
+from django.shortcuts import get_object_or_404
 from commons.send_email import rfq_created_admin, rfq_confirmed_admin
+
 
 # from vendor.models import Service
 from django.shortcuts import render
@@ -122,12 +123,12 @@ class RFQTypesAPI(APIView):
             or request.GET.get("type") == "completed"
         ):
             if request.GET.get("id") is not None:
-                rfq_instances = Rfq.objects.get(
+                rfq_instances = get_object_or_404(
+                    Rfq,
                     agent=request.user,
                     status=request.GET.get("type"),
                     id=int(request.GET.get("id")),
                 )
-
             else:
                 rfq_instances = Rfq.objects.filter(
                     agent=request.user, status=request.GET.get("type")

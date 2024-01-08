@@ -191,3 +191,23 @@ def rfq_confirmed_admin(rfq_instance):
                 [service.service.vendor_category.vendor.vendor.email],
                 DEFAULT_FROM_EMAIL,
             )
+
+    # send email to customer
+    html_content = render_to_string(
+        "email_notifications/rfq_confirmed_customer.html",
+        {
+            "agent_name": agent_instance.agent_name,
+            "agency_name": agent_instance.agency_name,
+            "agent_num": agent_instance.mobile_no,
+            "travel_date": datetime.fromisoformat(
+                str(rfq_instance.travel_date)
+            ).strftime("%d/%m/%Y %I:%M %p"),
+            "created_on": rfq_instance.created_on,
+            "tracking_id": rfq_instance.tracking_id,
+            "rfq_services": rfq_services,
+        },
+    )
+
+    send_html_mail(
+        "RFQ Confirmed", html_content, [rfq_instance.email_address], DEFAULT_FROM_EMAIL
+    )

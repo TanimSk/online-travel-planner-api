@@ -23,9 +23,9 @@
     </h1>
 
     <p>
-        Hi, <br>
-        A RFQ (created on: {{ created_on }}) has been confirmed by Agent (<b>{{ agent_name }}</b>). The services are
-        dispatched to the associated vendors. Unassigned services are marked with asterisk (*). Please assign them.
+        Greetings from Discover Thailand, <br>
+        Your RFQ (created on: {{ created_on }}) has been confirmed by Agent (<b>{{ agent_name }}</b>).
+        Please Pay Bills to the Agent and take a Printout of the invoice.
     </p>
 
     <p>
@@ -33,13 +33,6 @@
     Agency Name: {{ agency_name }} <br>
     Agent Name: {{ agent_name }} <br>
     Agent Mobile: {{ agent_num }} <br>
-    </p>
-
-    <p>
-    <h2>Customer Info:</h2>
-    Customer Name: {{ customer_name }} <br>
-    Customer Address: {{ customer_address }} <br>
-    Customer Mobile: {{ customer_num }} <br>
     </p>
 
     <p>
@@ -51,15 +44,7 @@
     <p>
     <h2>Services:</h2>
     {% for rfq_service in rfq_services %}
-    - {{ rfq_service.service.service_name }}
-    {% if rfq_service.service.vendor_category.vendor is None %}
-    * (Needs to be assigned)
-    {% else %}
-    (Dispatched to vendor: {{rfq_service.service.vendor_category.vendor.vendor_name}} |
-    Contact Name: {{rfq_service.service.vendor_category.vendor.contact_name }} )
-    {% endif %}
-
-    <br>
+    - {{ rfq_service.service.service_name }} <br>
     {% endfor %}
     </p>
 

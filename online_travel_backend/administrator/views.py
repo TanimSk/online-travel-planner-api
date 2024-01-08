@@ -36,6 +36,8 @@ from commons.models import Bill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
 
+from commons.send_email import rfq_updated_agent
+
 
 # Authenticate Vendor Only Class
 class AuthenticateOnlyAdmin(BasePermission):
@@ -162,6 +164,8 @@ class PendingRfqAPI(APIView):
             rfq_instance.status = status
             rfq_instance.approved_on = timezone.now()
             rfq_instance.save()
+
+            rfq_updated_agent(rfq_instance=rfq_instance)
 
             return Response({"status": f"Successfully {status}"})
 

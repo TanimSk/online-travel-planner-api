@@ -19,9 +19,10 @@ class EmailThread(threading.Thread):
 
     def run(self):
         msg = EmailMessage(
-            self.subject, self.html_content, self.sender, self.recipient_list
+            self.subject, "Discover", self.sender, self.recipient_list
         )
         msg.content_subtype = "html"
+        msg.body = self.html_content
         msg.send()
 
 
@@ -59,6 +60,9 @@ def rfq_created_admin(rfq_instance):
             "rfq_categories": rfq_categories,
         },
     )
-    # text_content = strip_tags(html_content)
+
+    print(html_content)
+    text_content = strip_tags(html_content)
+    print(text_content)
 
     send_html_mail("RFQ Created", html_content, emails, DEFAULT_FROM_EMAIL)

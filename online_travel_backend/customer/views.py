@@ -4,8 +4,13 @@ from rest_framework.permissions import BasePermission
 from dj_rest_auth.registration.views import RegisterView
 from agent.models import Agent, Rfq, RfqService
 from commons.models import Bill
+from .models import Customer
 
-from .serializers import CustomerCustomRegistrationSerializer, RfqSerializer
+from .serializers import (
+    CustomerCustomRegistrationSerializer,
+    RfqSerializer,
+    ProfileSerializer,
+)
 from agent.serializers import (
     PaidBillSerializer,
     BillRequestSerializer,
@@ -275,3 +280,22 @@ class AgentBillsAPI(APIView):
                 bill_instance.save()
 
                 return Response({"status": "Successfully paid bills"})
+
+
+class ProfileAPI(APIView):
+    permission_classes = [AuthenticateOnlyCustomer]
+    serializer_class = ProfileSerializer
+
+    def get(self, request, format=None, *args, **kwargs):
+        customer_instance = Customer.objects.get(customer=request.user)
+        serialized_data = self.serialized_data(customer_instance)
+        return Response(serialized_data.data)
+
+    def put(self, request, format=None, *args, **kwargs):
+        serialized_data = self.serializer_class(data=request.data)
+
+        if serialized_data.is_valid(raise_exception=True):
+            Customer.objects.filter(customer=request.user).update(
+                **serialized_data.data
+            )
+            return Response({"status": "Successfully updated"})

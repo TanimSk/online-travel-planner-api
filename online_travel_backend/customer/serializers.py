@@ -247,3 +247,12 @@ class RfqSerializer(serializers.ModelSerializer):
             rfq_instance.save()
 
         return rfq_instance
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        exclude = (
+            "customer",
+            "added_on",
+        )

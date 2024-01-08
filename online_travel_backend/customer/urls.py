@@ -5,6 +5,7 @@ from .views import (
     RFQTypesAPI,
     GetInvoiceAPI,
     AgentBillsAPI,
+    ProfileAPI
 )
 
 urlpatterns = [
@@ -22,4 +23,6 @@ urlpatterns = [
     ),
     # bills
     path("bill_requests/", AgentBillsAPI.as_view(), name="bill_requests"),
+    # profile
+    path("profile/", ProfileAPI.as_view(), name="profile"),
 ]

@@ -247,7 +247,7 @@ class AgentBillsAPI(APIView):
             # list of paid bills
             bills_instance = Bill.objects.filter(
                 agent=request.user, status_1="admin_paid"
-            ).order_by("admin_paid_on")
+            ).order_by("-admin_paid_on")
             serialized_data = PaidBillSerializer(bills_instance, many=True)
             return Response(serialized_data.data)
 

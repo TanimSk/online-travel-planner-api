@@ -18,7 +18,7 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from commons.models import Bill
 from .models import Rfq, RfqService, Agent
 
-from commons.send_email import rfq_created_admin
+from commons.send_email import rfq_created_admin, rfq_confirmed_admin
 
 # from vendor.models import Service
 from django.shortcuts import render
@@ -177,6 +177,8 @@ class RFQTypesAPI(APIView):
                     admin_due=rfq_service_instance.service_price,
                     service=rfq_service_instance,
                 )
+
+            rfq_confirmed_admin(rfq_instance=rfq_instance)
 
         return Response({"status": "Successfully confirmed RFQ"})
 

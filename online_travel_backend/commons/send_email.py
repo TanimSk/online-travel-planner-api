@@ -1,7 +1,7 @@
 import threading
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+# from django.utils.html import strip_tags
 from administrator.models import Administrator
 from online_travel_backend.settings import DEFAULT_FROM_EMAIL
 
@@ -68,10 +68,32 @@ def rfq_updated_agent(rfq_instance):
 
     emails = [agent_instance.agent.email]
 
-    print(rfq_instance.travel_date)
-
     html_content = render_to_string(
         "email_notifications/rfq_updated.html",
+        {
+            "customer_name": rfq_instance.customer_name,
+            "customer_address": rfq_instance.customer_address,
+            "customer_num": rfq_instance.contact_no,
+            "travel_date": datetime.fromisoformat(
+                str(rfq_instance.travel_date)
+            ).strftime("%d/%m/%Y %I:%M %p"),
+            "created_on": rfq_instance.created_on,
+            "tracking_id": rfq_instance.tracking_id,
+            "rfq_services": rfq_services,
+        },
+    )
+
+    send_html_mail("RFQ Created", html_content, emails, DEFAULT_FROM_EMAIL)
+
+
+def rfq_declined_agent(rfq_instance):
+    agent_instance = Agent.objects.get(agent=rfq_instance.agent)
+    rfq_services = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
+
+    emails = [agent_instance.agent.email]
+
+    html_content = render_to_string(
+        "email_notifications/rfq_declined.html",
         {
             "customer_name": rfq_instance.customer_name,
             "customer_address": rfq_instance.customer_address,

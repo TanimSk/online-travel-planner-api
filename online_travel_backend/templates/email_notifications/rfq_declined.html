@@ -24,7 +24,7 @@
 
     <p>
         Hi, <br>
-        Your RFQ (created on {{ created_on }}) has been approved by Discover Thailand and the prices have been updated.
+        Your RFQ (created on {{ created_on }}) has been declined by Discover Thailand. Please contact with the administrators of Discover Thailand for more information.
     </p>
 
     <p>
@@ -43,8 +43,7 @@
     <p>
     <h2>Services:</h2>
     {% for rfq_service in rfq_services %}
-    <h4>- {{ rfq_service.service.service_name }}:</h4>
-    &nbsp; &nbsp; &nbsp; price: {{ rfq_service.service_price }} BDT<br>
+    <h4>- {{ rfq_service.service.service_name }}</h4>
     {% endfor %}
     </p>
 

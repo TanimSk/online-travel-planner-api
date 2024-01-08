@@ -288,7 +288,7 @@ class ProfileAPI(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         customer_instance = Customer.objects.get(customer=request.user)
-        serialized_data = self.serialized_data(customer_instance)
+        serialized_data = self.serializer_class(customer_instance)
         return Response(serialized_data.data)
 
     def put(self, request, format=None, *args, **kwargs):

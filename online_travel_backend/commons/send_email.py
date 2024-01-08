@@ -64,7 +64,7 @@ def rfq_created_admin(rfq_instance):
 
 def rfq_updated_agent(rfq_instance):
     agent_instance = Agent.objects.get(agent=rfq_instance.agent)
-    rfq_services = RfqService.objects.filter(rfq=rfq_instance)
+    rfq_services = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
 
     emails = [agent_instance.agent.email]
 

@@ -50,9 +50,9 @@ def rfq_created_admin(rfq_instance):
             "agent_num": agent_instance.mobile_no,
             "customer_address": rfq_instance.customer_address,
             "customer_num": rfq_instance.contact_no,
-            "travel_date": datetime.fromisoformat(rfq_instance.travel_date).strftime(
-                "%d/%m/%Y %I:%M %p"
-            ),
+            "travel_date": datetime.fromisoformat(
+                str(rfq_instance.travel_date)
+            ).strftime("%d/%m/%Y %I:%M %p"),
             "created_on": rfq_instance.created_on,
             "tracking_id": rfq_instance.tracking_id,
             "rfq_categories": rfq_categories,
@@ -68,15 +68,17 @@ def rfq_updated_agent(rfq_instance):
 
     emails = [agent_instance.agent.email]
 
+    print(rfq_instance.travel_date)
+
     html_content = render_to_string(
         "email_notifications/rfq_updated.html",
         {
             "customer_name": rfq_instance.customer_name,
             "customer_address": rfq_instance.customer_address,
             "customer_num": rfq_instance.contact_no,
-            "travel_date": datetime.fromisoformat(rfq_instance.travel_date).strftime(
-                "%d/%m/%Y %I:%M %p"
-            ),
+            "travel_date": datetime.fromisoformat(
+                str(rfq_instance.travel_date)
+            ).strftime("%d/%m/%Y %I:%M %p"),
             "created_on": rfq_instance.created_on,
             "tracking_id": rfq_instance.tracking_id,
             "rfq_services": rfq_services,

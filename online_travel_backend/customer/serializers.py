@@ -257,4 +257,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         exclude = (
             "customer",
             "added_on",
+            "confirmed",
         )

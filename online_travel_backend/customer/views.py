@@ -184,7 +184,8 @@ class GetInvoiceAPI(APIView):
 
         # Send Invoice
         rfq_instance = Rfq.objects.get(
-            tracking_id=rfq_tracing_id, customer=request.user
+            tracking_id=rfq_tracing_id, 
+            # customer=request.user
         )
         services_instance = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
 

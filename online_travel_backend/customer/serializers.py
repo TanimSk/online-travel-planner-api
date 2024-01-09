@@ -250,6 +250,8 @@ class RfqSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    email_address = serializers.EmailField(source="customer.email", read_only=True)
+
     class Meta:
         model = Customer
         exclude = (

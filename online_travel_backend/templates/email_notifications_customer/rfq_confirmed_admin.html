@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFQ Created</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        .heading {
+            margin: 3rem auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">
+        Discover Thailand
+    </h1>
+
+    <p>
+        Hi, <br>
+        A RFQ (created on: {{ created_on }}) has been confirmed by Agent (<b>{{ agent_name }}</b>). The services are
+        dispatched to the associated vendors. Unassigned services are marked with asterisk (*). Please assign them.
+    </p>
+
+    <p>
+    <h2>Agent Info:</h2>
+    Agency Name: {{ agency_name }} <br>
+    Agent Name: {{ agent_name }} <br>
+    Agent Mobile: {{ agent_num }} <br>
+    </p>
+
+    <p>
+    <h2>Customer Info:</h2>
+    Customer Name: {{ customer_name }} <br>
+    Customer Address: {{ customer_address }} <br>
+    Customer Mobile: {{ customer_num }} <br>
+    </p>
+
+    <p>
+    <h2>RFQ Info:</h2>
+    Tentative Travel Date: {{ travel_date }} <br>
+    RFQ ID: {{ tracking_id }} <br>
+    </p>
+
+    <p>
+    <h2>Services:</h2>
+    {% for rfq_service in rfq_services %}
+    - {{ rfq_service.service.service_name }}
+    {% if rfq_service.service.vendor_category.vendor is None %}
+    * (Needs to be assigned)
+    {% else %}
+    (Dispatched to vendor: {{rfq_service.service.vendor_category.vendor.vendor_name}} |
+    Contact Name: {{rfq_service.service.vendor_category.vendor.contact_name }} )
+    {% endif %}
+
+    <br>
+    {% endfor %}
+    </p>
+
+</body>
+
+</html>

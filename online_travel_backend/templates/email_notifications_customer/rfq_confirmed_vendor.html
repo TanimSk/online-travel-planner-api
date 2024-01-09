@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFQ Created</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        .heading {
+            margin: 3rem auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">
+        Discover Thailand
+    </h1>
+
+    <p>
+        Hi, <br>
+        A RFQ (created on: {{ created_on }}) has been confirmed by Agent (<b>{{ agent_name }}</b>).
+        Please process this RFQ service and bill.
+    </p>
+
+    <p>
+    <h2>Agent Info:</h2>
+    Agency Name: {{ agency_name }} <br>
+    Agent Name: {{ agent_name }} <br>
+    Agent Mobile: {{ agent_num }} <br>
+    </p>
+
+    <p>
+    <h2>RFQ Info:</h2>
+    Tentative Travel Date: {{ travel_date }} <br>
+    RFQ ID: {{ tracking_id }} <br>
+    </p>
+
+    <p>
+    <h2>Service:</h2>
+        service category: {{ service_category }} <br>
+        service name: {{ service_name }} <br>
+        price: {{ service_price }}
+    </p>
+
+</body>
+
+</html>

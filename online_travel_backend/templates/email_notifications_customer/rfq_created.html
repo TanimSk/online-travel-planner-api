@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFQ Created</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        .heading {
+            margin: 3rem auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">
+        Discover Thailand (B2C)
+    </h1>
+
+    <p>
+        Hi, <br>
+        A customer (<b>{{ customer_name }}</b>) has placed a RFQ request through the B2C portal on
+        <b>{{ created_on }}</b>.
+    </p>
+
+    <p>
+    <h2>Customer Info:</h2>
+    Customer Name: {{ customer_name }} <br>
+    Customer Address: {{ customer_address }} <br>
+    Customer Mobile: {{ customer_num }} <br>
+    </p>
+
+    <p>
+    <h2>RFQ Info:</h2>
+    Tentative Travel Date: {{ travel_date }} <br>
+    RFQ ID: {{ tracking_id }} <br>
+    </p>
+
+    <p>
+    <h2>Service Categories:</h2>
+    {% for rfq_category in rfq_categories %}
+    - {{ rfq_category.category.category_name }} <br>
+    {% endfor %}
+    </p>
+
+</body>
+
+</html>

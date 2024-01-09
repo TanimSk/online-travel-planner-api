@@ -17,6 +17,7 @@ from agent.serializers import (
     BillPaySerializer,
 )
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
+from commons.send_email import rfq_created_admin
 from django.db import transaction
 
 from django.shortcuts import render
@@ -68,6 +69,7 @@ class CreateRfqAPI(APIView):
             rfq_instance = serialized_data.create(serialized_data.data)
             rfq_instance.save()
 
+            rfq_created_admin(rfq_instance=rfq_instance, is_customer=True)
             return Response({"status": "Successfully created RFQ"})
 
 

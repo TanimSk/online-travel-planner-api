@@ -32,33 +32,49 @@ def send_html_mail(subject, html_content, recipient_list, sender):
 # <status>_<email_to>
 
 
-def rfq_created_admin(rfq_instance):
-    agent_instance = Agent.objects.get(agent=rfq_instance.agent)
+def rfq_created_admin(rfq_instance, is_customer=False):
     rfq_categories = RfqCategory.objects.filter(rfq=rfq_instance)
-
     emails = list(
         Administrator.objects.filter(administrator__emailaddress__verified=True)
         .values_list("administrator__email", flat=True)
         .distinct()
     )
 
-    html_content = render_to_string(
-        "email_notifications/rfq_created.html",
-        {
-            "customer_name": rfq_instance.customer_name,
-            "agent_name": agent_instance.agent_name,
-            "agency_name": agent_instance.agency_name,
-            "agent_num": agent_instance.mobile_no,
-            "customer_address": rfq_instance.customer_address,
-            "customer_num": rfq_instance.contact_no,
-            "travel_date": datetime.fromisoformat(
-                str(rfq_instance.travel_date)
-            ).strftime("%d/%m/%Y %I:%M %p"),
-            "created_on": rfq_instance.created_on,
-            "tracking_id": rfq_instance.tracking_id,
-            "rfq_categories": rfq_categories,
-        },
-    )
+    if not is_customer:
+        agent_instance = Agent.objects.get(agent=rfq_instance.agent)
+        html_content = render_to_string(
+            "email_notifications/rfq_created.html",
+            {
+                "customer_name": rfq_instance.customer_name,
+                "agent_name": agent_instance.agent_name,
+                "agency_name": agent_instance.agency_name,
+                "agent_num": agent_instance.mobile_no,
+                "customer_address": rfq_instance.customer_address,
+                "customer_num": rfq_instance.contact_no,
+                "travel_date": datetime.fromisoformat(
+                    str(rfq_instance.travel_date)
+                ).strftime("%d/%m/%Y %I:%M %p"),
+                "created_on": rfq_instance.created_on,
+                "tracking_id": rfq_instance.tracking_id,
+                "rfq_categories": rfq_categories,
+            },
+        )
+
+    else:
+        html_content = render_to_string(
+            "email_notifications_customer/rfq_created.html",
+            {
+                "customer_name": rfq_instance.customer_name,
+                "customer_address": rfq_instance.customer_address,
+                "customer_num": rfq_instance.contact_no,
+                "travel_date": datetime.fromisoformat(
+                    str(rfq_instance.travel_date)
+                ).strftime("%d/%m/%Y %I:%M %p"),
+                "created_on": rfq_instance.created_on,
+                "tracking_id": rfq_instance.tracking_id,
+                "rfq_categories": rfq_categories,
+            },
+        )
 
     send_html_mail("RFQ Created", html_content, emails, DEFAULT_FROM_EMAIL)
 

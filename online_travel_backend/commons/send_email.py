@@ -234,7 +234,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
                 html_content = render_to_string(
                     "email_notifications_customer/rfq_confirmed_vendor.html",
                     {
-                        "customer_name": agent_instance.agent_name,
+                        "customer_name": rfq_instance.customer_name,
                         "travel_date": datetime.fromisoformat(
                             str(rfq_instance.travel_date)
                         ).strftime("%d/%m/%Y %I:%M %p"),

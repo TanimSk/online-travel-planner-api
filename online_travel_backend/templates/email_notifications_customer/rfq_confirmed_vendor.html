@@ -19,20 +19,13 @@
 
 <body>
     <h1 class="heading">
-        Discover Thailand
+        Discover Thailand (B2C)
     </h1>
 
     <p>
         Hi, <br>
-        A RFQ (created on: {{ created_on }}) has been confirmed by Agent (<b>{{ agent_name }}</b>).
+        A RFQ (created on: {{ created_on }}) has been confirmed by customer (<b>{{ customer_name }}</b>).
         Please process this RFQ service and bill.
-    </p>
-
-    <p>
-    <h2>Agent Info:</h2>
-    Agency Name: {{ agency_name }} <br>
-    Agent Name: {{ agent_name }} <br>
-    Agent Mobile: {{ agent_num }} <br>
     </p>
 
     <p>
@@ -43,9 +36,9 @@
 
     <p>
     <h2>Service:</h2>
-        service category: {{ service_category }} <br>
-        service name: {{ service_name }} <br>
-        price: {{ service_price }}
+    service category: {{ service_category }} <br>
+    service name: {{ service_name }} <br>
+    price: {{ service_price }}
     </p>
 
 </body>

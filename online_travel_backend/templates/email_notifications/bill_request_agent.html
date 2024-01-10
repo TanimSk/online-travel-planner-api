@@ -32,7 +32,7 @@
     <h2>RFQ Info:</h2>
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
-    Total Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill }}
+    Total Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill|add:bill_instance.agent_bill  }}
     </p>
 
     <p>

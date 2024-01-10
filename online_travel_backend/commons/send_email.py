@@ -84,7 +84,7 @@ def rfq_updated_agent(rfq_instance):
     agent_instance = Agent.objects.get(agent=rfq_instance.agent)
     rfq_services = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
 
-    if agent_instance.pseudo_agent:
+    if not agent_instance.pseudo_agent:
         emails = [agent_instance.agent.email]
 
         html_content = render_to_string(

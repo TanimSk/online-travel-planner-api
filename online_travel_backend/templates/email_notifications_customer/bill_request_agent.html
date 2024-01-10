@@ -32,8 +32,8 @@
     <h2>Service Info:</h2>
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
-    Service: {{ bill_instance.service.service.service_name }}
-    Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill|add:bill_instance.agent_bill }}
+    Service: {{ bill_instance.service.service.service_name }} <br>
+    Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill }}
     </p>
 
 

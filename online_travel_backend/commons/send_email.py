@@ -302,7 +302,7 @@ def bill_request_agent(bill_instance):
                     str(bill_instance.service.rfq_category.rfq.travel_date)
                 ).strftime("%d/%m/%Y %I:%M %p"),
                 "created_on": bill_instance.service.rfq_category.rfq.created_on,
-                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,                
+                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
                 "customer_name": bill_instance.service.rfq_category.rfq.customer_name,
                 "customer_address": bill_instance.service.rfq_category.rfq.customer_address,
                 "customer_num": bill_instance.service.rfq_category.rfq.contact_no,
@@ -319,17 +319,64 @@ def bill_request_agent(bill_instance):
                     str(bill_instance.service.rfq_category.rfq.travel_date)
                 ).strftime("%d/%m/%Y %I:%M %p"),
                 "created_on": bill_instance.service.rfq_category.rfq.created_on,
-                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,                
+                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
             },
         )
     send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
+def bill_pay_admin(bill_instance, is_customer=False):
+    if not is_customer:
+        agent_instance = Agent.objects.get(agent=bill_instance.agent)
+        emails = [bill_instance.service.rfq_category.rfq.email_address]
+
+        html_content = render_to_string(
+            "email_notifications/bill_request_agent.html",
+            {
+                "agent_name": agent_instance.agent_name,
+                "agency_name": agent_instance.agency_name,
+                "agent_num": agent_instance.mobile_no,
+                "bill_instance": bill_instance,
+                "paid_amount": bill_instance.admin_bill
+                + bill_instance.vendor_bill
+                - bill_instance.agent_due,
+                "travel_date": datetime.fromisoformat(
+                    str(bill_instance.service.rfq_category.rfq.travel_date)
+                ).strftime("%d/%m/%Y %I:%M %p"),
+                "created_on": bill_instance.service.rfq_category.rfq.created_on,
+                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
+                "customer_name": bill_instance.service.rfq_category.rfq.customer_name,
+                "customer_address": bill_instance.service.rfq_category.rfq.customer_address,
+                "customer_num": bill_instance.service.rfq_category.rfq.contact_no,
+            },
+        )
+
+    else:
+        agent_instance = Agent.objects.get(agent=bill_instance.agent)
+        emails = [bill_instance.service.rfq_category.rfq.email_address]
+
+        html_content = render_to_string(
+            "email_notifications_customer/bill_request_agent.html",
+            {
+                "bill_instance": bill_instance,
+                "paid_amount": bill_instance.admin_bill
+                + bill_instance.vendor_bill
+                - bill_instance.agent_due,
+                "travel_date": datetime.fromisoformat(
+                    str(bill_instance.service.rfq_category.rfq.travel_date)
+                ).strftime("%d/%m/%Y %I:%M %p"),
+                "created_on": bill_instance.service.rfq_category.rfq.created_on,
+                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
+                "customer_name": bill_instance.service.rfq_category.rfq.customer_name,
+                "customer_address": bill_instance.service.rfq_category.rfq.customer_address,
+                "customer_num": bill_instance.service.rfq_category.rfq.contact_no,
+            },
+        )
+
+    send_html_mail("Bill Paid", html_content, emails, DEFAULT_FROM_EMAIL)
+
+
 def bill_request_admin(bill_instance):
-    ...
-
-
-def bill_pay_admin(bill_instance):
     ...
 
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RFQ Created</title>
+    <title>Bill Paid</title>
     <style type="text/css">
         body {
             font-family: Tahoma, sans-serif;
@@ -24,8 +24,9 @@
 
     <p>
         Hi, <br>
-        Discover Thailand has requested you a bill (bill id: <b> {{ bill_instance.tracking_id }} </b>) for a RFQ created
-        on: {{ created_on }}.
+        An agent (agency name: {{ agency_name }}) has paid <b>{{ paid_amount }}Tk.</b> on
+        <b>{{ bill_instance.admin_paid_on }}</b>
+        against bill <b>#{{ bill_instance.tracking_id }}</b>.
     </p>
 
     <p>
@@ -33,7 +34,15 @@
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
     Service: {{ bill_instance.service.service.service_name }} <br>
-    Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill  }}
+    Paid Amount: {{ paid_amount }}
+    Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill }}
+    </p>
+
+    <p>
+    <h2>Agent Info:</h2>
+    Agency Name: {{ agency_name }} <br>
+    Agent Name: {{ agent_name }} <br>    
+    Agent Mobile: {{ agent_num }} <br>
     </p>
 
     <p>

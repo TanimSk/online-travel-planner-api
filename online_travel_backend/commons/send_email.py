@@ -327,7 +327,7 @@ def bill_request_agent(bill_instance):
                 "rfq_services": rfq_services,
             },
         )
-    send_html_mail("RFQ Confirmed", html_content, [emails], DEFAULT_FROM_EMAIL)
+    send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def bill_request_admin(bill_instance):

@@ -36,7 +36,7 @@ from commons.models import Bill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
 
-from commons.send_email import rfq_updated_agent, rfq_declined_agent
+from commons.send_email import rfq_updated_agent, rfq_declined_agent, bill_request_agent
 
 
 # Authenticate Vendor Only Class
@@ -581,6 +581,7 @@ class AgentBillAPI(APIView):
                 bill_instance.status_1 = "agent_bill"
                 bill_instance.agent_billed_on = timezone.now()
                 bill_instance.save()
+                bill_request_agent(bill_instance=bill_instance)
 
             return Response({"status": "Successfully requested for bill to agent"})
 

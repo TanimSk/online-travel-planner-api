@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill Request</title>
+    <title>RFQ Created</title>
     <style type="text/css">
         body {
             font-family: Tahoma, sans-serif;
@@ -19,25 +19,20 @@
 
 <body>
     <h1 class="heading">
-        Discover Thailand
+        Discover Thailand (B2C)
     </h1>
 
     <p>
         Hi, <br>
-        A RFQ (created on {{ created_on }}) has been approved by Discover Thailand and the prices have been updated.
-    </p>
-
-    <p>
-    <h2>Customer Info:</h2>
-    Customer Name: {{ customer_name }} <br>
-    Customer Address: {{ customer_address }} <br>
-    Customer Mobile: {{ customer_num }} <br>
+        Discover Thailand has requested you a bill (bill id: <b> {{ bill_instance.tracking_id }} </b>) for a RFQ created
+        on: {{ created_on }}.
     </p>
 
     <p>
     <h2>RFQ Info:</h2>
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
+    Total Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill }}
     </p>
 
     <p>

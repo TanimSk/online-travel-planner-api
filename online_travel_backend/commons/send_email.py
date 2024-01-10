@@ -7,6 +7,7 @@ from administrator.models import Administrator
 from online_travel_backend.settings import DEFAULT_FROM_EMAIL
 
 from agent.models import Agent, Rfq, RfqCategory, RfqService
+from customer.models import Customer
 from datetime import datetime
 
 
@@ -83,9 +84,10 @@ def rfq_updated_agent(rfq_instance):
     agent_instance = Agent.objects.get(agent=rfq_instance.agent)
     rfq_services = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
 
-    emails = [agent_instance.agent.email]
+    if agent_instance.pseudo_agent:
+        emails = [agent_instance.agent.email]
 
-    html_content = render_to_string(
+        html_content = render_to_string(
         "email_notifications/rfq_updated.html",
         {
             "customer_name": rfq_instance.customer_name,
@@ -99,18 +101,11 @@ def rfq_updated_agent(rfq_instance):
             "rfq_services": rfq_services,
         },
     )
-
-    send_html_mail("RFQ Updated and Approved", html_content, emails, DEFAULT_FROM_EMAIL)
-
-
-def rfq_declined_agent(rfq_instance):
-    agent_instance = Agent.objects.get(agent=rfq_instance.agent)
-    rfq_services = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
-
-    emails = [agent_instance.agent.email]
-
-    html_content = render_to_string(
-        "email_notifications/rfq_declined.html",
+    else:
+        # B2C
+        emails = [Customer.objects.get(customer=rfq_instance.customer).customer.email]
+        html_content = render_to_string(
+        "email_notifications_customer/rfq_updated.html",
         {
             "customer_name": rfq_instance.customer_name,
             "customer_address": rfq_instance.customer_address,
@@ -124,7 +119,9 @@ def rfq_declined_agent(rfq_instance):
         },
     )
 
-    send_html_mail("RFQ Declined", html_content, emails, DEFAULT_FROM_EMAIL)
+    
+
+    send_html_mail("RFQ Updated and Approved", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def rfq_declined_agent(rfq_instance):

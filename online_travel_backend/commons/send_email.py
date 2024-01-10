@@ -288,9 +288,6 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
 
 
 def bill_request_agent(bill_instance):
-    rfq_services = RfqService.objects.filter(
-        rfq_category__rfq=bill_instance.service.rfq_category.rfq
-    )
     agent_instance = Agent.objects.get(agent=bill_instance.agent)
 
     # Send to agent
@@ -305,8 +302,7 @@ def bill_request_agent(bill_instance):
                     str(bill_instance.service.rfq_category.rfq.travel_date)
                 ).strftime("%d/%m/%Y %I:%M %p"),
                 "created_on": bill_instance.service.rfq_category.rfq.created_on,
-                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
-                "rfq_services": rfq_services,
+                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,                
                 "customer_name": bill_instance.service.rfq_category.rfq.customer_name,
                 "customer_address": bill_instance.service.rfq_category.rfq.customer_address,
                 "customer_num": bill_instance.service.rfq_category.rfq.contact_no,
@@ -323,8 +319,7 @@ def bill_request_agent(bill_instance):
                     str(bill_instance.service.rfq_category.rfq.travel_date)
                 ).strftime("%d/%m/%Y %I:%M %p"),
                 "created_on": bill_instance.service.rfq_category.rfq.created_on,
-                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
-                "rfq_services": rfq_services,
+                "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,                
             },
         )
     send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)

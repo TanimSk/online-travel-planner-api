@@ -29,10 +29,11 @@
     </p>
 
     <p>
-    <h2>RFQ Info:</h2>
+    <h2>Service Info:</h2>
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
-    Total Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill|add:bill_instance.agent_bill  }}
+    Service: {{ bill_instance.service.service.service_name }}
+    Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill|add:bill_instance.agent_bill  }}
     </p>
 
     <p>
@@ -40,14 +41,6 @@
     Customer Name: {{ customer_name }} <br>
     Customer Address: {{ customer_address }} <br>
     Customer Mobile: {{ customer_num }} <br>
-    </p>
-
-    <p>
-    <h2>Services:</h2>
-    {% for rfq_service in rfq_services %}
-    <h4>- {{ rfq_service.service.service_name }}:</h4>
-    &nbsp; &nbsp; &nbsp; price: {{ rfq_service.service_price }} BDT<br>
-    {% endfor %}
     </p>
 
 </body>

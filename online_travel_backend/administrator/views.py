@@ -36,7 +36,12 @@ from commons.models import Bill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
 
-from commons.send_email import rfq_updated_agent, rfq_declined_agent, bill_request_agent
+from commons.send_email import (
+    rfq_updated_agent,
+    rfq_declined_agent,
+    bill_request_agent,
+    bill_pay_vendor,
+)
 
 
 # Authenticate Vendor Only Class
@@ -629,6 +634,7 @@ class VendorBillAPI(APIView):
                 bill_instance.vendor_paid_on = timezone.now()
                 bill_instance.status_2 = "vendor_paid"
                 bill_instance.save()
+                bill_pay_vendor(bill_instance=bill_instance)
 
                 return Response({"status": "Successfully paid bills"})
 

@@ -17,6 +17,7 @@ from administrator.serializers import BasicRfqSerializer
 from .models import Service, VendorCategory, Vendor
 from agent.models import RfqService, Rfq
 from commons.models import Category, Bill
+from commons.send_email import bill_request_admin
 
 
 # Authenticate Vendor Only Class
@@ -296,6 +297,7 @@ class AdminBillAPI(APIView):
                 bill_instance.status_2 = "admin_bill"
                 bill_instance.admin_billed_on = timezone.now()
                 bill_instance.save()
+                bill_request_admin(bill_instance=bill_instance)
 
             return Response({"status": "Successfully requested for bill to admin"})
 

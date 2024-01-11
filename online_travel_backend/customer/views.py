@@ -17,7 +17,7 @@ from agent.serializers import (
     BillPaySerializer,
 )
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
-from commons.send_email import rfq_created_admin, rfq_confirmed_admin
+from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
 from django.db import transaction
 
 from django.shortcuts import render
@@ -157,7 +157,7 @@ class RFQTypesAPI(APIView):
                     admin_due=rfq_service_instance.service_price,
                     service=rfq_service_instance,
                 )
-        
+
             rfq_confirmed_admin(rfq_instance, is_customer=True)
 
         return Response({"status": "Successfully confirmed RFQ"})
@@ -188,7 +188,7 @@ class GetInvoiceAPI(APIView):
 
         # Send Invoice
         rfq_instance = Rfq.objects.get(
-            tracking_id=rfq_tracing_id, 
+            tracking_id=rfq_tracing_id,
             # customer=request.user
         )
         services_instance = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
@@ -283,6 +283,8 @@ class AgentBillsAPI(APIView):
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
+
+                bill_pay_admin(bill_instance=bill_instance, is_customer=True)
 
                 return Response({"status": "Successfully paid bills"})
 

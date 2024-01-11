@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Paid</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        .heading {
+            margin: 3rem auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">
+        Discover Thailand
+    </h1>
+
+    <p>
+        Hi, <br>
+        A vendor ({{ vendor_name }}) has requested you a bill (ID: <b>{{ bill_instance.tracking_id }}</b>). Please
+        pay the bill.
+    </p>
+
+    <p>
+    <h2>Vendor Info:</h2>
+    Contact Name: {{ contact_name }} <br>
+    Vendor Name: {{ vendor_name }} <br>
+    Vendor Address: {{ vendor_address }} <br>
+    Vendor Mobile: {{ vendor_number }}
+    </p>
+
+    <p>
+    <h2>Service Info:</h2>
+    Tentative Travel Date: {{ travel_date }} <br>
+    RFQ ID: {{ tracking_id }} <br>
+    Service: {{ bill_instance.service.service.service_name }} <br>
+    Bill: {{ bill_instance.vendor_bill }}
+    </p>
+
+
+</body>
+
+</html>

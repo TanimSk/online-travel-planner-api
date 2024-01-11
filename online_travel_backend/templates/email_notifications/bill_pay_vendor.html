@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Paid</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        .heading {
+            margin: 3rem auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">
+        Discover Thailand
+    </h1>
+
+    <p>
+        Hi, <br>
+        Discover Thailand has paid <b>{{ amount_paid }} Tk.</b> against the bill (ID: <b>{{
+            bill_instance.tracking_id }}</b>).
+    </p>
+
+    <p>
+    <h2>Service Info:</h2>
+    Tentative Travel Date: {{ travel_date }} <br>
+    RFQ ID: {{ tracking_id }} <br>
+    Service: {{ bill_instance.service.service.service_name }} <br>
+    Paid Amount: {{ amount_paid }}
+    Bill: {{ bill_instance.vendor_bill }} <br>
+    </p>
+
+
+</body>
+
+</html>

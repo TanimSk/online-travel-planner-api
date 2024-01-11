@@ -8,6 +8,7 @@ from online_travel_backend.settings import DEFAULT_FROM_EMAIL
 
 from agent.models import Agent, Rfq, RfqCategory, RfqService
 from customer.models import Customer
+from vendor.models import Vendor
 from datetime import datetime
 
 
@@ -309,6 +310,7 @@ def bill_request_agent(bill_instance):
             },
         )
     else:
+        # Send to customer
         emails = [bill_instance.service.rfq_category.rfq.email_address]
 
         html_content = render_to_string(
@@ -322,16 +324,22 @@ def bill_request_agent(bill_instance):
                 "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
             },
         )
-    send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail(
+        "Bill Requested - Discover Thailand", html_content, emails, DEFAULT_FROM_EMAIL
+    )
 
 
 def bill_pay_admin(bill_instance, is_customer=False):
-    if not is_customer:
-        agent_instance = Agent.objects.get(agent=bill_instance.agent)
-        emails = [bill_instance.service.rfq_category.rfq.email_address]
+    agent_instance = Agent.objects.get(agent=bill_instance.agent)
+    emails = list(
+        Administrator.objects.filter(administrator__emailaddress__verified=True)
+        .values_list("administrator__email", flat=True)
+        .distinct()
+    )
 
+    if not is_customer:
         html_content = render_to_string(
-            "email_notifications/bill_request_agent.html",
+            "email_notifications/bill_pay_admin.html",
             {
                 "agent_name": agent_instance.agent_name,
                 "agency_name": agent_instance.agency_name,
@@ -352,11 +360,8 @@ def bill_pay_admin(bill_instance, is_customer=False):
         )
 
     else:
-        agent_instance = Agent.objects.get(agent=bill_instance.agent)
-        emails = [bill_instance.service.rfq_category.rfq.email_address]
-
         html_content = render_to_string(
-            "email_notifications_customer/bill_request_agent.html",
+            "email_notifications_customer/bill_pay_admin.html",
             {
                 "bill_instance": bill_instance,
                 "paid_amount": bill_instance.admin_bill
@@ -377,8 +382,44 @@ def bill_pay_admin(bill_instance, is_customer=False):
 
 
 def bill_request_admin(bill_instance):
-    ...
+    emails = list(
+        Administrator.objects.filter(administrator__emailaddress__verified=True)
+        .values_list("administrator__email", flat=True)
+        .distinct()
+    )
+
+    vendor_instance = Vendor.objects.get(vendor=bill_instance.vendor)
+
+    html_content = render_to_string(
+        "email_notifications/bill_req_admin.html",
+        {
+            "vendor_name": vendor_instance.vendor_name,
+            "bill_instance": bill_instance,
+            "contact_name": vendor_instance.contact_name,
+            "vendor_address": vendor_instance.vendor_address,
+            "vendor_number": vendor_instance.vendor_name,
+            "travel_date": datetime.fromisoformat(
+                str(bill_instance.service.rfq_category.rfq.travel_date)
+            ).strftime("%d/%m/%Y %I:%M %p"),
+            "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
+        },
+    )
+
+    send_html_mail("Bill Requested", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def bill_pay_vendor(bill_instance):
-    ...
+
+    html_content = render_to_string(
+        "email_notifications/bill_pay_vendor.html",
+        {
+            "bill_instance": bill_instance,
+            "amount_paid": bill_instance.vendor_bill - bill_instance.admin_due,
+            "travel_date": datetime.fromisoformat(
+                str(bill_instance.service.rfq_category.rfq.travel_date)
+            ).strftime("%d/%m/%Y %I:%M %p"),
+            "tracking_id": bill_instance.service.rfq_category.rfq.tracking_id,
+        },
+    )
+
+    send_html_mail("Bill Paid", html_content, [bill_instance.vendor.email], DEFAULT_FROM_EMAIL)

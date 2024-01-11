@@ -18,7 +18,7 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from commons.models import Bill
 from .models import Rfq, RfqService, Agent
 from django.shortcuts import get_object_or_404
-from commons.send_email import rfq_created_admin, rfq_confirmed_admin
+from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
 
 
 # from vendor.models import Service
@@ -287,6 +287,8 @@ class AgentBillsAPI(APIView):
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
+
+                bill_pay_admin(bill_instance=bill_instance)
 
                 return Response({"status": "Successfully paid bills"})
 

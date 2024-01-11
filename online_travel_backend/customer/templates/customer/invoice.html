@@ -198,7 +198,7 @@
           </td>
 
           <td>
-            {{ rfq_service.service_price|calculate_total_bill:rfq_service.admin_commission:rfq_service.agent_commission }} BDT.
+            {{ rfq_service.service_price|calculate_total_bill:[rfq_service.admin_commission, rfq_service.agent_commission] }} BDT.
           </td>
         </tr>
         {% endfor %}

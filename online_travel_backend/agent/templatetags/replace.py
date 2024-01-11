@@ -14,7 +14,6 @@ def mul(value, arg):
     return value * arg
 
 
-@register.filter
-def calculate_total_bill(bill, commissions):
-    commission1, commission2 = commissions
+@register.simple_tag
+def calculate_total_bill(bill, commission1, commission2):
     return bill + (bill * commission1 * 0.01) + (bill * commission2 * 0.01)

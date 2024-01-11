@@ -223,11 +223,7 @@
           </td>
 
           <td>
-            {% with commission1_value=rfq_service.service_price|mul:rfq_service.admin_commission|mul:0.01 %}
-            {% with commission2_value=rfq_service.service_price|mul:rfq_service.agent_commission|mul:0.01 %}
-            {{ rfq_service.service_price|add:commission1_value|add:commission2_value }}
-            {% endwith %}
-            {% endwith %} BDT.
+            {{ rfq_service.service_price|calculate_total_bill:rfq_service.admin_commission:rfq_service.agent_commission }} BDT.
           </td>
         </tr>
         {% endfor %}

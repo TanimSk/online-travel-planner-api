@@ -224,7 +224,10 @@ class GetInvoiceAPI(APIView):
 
         serialized_data = RfqInvoiceSerializer(rfq_instance)
 
-        print(Response(serialized_data.data))
+        import json
+
+
+        print(json.dumps(serialized_data.data))
         print("-------------------")
         print(
             "total:",

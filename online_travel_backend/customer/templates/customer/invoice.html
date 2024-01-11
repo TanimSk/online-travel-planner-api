@@ -73,7 +73,7 @@
     }
 
     .address .label-table {
-      width: 110px;
+      width: 100px;
     }
 
     .title {
@@ -128,7 +128,7 @@
     }
   </style>
   {% load replace %}
-  
+
 </head>
 
 <body>
@@ -136,8 +136,6 @@
     <div>
       <h1 class="heading">Invoice</h1>
     </div>
-
-    <!-- agent info omitted -->
 
     <div class="customer_info">
       <h1 class="title">Customer Info:</h1>
@@ -177,7 +175,7 @@
         {% for rfq_category in data.rfq_categories %}
         {% for rfq_service in rfq_category.rfq_services %}
         <tr>
-          <td>01</td>
+          <td>{{forloop.counter}}.</td>
           <td>
             {{ rfq_category.category.category_name }}
           </td>
@@ -199,15 +197,19 @@
             {% endfor %}
           </td>
 
-          <td>{{ rfq_service.service_price }} BDT</td>
+          <td>
+            {% with commission1_value=rfq_service.service_price|mul:rfq_service.admin_commission %}
+            {% with commission2_value=rfq_service.service_price|mul:rfq_service.agent_commission %}
+            {{ rfq_service.service_price|add:commission1_value|add:commission2_value }}
+            {% endwith %}
+            {% endwith %} BDT.
+          </td>
         </tr>
         {% endfor %}
         {% endfor %}
       </table>
     </div>
     <p class="total">
-      Service Charge: &nbsp; <span> {{ extra_charge }} BDT</span>
-      <br><br>
       Total Price Range: <span> {{ total_price }} BDT</span>
     </p>
   </div>

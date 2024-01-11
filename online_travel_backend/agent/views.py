@@ -223,18 +223,6 @@ class GetInvoiceAPI(APIView):
         )["charge"]
 
         serialized_data = RfqInvoiceSerializer(rfq_instance)
-
-        import json
-
-
-        print(json.dumps(serialized_data.data))
-        print("-------------------")
-        print(
-            "total:",
-            math.ceil(total_service_charge + extra_charge_agent + extra_charge_admin),
-        )
-        print("extra:", math.ceil(extra_charge_admin + extra_charge_agent))
-
         
         return render(
             request,

@@ -201,7 +201,7 @@ class GetInvoiceAPI(APIView):
             charge=Sum((F("service_price") * F("admin_commission")) / 100)
         )["charge"]
         extra_charge_agent = services_instance.aggregate(
-            charge=Sum((F("service_price") * F("admin_commission")) / 100)
+            charge=Sum((F("service_price") * F("agent_commission")) / 100)
         )["charge"]
 
         serialized_data = RfqInvoiceSerializer(rfq_instance)

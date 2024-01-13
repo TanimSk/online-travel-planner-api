@@ -119,7 +119,7 @@ class Service(models.Model):
     car_type = models.CharField(blank=True, null=True)
 
     # tour packages
-    services_name = ArrayField(models.URLField(), default=list, blank=True, null=True)
+    services_name = ArrayField(models.CharField(), default=list, blank=True, null=True)
     cover_img = models.URLField(blank=True, null=True)
 
     def __str__(self) -> str:

@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from commons.models import Category
 from vendor.models import Service
+from django.contrib.postgres.fields import ArrayField
 import uuid
 
 
@@ -156,6 +157,9 @@ class RfqService(models.Model):
 
     # AV production
     duration = models.IntegerField(default=0)
+
+    # Package
+    services_name = ArrayField(models.CharField(), default=list, blank=True, null=True)
 
     #  ---- Prices ----
     # Calculate price, when placing rfq order

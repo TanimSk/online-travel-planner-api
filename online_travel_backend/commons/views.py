@@ -59,8 +59,7 @@ class QueryServicesAPI(APIView):
                 if type(value) is list:
                     if value:
                         dict[f"{key}__contains"] = value
-                    else:
-                        continue
+                    continue
 
                 dict[f"{key}__icontains"] = value
         print(dict)

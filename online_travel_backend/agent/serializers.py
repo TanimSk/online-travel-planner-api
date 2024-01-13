@@ -464,6 +464,8 @@ class ServiceInfo(serializers.ModelSerializer):
             "overview",
             "itinerary",
             "rates",
+            "services_name",
+            "cover_img",
         )
         model = Service
 

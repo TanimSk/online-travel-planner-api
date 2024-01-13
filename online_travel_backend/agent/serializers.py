@@ -299,7 +299,7 @@ class QueryServiceSerializer(serializers.Serializer):
     car_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     # tour package
-    services_name = serializers.ListField(required=False, allow_null=True, allow_blank=True)
+    services_name = serializers.ListField(required=False, allow_null=True)
 
 
 class QueryResultSerializer(serializers.ModelSerializer):

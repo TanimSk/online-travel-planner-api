@@ -56,6 +56,12 @@ class QueryServicesAPI(APIView):
         dict = {}
         for key, value in data.items():
             if not (value == "" or value is None):
+                if type(value) is list:
+                    if value:
+                        dict[f"{key}__icontains"] = value
+                    else:
+                        continue
+
                 dict[f"{key}__icontains"] = value
 
         return dict

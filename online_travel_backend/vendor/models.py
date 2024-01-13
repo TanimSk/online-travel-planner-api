@@ -82,7 +82,6 @@ class Service(models.Model):
     cost_per_hour = models.FloatField(default=0)
     admin_commission = models.FloatField(default=0)
 
-
     # venue sourcing
     area_name = models.CharField(max_length=500, blank=True, null=True)
 
@@ -118,6 +117,10 @@ class Service(models.Model):
 
     # daily transportation
     car_type = models.CharField(blank=True, null=True)
+
+    # tour packages
+    services_name = ArrayField(models.URLField(), default=list, blank=True, null=True)
+    cover_img = models.URLField(blank=True, null=True)
 
     def __str__(self) -> str:
         return self.service_name

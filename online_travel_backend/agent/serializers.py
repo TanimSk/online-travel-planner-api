@@ -298,6 +298,9 @@ class QueryServiceSerializer(serializers.Serializer):
     # daily transportation
     car_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
+    # tour package
+    services_name = serializers.ListField(required=False, allow_null=True, allow_blank=True)
+
 
 class QueryResultSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField(method_name="get_total_price")

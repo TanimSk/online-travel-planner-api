@@ -62,7 +62,7 @@ class QueryServicesAPI(APIView):
                     continue
 
                 dict[f"{key}__icontains"] = value
-        print(dict)
+
         return dict
 
     def post(self, request, format=None, *args, **kwargs):

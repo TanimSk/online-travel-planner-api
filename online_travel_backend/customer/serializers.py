@@ -96,8 +96,7 @@ class RfqSerializer(serializers.ModelSerializer):
 
         return super(RfqSerializer, self).to_internal_value(copy_data)
 
-        # get total price
-
+    # get total price
     def calc_total_price_value(self, service_instance, rfq_service_instance):
         delta_days = 1
 
@@ -106,6 +105,7 @@ class RfqSerializer(serializers.ModelSerializer):
             (rfq_service_instance.get("check_in_date", None) is None)
             and (rfq_service_instance.get("check_out_date", None) is None)
         ):
+            print(rfq_service_instance.get("check_in_date", None))
             date_format = "%Y-%m-%dT%H:%M:%S"
             date1 = datetime.strptime(
                 rfq_service_instance.get("check_in_date", None), date_format
@@ -133,12 +133,12 @@ class RfqSerializer(serializers.ModelSerializer):
             + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
         )
 
-        # appending commissions || No Agent commissions in customers
-        total_price = total_price + (
+        # appending commissions
+        total_price_added = total_price + (
             total_price * service_instance.admin_commission * 0.01
         )
 
-        return total_price
+        return [total_price_added, total_price]
 
     # get json
     def calc_total_price(self, validated_data):
@@ -212,33 +212,19 @@ class RfqSerializer(serializers.ModelSerializer):
 
                     # price calculation
                     service_instance = Service.objects.get(id=service_id)
-                    total_price = (
-                        (
-                            service_instance.infant_price
-                            * rfq_service.get("infant_members", 0)
-                        )
-                        + (
-                            service_instance.child_price
-                            * rfq_service.get("child_members", 0)
-                        )
-                        + (
-                            service_instance.adult_price
-                            * rfq_service.get("adult_members", 0)
-                        )
-                        + (
-                            service_instance.service_price
-                            * rfq_service.get("members", 0)
-                        )
+
+                    total_price = self.calc_total_price_value(
+                        service_instance, rfq_service
                     )
 
-                    rfq_total_price += total_price + (
-                        total_price * service_instance.admin_commission * 0.01
-                    )
+                    # price with commission
+                    rfq_total_price += total_price[1]
 
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
                         service=service_instance,
-                        service_price=total_price,
+                        # without commisssion, base price
+                        service_price=total_price[0],
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
                     )

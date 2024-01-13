@@ -139,13 +139,13 @@ class RfqSerializer(serializers.ModelSerializer):
         ).commission
 
         # appending commissions
-        total_price = (
+        total_price_added = (
             total_price
             + (total_price * service_instance.admin_commission * 0.01)
             + (total_price * agent_commission * 0.01)
         )
 
-        return total_price
+        return [total_price_added, total_price]
 
     # get json
     def calc_total_price(self, validated_data):
@@ -170,7 +170,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 total_services += 1
                 total_price += self.calc_total_price_value(
                     service_instance, rfq_service
-                )
+                )[0]
         return {"total_price": total_price, "total_services": total_services}
 
     def create(self, validated_data):
@@ -200,10 +200,13 @@ class RfqSerializer(serializers.ModelSerializer):
 
                     # price calculation
                     service_instance = Service.objects.get(id=service_id)
+
                     total_price = self.calc_total_price_value(
                         service_instance, rfq_service
                     )
-                    rfq_total_price += total_price
+
+                    # price with commission
+                    rfq_total_price += total_price[1]
 
                     agent_commission = Agent.objects.get(
                         agent=self.context.get("request").user
@@ -212,7 +215,8 @@ class RfqSerializer(serializers.ModelSerializer):
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
                         service=service_instance,
-                        service_price=total_price,
+                        # without commisssion, base price 
+                        service_price=total_price[0],
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
                         agent_commission=agent_commission

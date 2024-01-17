@@ -288,6 +288,29 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
     )
 
 
+# rfq_assigned_vendor.html
+def rfq_assigned_vendor(service_instance):
+    agent_instance = Agent.objects.get(agent=service_instance.rfq_category.rfq.agent)
+
+    html_content = render_to_string(
+        "email_notifications/rfq_confirmed_vendor.html",
+        {
+            "agent_name": agent_instance.agent_name,
+            "agency_name": agent_instance.agency_name,
+            "agent_num": agent_instance.mobile_no,
+            "service_category": service_instance.rfq_category.category.category_name,
+            "service_name": service_instance.service.service_name,
+            "service_price": service_instance.service_price,
+        },
+    )
+    send_html_mail(
+        "RFQ Assigned",
+        html_content,
+        [service_instance.service.vendor_category.vendor.vendor.email],
+        DEFAULT_FROM_EMAIL,
+    )
+
+
 def bill_request_agent(bill_instance):
     agent_instance = Agent.objects.get(agent=bill_instance.agent)
 
@@ -409,7 +432,6 @@ def bill_request_admin(bill_instance):
 
 
 def bill_pay_vendor(bill_instance):
-
     html_content = render_to_string(
         "email_notifications/bill_pay_vendor.html",
         {
@@ -422,4 +444,6 @@ def bill_pay_vendor(bill_instance):
         },
     )
 
-    send_html_mail("Bill Paid", html_content, [bill_instance.vendor.email], DEFAULT_FROM_EMAIL)
+    send_html_mail(
+        "Bill Paid", html_content, [bill_instance.vendor.email], DEFAULT_FROM_EMAIL
+    )

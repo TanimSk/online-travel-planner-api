@@ -188,13 +188,10 @@ REST_USE_JWT = True
 EMAIL_USE_TLS = True
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "onghakdev@gmail.com"
-EMAIL_HOST_PASSWORD = "tzwexgkvvucdzgqf"
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-SERVER_EMAIL = "onghakdev@gmail.com"
+EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "noreply.service.tanimsk@gmail.com"
+EMAIL_HOST_PASSWORD = "igcosdywfsqodffg"
 # EMAIL_BACKEND = "django_smtp_ssl.SSLEmailBackend"
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 # EMAIL_HOST = 'smtp.zoho.com'

@@ -41,6 +41,7 @@ from commons.send_email import (
     rfq_declined_agent,
     bill_request_agent,
     bill_pay_vendor,
+    rfq_assigned_vendor
 )
 
 
@@ -517,6 +518,7 @@ class AssignAgentAPI(APIView):
                     # shift
                     rfq_service_instance.service = service_instance.first()
                     rfq_service_instance.save()
+                    rfq_assigned_vendor(rfq_service_instance)
 
                     return Response(
                         {"status": "Successfully assigned service to vendor"}
@@ -548,6 +550,9 @@ class AssignAgentAPI(APIView):
                 # assign
                 rfq_service_instance.service = copied_service_instance
                 rfq_service_instance.save()
+
+                # email
+                rfq_assigned_vendor(rfq_service_instance)
 
                 # Assign Bill to Vendor
                 bill_instance = Bill.objects.get(service=rfq_service_instance)

@@ -185,7 +185,8 @@ REST_USE_JWT = True
 
 ############################ All Auth Config ############################
 
-EMAIL_USE_TLS = True
+# EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
 # EMAIL_HOST = "smtp.gmail.com"
 EMAIL_HOST = "smtp.zoho.com"
 # EMAIL_PORT = 587

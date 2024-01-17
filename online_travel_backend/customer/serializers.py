@@ -218,13 +218,13 @@ class RfqSerializer(serializers.ModelSerializer):
                     )
 
                     # price with commission
-                    rfq_total_price += total_price[1]
+                    rfq_total_price += total_price[0]
 
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
                         service=service_instance,
                         # without commisssion, base price
-                        service_price=total_price[0],
+                        service_price=total_price[1],
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
                     )

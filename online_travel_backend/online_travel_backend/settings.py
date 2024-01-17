@@ -194,6 +194,8 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "onghak@miahtrip.com"
 EMAIL_HOST_PASSWORD = "ongshak1@Ota_zoho"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+SERVER_EMAIL = "onghak@miahtrip.com"
+
 # EMAIL_BACKEND = "django_smtp_ssl.SSLEmailBackend"
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

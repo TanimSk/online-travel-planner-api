@@ -45,6 +45,8 @@
     <h2>Services:</h2>
     {% for rfq_service in rfq_services %}
     - {{ rfq_service.service.service_name }} <br>
+    <b>Itinerary:</b> <br>
+    {{ rfq_service.service.itinerary }} <br>
     {% endfor %}
     </p>
 

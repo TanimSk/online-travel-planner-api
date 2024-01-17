@@ -39,7 +39,7 @@
     {% for rfq_service in rfq_services %}
     - {{ rfq_service.service.service_name }} <br>
     <b>Itinerary:</b> <br>
-    {{ rfq_service.service.itinerary }} <br>
+    {{ rfq_service.service.itinerary | safe }} <br>
     {% endfor %}
     </p>
 

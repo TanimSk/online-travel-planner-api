@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-!mts*_fw=s#$#5&g62i$_km(&a3nqqgq+h^$24odv70qxbs97z
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "https://api-ota.ongshak.com", "https://api.miahtrip.com/"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "https://api-ota.ongshak.com", "https://api.miahtrip.com"]
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
 # Update this in production

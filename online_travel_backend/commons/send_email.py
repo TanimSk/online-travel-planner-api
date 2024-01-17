@@ -293,7 +293,7 @@ def rfq_assigned_vendor(service_instance):
     agent_instance = Agent.objects.get(agent=service_instance.rfq_category.rfq.agent)
 
     html_content = render_to_string(
-        "email_notifications/rfq_confirmed_vendor.html",
+        "email_notifications/rfq_assigned_vendor.html",
         {
             "agent_name": agent_instance.agent_name,
             "agency_name": agent_instance.agency_name,

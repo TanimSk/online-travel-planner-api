@@ -50,7 +50,7 @@ class Rfq(models.Model):
     )
 
     # tracing
-    created_on = models.DateTimeField(auto_now_add=timezone.now)
+    created_on = models.DateTimeField(auto_now_add=timezone.localtime)
     approved_on = models.DateTimeField(blank=True, null=True)
     tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
     total_price = models.FloatField(blank=True, null=True)

@@ -236,9 +236,7 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Asia/Dhaka"
-
 USE_I18N = True
-
 USE_TZ = False
 
 

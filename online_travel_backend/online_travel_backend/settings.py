@@ -188,7 +188,7 @@ REST_USE_JWT = True
 EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = True
 # EMAIL_HOST = "smtp.gmail.com"
-EMAIL_HOST = "smtp.zoho.com"
+EMAIL_HOST = "smtp.zoho.in"
 EMAIL_PORT = 587
 # EMAIL_PORT = 465
 EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "onghak@miahtrip.com"

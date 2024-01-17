@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from commons.models import Category
 from vendor.models import Service
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 import uuid
 
 
@@ -49,7 +50,7 @@ class Rfq(models.Model):
     )
 
     # tracing
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(auto_now_add=timezone.now)
     approved_on = models.DateTimeField(blank=True, null=True)
     tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
     total_price = models.FloatField(blank=True, null=True)

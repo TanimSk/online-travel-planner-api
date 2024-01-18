@@ -185,24 +185,24 @@ REST_USE_JWT = True
 
 ############################ All Auth Config ############################
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "noreply.service.tanimsk@gmail.com"
-EMAIL_HOST_PASSWORD = "igcosdywfsqodffg"
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = "noreply.service.tanimsk@gmail.com"
+# EMAIL_HOST_PASSWORD = "igcosdywfsqodffg"
 # EMAIL_BACKEND = "django_smtp_ssl.SSLEmailBackend"
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-# EMAIL_HOST = 'smtp.zoho.com'
-# EMAIL_PORT = 465
-# EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = True
-# # EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'onghak@miahtrip.com'
-# EMAIL_HOST_PASSWORD = 'ongshak1@Ota_zoho'
-# DEFAULT_FROM_EMAIL = 'onghak@miahtrip.com'
-# SERVER_EMAIL = 'onghak@miahtrip.com'
+EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+# EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'onghak@miahtrip.com'
+EMAIL_HOST_PASSWORD = 'ongshak1@Ota_zoho'
+DEFAULT_FROM_EMAIL = 'onghak@miahtrip.com'
+SERVER_EMAIL = 'onghak@miahtrip.com'
 
 
 AUTHENTICATION_BACKENDS = (

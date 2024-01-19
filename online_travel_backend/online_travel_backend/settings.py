@@ -107,7 +107,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "travel_planner",
-        "USER": "tanimsk",
+        "USER": "ongshak",
         "PASSWORD": "123",
         "HOST": "localhost",
         "PORT": "",

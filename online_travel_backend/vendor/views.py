@@ -17,7 +17,7 @@ from administrator.serializers import BasicRfqSerializer
 from .models import Service, VendorCategory, Vendor
 from agent.models import RfqService, Rfq
 from commons.models import Category, Bill
-from commons.send_email import bill_request_admin
+from commons.send_email import bill_request_admin, service_created_admin
 
 
 # Authenticate Vendor Only Class
@@ -83,14 +83,18 @@ class ManageServicesAPI(APIView):
                     vendor_category_instance = VendorCategory.objects.create(
                         category_id=category_id, vendor=vendor_instance
                     )
-                    Service.objects.create(
+                    service_instance = Service.objects.create(
                         vendor_category=vendor_category_instance, **service_data
                     )
+
+                    # send emails
+                    service_created_admin(service_instance)
 
                 else:
                     return Response({"error": "Category doesn't exist!"})
 
             return Response({"status": "Successfully created service"})
+
 
     def put(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:

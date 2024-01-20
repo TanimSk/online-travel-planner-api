@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Paid</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        .heading {
+            margin: 3rem auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="heading">
+        Discover Thailand
+    </h1>
+
+    <p>
+        Hi, <br>
+        A vendor (Name: {{ vendor_name }}) has created a service. Please Review the service, add commission and approve
+        or, decline.
+    </p>
+
+    <p>
+    <h2>Service Info:</h2>
+    Category: {{ category_name }} <br>
+    Service Name: {{ service_name }} <br>
+    description: {{ description }} <br>
+    </p>
+
+    <p>
+    <h2>Vendor Info:</h2>
+    Vendor Name: {{ vendor_name }} <br>
+    Vendor Address: {{ vendor_address }} <br>
+    Vendor Number: {{ vendor_number }} <br>
+    </p>
+
+</body>
+
+</html>

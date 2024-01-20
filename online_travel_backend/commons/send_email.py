@@ -447,3 +447,63 @@ def bill_pay_vendor(bill_instance):
     send_html_mail(
         "Bill Paid", html_content, [bill_instance.vendor.email], DEFAULT_FROM_EMAIL
     )
+
+
+def service_created_admin(service_instance):
+    emails = list(
+        Administrator.objects.filter(administrator__emailaddress__verified=True)
+        .values_list("administrator__email", flat=True)
+        .distinct()
+    )
+
+    html_content = render_to_string(
+        "email_notifications/service_created_admin.html",
+        {
+            "vendor_name": service_instance.vendor_category.vendor.vendor_name,
+            "vendor_address": service_instance.vendor_category.vendor.vendor_address,
+            "vendor_number": service_instance.vendor_category.vendor.vendor_number,
+            "category_name": service_instance.vendor_category.category.category_name,
+            "service_name": service_instance.service_name,
+            "description": service_instance.description,
+        },
+    )
+
+    send_html_mail("New Service Created", html_content, [emails], DEFAULT_FROM_EMAIL)
+
+
+def service_approved_vendor(service_instance):
+    html_content = render_to_string(
+        "email_notifications/service_approved_vendor.html",
+        {
+            "category_name": service_instance.vendor_category.category.category_name,
+            "service_name": service_instance.service_name,
+            "description": service_instance.description,
+            "created_on": service_instance.created_on,
+        },
+    )
+
+    send_html_mail(
+        "Service Approved",
+        html_content,
+        [service_instance.vendor_category.vendor.email],
+        DEFAULT_FROM_EMAIL,
+    )
+
+
+def service_declined_vendor(service_instance):
+    html_content = render_to_string(
+        "email_notifications/service_declined_vendor.html",
+        {
+            "category_name": service_instance.vendor_category.category.category_name,
+            "service_name": service_instance.service_name,
+            "description": service_instance.description,
+            "created_on": service_instance.created_on,
+        },
+    )
+
+    send_html_mail(
+        "Service Declined",
+        html_content,
+        [service_instance.vendor_category.vendor.email],
+        DEFAULT_FROM_EMAIL,
+    )

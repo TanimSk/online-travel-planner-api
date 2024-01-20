@@ -42,6 +42,8 @@ from commons.send_email import (
     bill_request_agent,
     bill_pay_vendor,
     rfq_assigned_vendor,
+    service_approved_vendor,
+    service_declined_vendor,
 )
 
 
@@ -362,7 +364,7 @@ class ManageVendorServicesAPI(APIView):
             instance.admin_commission = serialized_data.data.get("commission")
             instance.approved = True
             instance.save()
-            # instance = Service.objects.get(id=service_id, added_by_admin=False)
+            service_approved_vendor(instance)
             return Response({"status": "Service has been approved"})
 
     def delete(self, request, service_id=None, format=None, *args, **kwargs):
@@ -370,6 +372,9 @@ class ManageVendorServicesAPI(APIView):
             return Response({"error": "Service id is missing"})
 
         instance = Service.objects.get(id=service_id, added_by_admin=False)
+        # send Email
+        service_declined_vendor(instance)
+        
         instance.delete()
         return Response({"status": "Successfully declined service"})
 
@@ -626,9 +631,6 @@ class VendorBillAPI(APIView):
             .exclude(status_2="vendor_bill")
             .order_by("-admin_billed_on")
         )
-
-        for b in bills_instance:
-            print(b.admin_billed_on)
 
         serialized_data = BillRequestSerializer(bills_instance, many=True)
         return Response(serialized_data.data)

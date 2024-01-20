@@ -41,7 +41,7 @@ from commons.send_email import (
     rfq_declined_agent,
     bill_request_agent,
     bill_pay_vendor,
-    rfq_assigned_vendor
+    rfq_assigned_vendor,
 )
 
 
@@ -356,21 +356,33 @@ class ManageVendorServicesAPI(APIView):
         if service_id is None:
             return Response({"error": "Service id is missing"})
 
-        instance = Service.objects.get(id=service_id, added_by_admin=False)
-        instance.approved = True
-        instance.save()
-        return Response({"status": "Service has been approved"})
-
-    def put(self, request, service_id=None, format=None, *args, **kwargs):
-        if service_id is None:
-            return Response({"error": "Service id is missing"})
-
         serialized_data = UpdateCommissionSerializer(data=request.data)
         if serialized_data.is_valid(raise_exception=True):
             instance = Service.objects.get(id=service_id, added_by_admin=False)
             instance.admin_commission = serialized_data.data.get("commission")
+            instance.approved = True
             instance.save()
-            return Response({"status": "Successfully updated commission"})
+            # instance = Service.objects.get(id=service_id, added_by_admin=False)
+            return Response({"status": "Service has been approved"})
+
+    def delete(self, request, service_id=None, format=None, *args, **kwargs):
+        if service_id is None:
+            return Response({"error": "Service id is missing"})
+
+        instance = Service.objects.get(id=service_id, added_by_admin=False)
+        instance.delete()
+        return Response({"status": "Successfully declined service"})
+
+    # def put(self, request, service_id=None, format=None, *args, **kwargs):
+    #     if service_id is None:
+    #         return Response({"error": "Service id is missing"})
+
+    #     serialized_data = UpdateCommissionSerializer(data=request.data)
+    #     if serialized_data.is_valid(raise_exception=True):
+    #         instance = Service.objects.get(id=service_id, added_by_admin=False)
+    #         instance.admin_commission = serialized_data.data.get("commission")
+    #         instance.save()
+    #         return Response({"status": "Successfully updated commission"})
 
 
 # admin services

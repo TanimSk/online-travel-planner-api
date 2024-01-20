@@ -623,7 +623,7 @@ class VendorBillAPI(APIView):
         # list of bill requests with due payment
         bills_instance = (
             Bill.objects.filter(admin_due__gt=0)
-            .exclude(status_2="admin_bill")
+            .exclude(status_2="vendor_bill")
             .order_by("-admin_billed_on")
         )
         serialized_data = BillRequestSerializer(bills_instance, many=True)

@@ -273,7 +273,7 @@ class AdminBillAPI(APIView):
     def get(self, request, format=None, *args, **kwargs):
         if request.GET.get("received") == "true":
             # Getting received payments
-            bills_instance = Bill.objects.filter(status_2="vendor_paid").order_by(
+            bills_instance = Bill.objects.filter(vendor=request.user, status_2="vendor_paid").order_by(
                 "-vendor_paid_on"
             )
             serialized_data = BillServicesSerializer(bills_instance, many=True)

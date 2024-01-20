@@ -626,6 +626,10 @@ class VendorBillAPI(APIView):
             .exclude(status_2="vendor_bill")
             .order_by("-admin_billed_on")
         )
+
+        for b in bills_instance:
+            print(b.tracking_id)
+
         serialized_data = BillRequestSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 

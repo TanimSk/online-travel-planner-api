@@ -374,7 +374,7 @@ class ManageVendorServicesAPI(APIView):
         instance = Service.objects.get(id=service_id, added_by_admin=False)
         # send Email
         service_declined_vendor(instance)
-        
+
         instance.delete()
         return Response({"status": "Successfully declined service"})
 

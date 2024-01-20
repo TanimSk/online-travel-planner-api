@@ -5,7 +5,7 @@ from .views import (
     RFQTypesAPI,
     GetInvoiceAPI,
     AgentBillsAPI,
-    ProfileAPI
+    ProfileAPI,
 )
 
 urlpatterns = [

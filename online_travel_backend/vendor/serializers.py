@@ -22,7 +22,7 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
             "vendor_name": self.validated_data.get("vendor_name", ""),
             "vendor_address": self.validated_data.get("vendor_address", ""),
             "vendor_number": self.validated_data.get("vendor_number", ""),
-            "logo_url": self.validated_data.get("vendor_number", "logo_url"),
+            "logo_url": self.validated_data.get("logo_url", "logo_url"),
             "password_text": self.validated_data.get("password1", ""),
         }
         data.update(extra_data)

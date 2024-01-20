@@ -2,5 +2,4 @@
 
 {% block content %}{% endblock %}
 
-{{ site_domain }}{% endblocktrans %}
 {% endautoescape %}

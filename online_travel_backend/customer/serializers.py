@@ -245,3 +245,4 @@ class ProfileSerializer(serializers.ModelSerializer):
             "added_on",
             "confirmed",
         )
+

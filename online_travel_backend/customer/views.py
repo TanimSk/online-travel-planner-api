@@ -4,6 +4,7 @@ from rest_framework.permissions import BasePermission
 from dj_rest_auth.registration.views import RegisterView
 from agent.models import Agent, Rfq, RfqService
 from commons.models import Bill
+from vendor.models import Service
 from .models import Customer
 
 from .serializers import (
@@ -15,6 +16,7 @@ from agent.serializers import (
     PaidBillSerializer,
     BillRequestSerializer,
     BillPaySerializer,
+    ServiceInfo,
 )
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
@@ -306,3 +308,19 @@ class ProfileAPI(APIView):
                 **serialized_data.data
             )
             return Response({"status": "Successfully updated"})
+
+
+# Package API
+class PackagesAPI(APIView):
+    def get(self, request, package_id=None, format=None, *args, **kwargs):
+        if package_id is not None:
+            service_instance = Service.objects.filter(
+                vendor_category__category__category_name="Tour Packages", id=package_id
+            )
+            return Response(ServiceInfo(service_instance).data)
+
+        service_instance = Service.objects.filter(
+            vendor_category__category__category_name="Tour Packages"
+        )
+
+        return Response(ServiceInfo(service_instance, many=True).data)

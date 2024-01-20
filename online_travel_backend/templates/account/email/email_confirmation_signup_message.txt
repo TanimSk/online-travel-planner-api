@@ -7,13 +7,13 @@
 To confirm this is correct, go to 
 {% endblocktrans %}{% endautoescape %}
 {% if user.is_admin %}
-https://travel-planner.ongshak.com/admin_auth/{{ activate_url }}
+https://miahtrip.com/admin_auth/{{ activate_url }}
 {% elif user.is_agent %}
-https://travel-planner.ongshak.com/agent_auth/{{ activate_url }}
+https://miahtrip.com/agent_auth/{{ activate_url }}
 {% elif user.is_vendor %}
-https://travel-planner.ongshak.com/vendor_auth/{{ activate_url }}
+https://miahtrip.com/vendor_auth/{{ activate_url }}
 Your password is: {{ user.vendor.password_text }}
 {% else %}
-https://travel-planner.ongshak.com/customer_auth/{{ activate_url }}
+https://miahtrip.com/customer_auth/{{ activate_url }}
 {% endif %}
 {% endblock %}

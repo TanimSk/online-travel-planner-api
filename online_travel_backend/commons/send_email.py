@@ -468,7 +468,7 @@ def service_created_admin(service_instance):
         },
     )
 
-    send_html_mail("New Service Created", html_content, [emails], DEFAULT_FROM_EMAIL)
+    send_html_mail("New Service Created", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def service_approved_vendor(service_instance):

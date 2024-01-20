@@ -628,7 +628,7 @@ class VendorBillAPI(APIView):
         )
 
         for b in bills_instance:
-            print(b.tracking_id)
+            print(b.admin_billed_on)
 
         serialized_data = BillRequestSerializer(bills_instance, many=True)
         return Response(serialized_data.data)

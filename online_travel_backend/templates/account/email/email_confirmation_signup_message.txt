@@ -21,7 +21,7 @@ https://miahtrip.com/customer_auth/{{ activate_url }}
 
 We appreciate your trust in miahtrip.com, and we look forward to providing you with a seamless and secure experience.
 
-Thank you for choosing {{ site_domain }}.
+Thank you.
 
 {% endblock %}
 

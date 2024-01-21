@@ -12,6 +12,7 @@ from .serializers import (
     BillServicesSerializer,
     DispatchBillServiceSerializer,
     RfqServiceUpdateSerializer,
+    ReceivedPaymentSerializer,
 )
 from administrator.serializers import BasicRfqSerializer
 from .models import Service, VendorCategory, Vendor
@@ -280,7 +281,7 @@ class AdminBillAPI(APIView):
             bills_instance = Bill.objects.filter(
                 vendor=request.user, status_2="vendor_paid"
             ).order_by("-vendor_paid_on")
-            serialized_data = BillServicesSerializer(bills_instance, many=True)
+            serialized_data = ReceivedPaymentSerializer(bills_instance, many=True)
             return Response(serialized_data.data)
 
         # getting bills

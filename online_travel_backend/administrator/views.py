@@ -660,7 +660,7 @@ class VendorBillAPI(APIView):
                 bill_instance.save()
                 bill_pay_vendor(bill_instance=bill_instance)
 
-                return Response({"status": "Successfully paid bills"})
+            return Response({"status": "Successfully paid bills"})
 
 
 # Agent List

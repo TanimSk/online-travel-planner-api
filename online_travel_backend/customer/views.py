@@ -315,7 +315,7 @@ class ProfileAPI(APIView):
 class PackagesAPI(APIView):
     def get(self, request, package_id=None, format=None, *args, **kwargs):
         if package_id is not None:
-            service_instance = Service.objects.filter(
+            service_instance = Service.objects.get(
                 vendor_category__category__category_name="Tour Packages", id=package_id
             )
             return Response(ServiceInfo(service_instance).data)

@@ -96,7 +96,6 @@ class ManageServicesAPI(APIView):
 
             return Response({"status": "Successfully created service"})
 
-
     def put(self, request, service_id=None, format=None, *args, **kwargs):
         if service_id is None:
             return Response({"error": "Service id missing"})
@@ -156,11 +155,10 @@ class NewTasksAPI(APIView):
                     .exclude(order_status="dispatched")
                     # .exclude(order_status="complete")
                     .order_by("-id")
-                    .distinct()                    
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )
-            
+
             print(rfq_instances)
 
             response_array = []

@@ -272,7 +272,7 @@ class AgentBillsAPI(APIView):
                 due_amount = (
                     # bill_instance.vendor_bill
                     # + bill_instance.agent_bill
-                    +bill_instance.agent_due
+                    bill_instance.agent_due
                     - service.get("paid_amount")
                 )
 
@@ -291,7 +291,7 @@ class AgentBillsAPI(APIView):
 
                 bill_pay_admin(bill_instance=bill_instance)
 
-                return Response({"status": "Successfully paid bills"})
+            return Response({"status": "Successfully paid bills"})
 
 
 # class BillPayAPI(APIView):

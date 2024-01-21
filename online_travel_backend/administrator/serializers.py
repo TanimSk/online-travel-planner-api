@@ -160,6 +160,7 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
             "customer_address",
             "contact_no",
             "service_name",
+            "received_money",
         )
 
     def get_total_bill(self, obj):

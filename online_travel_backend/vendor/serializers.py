@@ -122,13 +122,13 @@ class RfqServiceUpdateSerializer(serializers.ModelSerializer):
 
 # Received Payments
 class ReceivedPaymentSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(
-        source="service.rfq_category.rfq.customer_name"
-    )
-    customer_address = serializers.CharField(
-        source="service.rfq_category.rfq.customer_address"
-    )
-    contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
+    # customer_name = serializers.CharField(
+    #     source="service.rfq_category.rfq.customer_name"
+    # )
+    # customer_address = serializers.CharField(
+    #     source="service.rfq_category.rfq.customer_address"
+    # )
+    # contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
     service_name = serializers.CharField(source="service.service.service_name")
     received_money = serializers.SerializerMethodField()
 
@@ -138,15 +138,15 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
             "tracking_id",
             "created_on",
             "vendor_bill",
-            "customer_name",
-            "customer_address",
+            # "customer_name",
+            # "customer_address",
             "contact_no",
             "service_name",
             "received_money",
         )
 
     def get_received_money(self, obj):
-        return obj.vendor_bill - obj.agent_due
+        return obj.vendor_bill - obj.admin_due
 
 
 # Bills

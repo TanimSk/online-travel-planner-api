@@ -11,13 +11,14 @@ from .serializers import (
     CustomerCustomRegistrationSerializer,
     RfqSerializer,
     ProfileSerializer,
+    ServiceInfo
 )
 from agent.serializers import (
     PaidBillSerializer,
     BillRequestSerializer,
     BillPaySerializer,
-    ServiceInfo,
 )
+
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
 from django.db import transaction

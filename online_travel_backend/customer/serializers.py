@@ -246,3 +246,31 @@ class ProfileSerializer(serializers.ModelSerializer):
             "confirmed",
         )
 
+
+class ServiceInfo(serializers.ModelSerializer):
+    category_name = serializers.CharField(
+        source="vendor_category.category.category_name"
+    )
+    category_description = serializers.CharField(
+        source="vendor_category.category.description"
+    )
+    category_id = serializers.CharField(
+        source="vendor_category.category.id"
+    )
+
+    class Meta:
+        fields = (
+            "id",
+            "category_id",
+            "service_name",
+            "image_urls",
+            "description",
+            "category_name",
+            "category_description",
+            "overview",
+            "itinerary",
+            "rates",
+            "services_name",
+            "cover_img",
+        )
+        model = Service

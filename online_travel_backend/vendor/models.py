@@ -49,6 +49,9 @@ class VendorCategory(models.Model):
         )
 
     def __str__(self) -> str:
+        if self.vendor is None:
+            return f"{self.category.category_name} | none"
+
         return f"{self.category.category_name} | {self.vendor.vendor_name}"
 
     @property

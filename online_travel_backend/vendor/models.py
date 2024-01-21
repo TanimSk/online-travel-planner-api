@@ -49,7 +49,7 @@ class VendorCategory(models.Model):
         )
 
     def __str__(self) -> str:
-        return self.category.category_name
+        return f"{self.category.category_name} | {self.vendor.vendor_name}"
 
     @property
     def vendor_services(self):

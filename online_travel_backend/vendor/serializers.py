@@ -140,7 +140,7 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
             "vendor_bill",
             # "customer_name",
             # "customer_address",
-            "contact_no",
+            # "contact_no",
             "service_name",
             "received_money",
         )

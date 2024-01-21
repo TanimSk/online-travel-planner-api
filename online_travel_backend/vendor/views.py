@@ -139,7 +139,7 @@ class NewTasksAPI(APIView):
                         service__vendor_category__vendor__isnull=False,
                         order_status="dispatched",
                     )
-                    .order_by("-id")
+                    .order_by("-rfq_category__rfq_id")
                     .distinct("rfq_category__rfq_id")
                     # .distinct()
                 )
@@ -154,7 +154,7 @@ class NewTasksAPI(APIView):
                     )
                     .exclude(order_status="dispatched")
                     # .exclude(order_status="complete")
-                    .order_by("-id")
+                    .order_by("-rfq_category__rfq_id")
                     .distinct("rfq_category__rfq_id")
                     # .distinct()
                 )

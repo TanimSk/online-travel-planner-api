@@ -485,7 +485,7 @@ def service_approved_vendor(service_instance):
     send_html_mail(
         "Service Approved",
         html_content,
-        [service_instance.vendor_category.vendor.email],
+        [service_instance.vendor_category.vendor.vendor.email],
         DEFAULT_FROM_EMAIL,
     )
 
@@ -504,6 +504,6 @@ def service_declined_vendor(service_instance):
     send_html_mail(
         "Service Declined",
         html_content,
-        [service_instance.vendor_category.vendor.email],
+        [service_instance.vendor_category.vendor.vendor.email],
         DEFAULT_FROM_EMAIL,
     )

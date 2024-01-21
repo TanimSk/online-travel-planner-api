@@ -226,7 +226,9 @@ class BillRequestSerializer(serializers.ModelSerializer):
         )
 
     def get_total_bill(self, obj):
-        return obj.vendor_bill + obj.admin_bill
+        return obj.vendor_bill
+
+    # + obj.admin_bill
 
 
 # Bill Request
@@ -258,7 +260,8 @@ class PaidBillSerializer(serializers.ModelSerializer):
         )
 
     def get_total_bill(self, obj):
-        return obj.vendor_bill + obj.admin_bill
+        return obj.vendor_bill 
+    # + obj.admin_bill
 
     def get_paid_amount(self, obj):
         return obj.vendor_bill - obj.admin_due

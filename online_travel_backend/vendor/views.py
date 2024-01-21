@@ -141,6 +141,7 @@ class NewTasksAPI(APIView):
                     )
                     .order_by("-rfq_category__rfq_id")
                     .distinct("rfq_category__rfq_id")
+                    .values("rfq_category__rfq_id")
                     # .distinct()
                 )
             else:
@@ -156,6 +157,7 @@ class NewTasksAPI(APIView):
                     # .exclude(order_status="complete")
                     .order_by("-rfq_category__rfq_id")
                     .distinct("rfq_category__rfq_id")
+                    .values("rfq_category__rfq_id")
                     # .distinct()
                 )
 

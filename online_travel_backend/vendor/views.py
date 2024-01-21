@@ -161,8 +161,6 @@ class NewTasksAPI(APIView):
                     # .distinct()
                 )
 
-            print(rfq_instances)
-
             response_array = []
             for rfq_instance in rfq_instances:
                 data = {}
@@ -214,11 +212,13 @@ class NewTasksAPI(APIView):
             if request.GET.get("completed", None) == "true":
                 # completed tasks
                 rfq_service_instance = RfqService.objects.filter(
+                    service__vendor_category__vendor__vendor=request.user,
                     rfq_category__rfq=rfq, order_status="dispatched"
                 ).order_by("-id")
             else:
                 rfq_service_instance = (
                     RfqService.objects.filter(
+                        service__vendor_category__vendor__vendor=request.user,
                         rfq_category__rfq=rfq,
                     )
                     # .exclude(order_status="complete")

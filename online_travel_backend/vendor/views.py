@@ -160,6 +160,8 @@ class NewTasksAPI(APIView):
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )
+            
+            print(rfq_instances)
 
             response_array = []
             for rfq_instance in rfq_instances:

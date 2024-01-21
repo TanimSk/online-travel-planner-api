@@ -254,7 +254,7 @@ class ServiceInfo(serializers.ModelSerializer):
     category_description = serializers.CharField(
         source="vendor_category.category.description"
     )
-    category_id = serializers.CharField(
+    category_id = serializers.IntegerField(
         source="vendor_category.category.id"
     )
 

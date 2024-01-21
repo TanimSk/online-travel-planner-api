@@ -156,6 +156,7 @@ class NewTasksAPI(APIView):
                     .exclude(order_status="dispatched")
                     # .exclude(order_status="complete")
                     .order_by("-id")
+                    .distinct()                    
                     .values("rfq_category__rfq_id")
                     .distinct()
                 )

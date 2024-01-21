@@ -51,7 +51,7 @@ class ManageServicesSerializer(serializers.ModelSerializer):
         source="vendor_category.category.category_name", read_only=True
     )
     vendor_name = serializers.CharField(
-        source="vendor_category.vendor_name", read_only=True
+        source="vendor_category.vendor.vendor_name", read_only=True
     )
 
     vendor_number = serializers.CharField(
@@ -59,6 +59,9 @@ class ManageServicesSerializer(serializers.ModelSerializer):
     )
     vendor_email = serializers.CharField(
         source="vendor_category.vendor.vendor.email", read_only=True
+    )
+    vendor_logo_url = serializers.URLField(
+        source="vendor_category.vendor.logo_url", read_only=True
     )
 
     category_id = serializers.IntegerField(source="vendor_category.category.id")

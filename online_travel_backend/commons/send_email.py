@@ -62,6 +62,28 @@ def rfq_created_admin(rfq_instance, is_customer=False):
             },
         )
 
+        html_content_agent = render_to_string(
+            "email_notifications/rfq_created_agent.html",
+            {
+                "customer_name": rfq_instance.customer_name,
+                "customer_address": rfq_instance.customer_address,
+                "customer_num": rfq_instance.contact_no,
+                "travel_date": datetime.fromisoformat(
+                    str(rfq_instance.travel_date)
+                ).strftime("%d/%m/%Y %I:%M %p"),
+                "created_on": rfq_instance.created_on,
+                "tracking_id": rfq_instance.tracking_id,
+                "rfq_categories": rfq_categories,
+            },
+        )
+
+        send_html_mail(
+            "RFQ Created",
+            html_content_agent,
+            [rfq_instance.rfq_category.rfq.agent.email],
+            DEFAULT_FROM_EMAIL,
+        )
+
     else:
         html_content = render_to_string(
             "email_notifications_customer/rfq_created.html",

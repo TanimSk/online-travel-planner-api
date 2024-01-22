@@ -80,8 +80,14 @@ class QueryServicesAPI(APIView):
                 "members",
                 "check_in_date",
                 "check_out_date",
+                "duration",
+                "depart_time",
+                "return_time",
             ]:
-                serialized_copy.pop(key)
+                try:
+                    serialized_copy.pop(key)
+                except KeyError:
+                    pass
 
             services_instances = Service.objects.filter(
                 vendor_category__category__id=serialized_data.data.get("category_id"),

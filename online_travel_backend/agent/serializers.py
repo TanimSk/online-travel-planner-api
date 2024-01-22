@@ -193,15 +193,17 @@ class RfqSerializer(serializers.ModelSerializer):
                 for rfq_service in rfq_services:
                     service_id = rfq_service.pop("service")
 
-                    # try:
-                    rfq_service.pop("service_price")
-                    rfq_service.pop("room_type")
-                    rfq_service.pop("bed_type")
-                    rfq_service.pop("services_name")
-                    rfq_service.pop("area_name")
-
-                    # except KeyError:
-                        # pass
+                    for key in [
+                        "service_price",
+                        "room_type",
+                        "bed_type",
+                        "services_name",
+                        "area_name",
+                    ]:
+                        try:
+                            rfq_service.pop(key)
+                        except KeyError:
+                            pass
 
                     # price calculation
                     service_instance = Service.objects.get(id=service_id)

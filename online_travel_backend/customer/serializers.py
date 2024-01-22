@@ -207,6 +207,12 @@ class RfqSerializer(serializers.ModelSerializer):
 
                     try:
                         rfq_service.pop("service_price")
+
+                        rfq_service.pop("room_type")
+                        rfq_service.pop("bed_type")
+                        rfq_service.pop("services_name")
+                        rfq_service.pop("area_name")
+
                     except KeyError:
                         pass
 
@@ -225,6 +231,10 @@ class RfqSerializer(serializers.ModelSerializer):
                         service=service_instance,
                         # without commisssion, base price
                         service_price=total_price[1],
+                        room_type=service_instance.room_type,
+                        bed_type=service_instance.bed_type,
+                        services_name=service_instance.services_name,
+                        area_name=service_instance.area_name,
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
                     )
@@ -254,9 +264,7 @@ class ServiceInfo(serializers.ModelSerializer):
     category_description = serializers.CharField(
         source="vendor_category.category.description"
     )
-    category_id = serializers.IntegerField(
-        source="vendor_category.category.id"
-    )
+    category_id = serializers.IntegerField(source="vendor_category.category.id")
 
     class Meta:
         fields = (

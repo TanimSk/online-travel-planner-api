@@ -127,6 +127,7 @@ class RfqService(models.Model):
     child_members = models.IntegerField(default=0)
     adult_members = models.IntegerField(default=0)
     members = models.IntegerField(default=1)
+    area_name = models.CharField(blank=True, null=True, max_length=500)
 
     # Hotel
     # hotel_name = models.CharField(max_length=300, blank=True, null=True)

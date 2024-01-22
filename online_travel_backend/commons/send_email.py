@@ -80,7 +80,7 @@ def rfq_created_admin(rfq_instance, is_customer=False):
         send_html_mail(
             "RFQ Created",
             html_content_agent,
-            [rfq_instance.rfq_category.rfq.agent.email],
+            [rfq_instance.agent.email],
             DEFAULT_FROM_EMAIL,
         )
 

@@ -23,7 +23,7 @@ from .serializers import (
     AgentSerializer,
     BillRequestSerializer,
     PaidBillSerializer,
-    ReceivedPaymentSerializer
+    ReceivedPaymentSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -586,15 +586,15 @@ class AgentBillAPI(APIView):
 
     def get(self, request, format=None, *args, **kwargs):
         if request.GET.get("received") == "true":
-            bills_instance = Bill.objects.filter(status_1="admin_paid").order_by(
-                "-admin_paid_on"
-            )
+            bills_instance = Bill.objects.filter(
+                vendor__isnull=False, status_1="admin_paid"
+            ).order_by("-admin_paid_on")
             serialized_data = ReceivedPaymentSerializer(bills_instance, many=True)
             return Response(serialized_data.data)
 
-        bills_instance = Bill.objects.filter(status_1="admin_bill").order_by(
-            "-created_on"
-        )
+        bills_instance = Bill.objects.filter(
+            vendor__isnull=False, status_1="admin_bill"
+        ).order_by("-created_on")
         serialized_data = BillServicesSerializer(bills_instance, many=True)
         return Response(serialized_data.data)
 

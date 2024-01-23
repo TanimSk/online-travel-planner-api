@@ -111,6 +111,7 @@ class VendorListSerializer(serializers.ModelSerializer):
 class EditPriceSerializer(serializers.Serializer):
     service_id = serializers.IntegerField()
     service_price = serializers.FloatField()
+    remarks = serializers.CharField()
 
 
 # assign vendor

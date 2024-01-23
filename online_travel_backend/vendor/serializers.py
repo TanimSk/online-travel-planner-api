@@ -13,7 +13,9 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
     vendor_name = serializers.CharField(required=True)
     vendor_address = serializers.CharField(required=True)
     vendor_number = serializers.CharField(required=True)
+
     logo_url = serializers.URLField(required=True)
+    office_images = serializers.ListField(required=True)
 
     def get_cleaned_data(self):
         data = super(VendorCustomRegistrationSerializer, self).get_cleaned_data()
@@ -22,7 +24,8 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
             "vendor_name": self.validated_data.get("vendor_name", ""),
             "vendor_address": self.validated_data.get("vendor_address", ""),
             "vendor_number": self.validated_data.get("vendor_number", ""),
-            "logo_url": self.validated_data.get("logo_url", "logo_url"),
+            "logo_url": self.validated_data.get("logo_url", ""),
+            "office_images": self.validated_data.get("office_images", ""),
             "password_text": self.validated_data.get("password1", ""),
         }
         data.update(extra_data)
@@ -40,6 +43,7 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
             vendor_address=self.cleaned_data.get("vendor_address"),
             vendor_number=self.cleaned_data.get("vendor_number"),
             logo_url=self.cleaned_data.get("logo_url"),
+            office_images=self.cleaned_data.get("office_images"),
         )
         vendor.save()
         return user

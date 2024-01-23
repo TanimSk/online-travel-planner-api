@@ -14,7 +14,10 @@ class Vendor(models.Model):
     vendor_name = models.CharField(max_length=200)
     vendor_address = models.CharField(max_length=500)
     vendor_number = models.CharField(max_length=20)
+    
     logo_url = models.URLField()
+    office_images = ArrayField(models.URLField(), default=list, blank=True, null=True)
+
 
     password_text = models.CharField(blank=True, null=True, max_length=300)
 

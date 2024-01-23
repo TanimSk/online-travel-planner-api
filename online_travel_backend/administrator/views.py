@@ -172,6 +172,8 @@ class PendingRfqAPI(APIView):
 
             else:
                 status = "declined"
+
+                # send email
                 rfq_declined_agent(rfq_instance=rfq_instance)
 
             rfq_instance.status = status
@@ -194,6 +196,7 @@ class PendingRfqAPI(APIView):
             )
 
             rfq_service.service_price = serialized_data.data.get("service_price")
+            rfq_service.remarks = serialized_data.data.get("remarks")
             rfq_service.save()
 
             # get all services price and get the total amount

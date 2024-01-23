@@ -120,6 +120,7 @@ class RfqService(models.Model):
     order_status = models.CharField(max_length=40, default="incomplete")
     completed_on = models.DateTimeField(blank=True, null=True)
     tracing_id = models.UUIDField(default=uuid.uuid4, unique=True)
+    remarks = models.TextField(blank=True, null=True)
 
     # Commons
     travel_time = models.DateTimeField(blank=True, null=True)

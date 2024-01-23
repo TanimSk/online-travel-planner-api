@@ -9,7 +9,8 @@ class Customer(models.Model):
 
     customer_name = models.CharField(max_length=200)
     customer_address = models.CharField(max_length=500)
-    customer_number = models.CharField(max_length=20)
+    customer_number = models.CharField(max_length=30)
+    customer_nationality = models.CharField(max_length=60)
 
     # tracing
     added_on = models.DateTimeField(auto_now_add=True)

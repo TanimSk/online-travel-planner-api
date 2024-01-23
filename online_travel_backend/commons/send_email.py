@@ -10,25 +10,34 @@ from agent.models import Agent, Rfq, RfqCategory, RfqService
 from customer.models import Customer
 from vendor.models import Vendor
 from datetime import datetime
+from weasyprint import HTML
 
 
 class EmailThread(threading.Thread):
-    def __init__(self, subject, html_content, recipient_list, sender):
+    def __init__(self, subject, html_content, recipient_list, sender, pdfs=None):
         self.subject = subject
         self.recipient_list = recipient_list
         self.html_content = html_content
         self.sender = sender
+        self.pdfs = pdfs
         threading.Thread.__init__(self)
 
     def run(self):
-        msg = EmailMessage(self.subject, "Discover", self.sender, self.recipient_list)
+        msg = EmailMessage(self.subject, None, self.sender, self.recipient_list)
+
+        # sending PDFs
+        if self.pdfs is not None:
+            for pdf in self.pdfs:
+                pdf_data = HTML(string=pdf.content).write_pdf()
+                msg.attach(pdf.name, pdf_data, "application/pdf")
+
         msg.content_subtype = "html"
         msg.body = self.html_content
         msg.send()
 
 
-def send_html_mail(subject, html_content, recipient_list, sender):
-    EmailThread(subject, html_content, recipient_list, sender).start()
+def send_html_mail(subject, html_content, recipient_list, sender, pdfs=None):
+    EmailThread(subject, html_content, recipient_list, sender, pdfs).start()
 
 
 # <status>_<email_to>
@@ -77,11 +86,13 @@ def rfq_created_admin(rfq_instance, is_customer=False):
             },
         )
 
+        # send to agent
         send_html_mail(
             "RFQ Created",
             html_content_agent,
             [rfq_instance.agent.email],
             DEFAULT_FROM_EMAIL,
+            [html_content_agent],
         )
 
     else:
@@ -100,6 +111,7 @@ def rfq_created_admin(rfq_instance, is_customer=False):
             },
         )
 
+    # send to admin
     send_html_mail("RFQ Created", html_content, emails, DEFAULT_FROM_EMAIL)
 
 

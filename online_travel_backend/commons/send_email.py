@@ -28,8 +28,8 @@ class EmailThread(threading.Thread):
         # sending PDFs
         if self.pdfs is not None:
             for pdf in self.pdfs:
-                pdf_data = HTML(string=pdf.content).write_pdf()
-                msg.attach(pdf.name, pdf_data, "application/pdf")
+                pdf_data = HTML(string=pdf["content"]).write_pdf()
+                msg.attach(pdf["name"], pdf_data, "application/pdf")
 
         msg.content_subtype = "html"
         msg.body = self.html_content
@@ -92,7 +92,7 @@ def rfq_created_admin(rfq_instance, is_customer=False):
             html_content_agent,
             [rfq_instance.agent.email],
             DEFAULT_FROM_EMAIL,
-            [html_content_agent],
+            [{"name": "test.pdf", "content": html_content}],
         )
 
     else:

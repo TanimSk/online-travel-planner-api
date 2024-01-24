@@ -689,13 +689,13 @@ class AgentListAPI(APIView):
 
 
         if agent_id is None:
-            agents_instance = Agent.objects.filter(agent__emailaddress__verified=True)
+            agents_instance = Agent.objects.filter(agent__emailaddress__verified=True, pseudo_agent=False)
             serialized_data = self.serializer_class(agents_instance, many=True)
             return Response(serialized_data.data)
 
         # get single agent
         agents_instance = Agent.objects.get(
-            agent__emailaddress__verified=True, id=agent_id
+            agent__emailaddress__verified=True, id=agent_id, pseudo_agent=False
         )
         serialized_data = self.serializer_class(agents_instance)
         return Response(serialized_data.data)

@@ -279,14 +279,15 @@ class AgentBillsAPI(APIView):
                         {"error": "Paid amount cannot be greater than bill!"}
                     )
 
-                bill_instance.admin_payment_type = service.get(
-                    "admin_payment_type", None
-                )
+                # bill_instance.admin_payment_type = service.get(
+                #     "admin_payment_type", None
+                # )
                 bill_instance.agent_due = due_amount
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
 
+                # Send Emails
                 bill_pay_admin(bill_instance=bill_instance, is_customer=True)
 
                 return Response({"status": "Successfully paid bills"})

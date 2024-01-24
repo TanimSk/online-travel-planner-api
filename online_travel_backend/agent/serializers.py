@@ -450,6 +450,7 @@ class BillPaySerializer(serializers.ModelSerializer):
     paid_amount = serializers.FloatField()
     receipt_img = serializers.URLField(required=False, allow_blank=True)
     received_by = serializers.CharField(required=False, allow_blank=True)
+    admin_payment_type = serializers.CharField(required=True)
 
     class Meta:
         model = Bill

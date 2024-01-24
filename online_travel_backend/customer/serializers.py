@@ -111,8 +111,8 @@ class RfqSerializer(serializers.ModelSerializer):
             (rfq_service_instance.get("check_in_date", None) is None)
             and (rfq_service_instance.get("check_out_date", None) is None)
         ):
-            print(rfq_service_instance.get("check_in_date", None))
-            date_format = "%Y-%m-%dT%H:%M:%S"
+            # print(rfq_service_instance.get("check_in_date", None))
+            date_format = "%Y-%m-%dT%H:%M:%S%z"
             date1 = datetime.strptime(
                 rfq_service_instance.get("check_in_date", None), date_format
             )

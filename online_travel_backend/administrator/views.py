@@ -678,18 +678,21 @@ class AgentListAPI(APIView):
             if agent_id is None:
                 customer_instance = Customer.objects.filter(
                     customer__emailaddress__verified=True
-                )
+                ).order_by("-added_on")
                 serialized_data = CustomerSerializer(customer_instance, many=True)
                 return Response(serialized_data.data)
-            
+
             # get single customer
-            customer_instance = Customer.objects.get(customer__emailaddress__verified=True, id=agent_id)
+            customer_instance = Customer.objects.get(
+                customer__emailaddress__verified=True, id=agent_id
+            )
             serialized_data = CustomerSerializer(customer_instance)
             return Response(serialized_data.data)
 
-
         if agent_id is None:
-            agents_instance = Agent.objects.filter(agent__emailaddress__verified=True, pseudo_agent=False)
+            agents_instance = Agent.objects.filter(
+                agent__emailaddress__verified=True, pseudo_agent=False
+            ).order_by("-registered_on")
             serialized_data = self.serializer_class(agents_instance, many=True)
             return Response(serialized_data.data)
 

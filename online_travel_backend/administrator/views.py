@@ -24,6 +24,7 @@ from .serializers import (
     BillRequestSerializer,
     PaidBillSerializer,
     ReceivedPaymentSerializer,
+    CustomerSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -36,6 +37,7 @@ from agent.models import Rfq, RfqService, Agent
 from commons.models import Bill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
+from customer.models import Customer
 
 from commons.send_email import (
     rfq_updated_agent,
@@ -672,11 +674,26 @@ class AgentListAPI(APIView):
     serializer_class = AgentSerializer
 
     def get(self, request, agent_id=None, format=None, *args, **kwargs):
+        if request.GET.get("b2c") == "true":
+            if agent_id is None:
+                customer_instance = Customer.objects.filter(
+                    customer__emailaddress__verified=True
+                )
+                serialized_data = CustomerSerializer(customer_instance, many=True)
+                return Response(serialized_data.data)
+            
+            # get single customer
+            customer_instance = Customer.objects.get(customer__emailaddress__verified=True, id=agent_id)
+            serialized_data = CustomerSerializer(customer_instance)
+            return Response(serialized_data.data)
+
+
         if agent_id is None:
             agents_instance = Agent.objects.filter(agent__emailaddress__verified=True)
             serialized_data = self.serializer_class(agents_instance, many=True)
             return Response(serialized_data.data)
 
+        # get single agent
         agents_instance = Agent.objects.get(
             agent__emailaddress__verified=True, id=agent_id
         )

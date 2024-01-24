@@ -6,6 +6,7 @@ from agent.models import Rfq, RfqCategory, RfqService, Agent
 # from django.conf import settings
 from commons.models import Bill
 from vendor.models import Vendor, VendorCategory, Service
+from customer.models import Customer
 
 
 class AdminCustomRegistrationSerializer(RegisterSerializer):
@@ -45,6 +46,17 @@ class AgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agent
         exclude = ("agent",)
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    email_address = serializers.EmailField(source="customer.email", read_only=True)
+
+    class Meta:
+        model = Customer
+        exclude = (
+            "customer",
+            "confirmed",
+        )
 
 
 # RFQ
@@ -261,7 +273,8 @@ class PaidBillSerializer(serializers.ModelSerializer):
         )
 
     def get_total_bill(self, obj):
-        return obj.vendor_bill 
+        return obj.vendor_bill
+
     # + obj.admin_bill
 
     def get_paid_amount(self, obj):

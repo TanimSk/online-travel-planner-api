@@ -11,6 +11,7 @@ class Customer(models.Model):
     customer_address = models.CharField(max_length=500)
     customer_number = models.CharField(max_length=30)
     customer_nationality = models.CharField(max_length=60)
+    customer_country_code = models.CharField(max_length=60)
 
     # tracing
     added_on = models.DateTimeField(auto_now_add=True)

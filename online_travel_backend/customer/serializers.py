@@ -18,6 +18,7 @@ class CustomerCustomRegistrationSerializer(RegisterSerializer):
     customer_address = serializers.CharField(required=True)
     customer_number = serializers.CharField(required=True)
     customer_nationality = serializers.CharField(required=True)
+    customer_country_code = serializers.CharField(required=True)
 
     def get_cleaned_data(self):
         data = super(CustomerCustomRegistrationSerializer, self).get_cleaned_data()
@@ -26,6 +27,7 @@ class CustomerCustomRegistrationSerializer(RegisterSerializer):
             "customer_address": self.validated_data.get("customer_address", ""),
             "customer_number": self.validated_data.get("customer_number", ""),
             "customer_nationality": self.validated_data.get("customer_nationality", ""),
+            "customer_country_code": self.validated_data.get("customer_country_code", "")
         }
         data.update(extra_data)
         return data
@@ -40,6 +42,7 @@ class CustomerCustomRegistrationSerializer(RegisterSerializer):
             customer_address=self.cleaned_data.get("customer_address"),
             customer_number=self.cleaned_data.get("customer_number"),
             customer_nationality=self.cleaned_data.get("customer_nationality"),
+            customer_country_code=self.cleaned_data.get("customer_country_code"),
         )
         vendor.save()
         return user

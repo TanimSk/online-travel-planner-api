@@ -615,15 +615,6 @@ class AgentBillAPI(APIView):
                 bill_instance.agent_billed_on = timezone.now()
                 bill_instance.save()
 
-                # sub bills
-                AdminSubBill.objects.create(
-                    bill=bill_instance,
-                    payment_type=service.get("admin_payment_type"),
-                    receipt_img=service.get("receipt_img"),
-                    received_by=service.get("received_by"),
-                    paid_amount=service.get("paid_amount"),
-                )
-
                 # send emails
                 bill_request_agent(bill_instance=bill_instance)
 
@@ -674,6 +665,17 @@ class VendorBillAPI(APIView):
                 bill_instance.vendor_paid_on = timezone.now()
                 bill_instance.status_2 = "vendor_paid"
                 bill_instance.save()
+
+                # sub bills
+                AdminSubBill.objects.create(
+                    bill=bill_instance,
+                    payment_type=service.get("admin_payment_type"),
+                    receipt_img=service.get("receipt_img"),
+                    received_by=service.get("received_by"),
+                    paid_amount=service.get("paid_amount"),
+                )
+
+                # send emails
                 bill_pay_vendor(bill_instance=bill_instance)
 
             return Response({"status": "Successfully paid bills"})

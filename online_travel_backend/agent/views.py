@@ -15,7 +15,7 @@ from .serializers import (
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
 # from vendor.serializers import ManageServicesSerializer
-from commons.models import Bill
+from commons.models import Bill, AgentSubBill
 from .models import Rfq, RfqService, Agent
 from django.shortcuts import get_object_or_404
 from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
@@ -223,7 +223,7 @@ class GetInvoiceAPI(APIView):
         )["charge"]
 
         serialized_data = RfqInvoiceSerializer(rfq_instance)
-        
+
         return render(
             request,
             "agent/invoice.html",
@@ -281,14 +281,24 @@ class AgentBillsAPI(APIView):
                         {"error": "Paid amount cannot be greater than bill!"}
                     )
 
-                bill_instance.admin_payment_type = service.get(
-                    "admin_payment_type", None
-                )
+                # bill_instance.admin_payment_type = service.get(
+                #     "admin_payment_type", None
+                # )
                 bill_instance.agent_due = due_amount
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
 
+                # sub bills
+                AgentSubBill.objects.create(
+                    bill=bill_instance,
+                    payment_type=service.get("admin_payment_type"),
+                    receipt_img=service.get("receipt_img"),
+                    received_by=service.get("received_by"),
+                    paid_amount=service.get("paid_amount"),
+                )
+
+                # send emails
                 bill_pay_admin(bill_instance=bill_instance)
 
             return Response({"status": "Successfully paid bills"})

@@ -4,7 +4,7 @@ from .models import Administrator
 from agent.models import Rfq, RfqCategory, RfqService, Agent
 
 # from django.conf import settings
-from commons.models import Bill
+from commons.models import Bill, AgentSubBill
 from vendor.models import Vendor, VendorCategory, Service
 from customer.models import Customer
 
@@ -148,6 +148,12 @@ class AssignServiceSerializer(serializers.Serializer):
     vendor_id = serializers.IntegerField(required=True)
 
 
+class SubBillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AgentSubBill
+        fields = "__all__"
+
+
 # Received Payments
 class ReceivedPaymentSerializer(serializers.ModelSerializer):
     total_bill = serializers.SerializerMethodField()
@@ -162,9 +168,12 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
     contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
     service_name = serializers.CharField(source="service.service.service_name")
 
+    agent_sub_bill = SubBillSerializer(many=True)
+
     class Meta:
         model = Bill
         fields = (
+            "agent_sub_bill",
             "tracking_id",
             "vendor_bill",
             "admin_bill",
@@ -284,6 +293,8 @@ class PaidBillSerializer(serializers.ModelSerializer):
 class BillPaySerializer(serializers.ModelSerializer):
     tracking_id = serializers.UUIDField()
     paid_amount = serializers.FloatField()
+    receipt_img = serializers.URLField(required=False, allow_blank=True)
+    received_by = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Bill
@@ -291,6 +302,8 @@ class BillPaySerializer(serializers.ModelSerializer):
             "tracking_id",
             "admin_payment_type",
             "paid_amount",
+            "receipt_img",
+            "received_by",
         )
 
 

@@ -34,7 +34,7 @@ from vendor.serializers import (
 )
 
 from agent.models import Rfq, RfqService, Agent
-from commons.models import Bill
+from commons.models import Bill, AdminSubBill
 from commons.models import Category, User
 from vendor.models import Vendor, VendorCategory, Service
 from customer.models import Customer
@@ -614,6 +614,17 @@ class AgentBillAPI(APIView):
                 bill_instance.status_1 = "agent_bill"
                 bill_instance.agent_billed_on = timezone.now()
                 bill_instance.save()
+
+                # sub bills
+                AdminSubBill.objects.create(
+                    bill=bill_instance,
+                    payment_type=service.get("admin_payment_type"),
+                    receipt_img=service.get("receipt_img"),
+                    received_by=service.get("received_by"),
+                    paid_amount=service.get("paid_amount"),
+                )
+
+                # send emails
                 bill_request_agent(bill_instance=bill_instance)
 
             return Response({"status": "Successfully requested for bill to agent"})
@@ -656,9 +667,9 @@ class VendorBillAPI(APIView):
                         {"error": "Paid amount cannot be greater than bill!"}
                     )
 
-                bill_instance.admin_payment_type = service.get(
-                    "admin_payment_type", None
-                )
+                # bill_instance.admin_payment_type = service.get(
+                #     "admin_payment_type", None
+                # )
                 bill_instance.admin_due = due_amount
                 bill_instance.vendor_paid_on = timezone.now()
                 bill_instance.status_2 = "vendor_paid"

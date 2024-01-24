@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from .models import Vendor, Service
 from agent.models import RfqService, Rfq, Agent
-from commons.models import Bill, Category
+from commons.models import Bill, Category, AdminSubBill
 
 
 class VendorCustomRegistrationSerializer(RegisterSerializer):
@@ -124,6 +124,12 @@ class RfqServiceUpdateSerializer(serializers.ModelSerializer):
         model = RfqService
 
 
+class SubBillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdminSubBill
+        fields = "__all__"
+
+
 # Received Payments
 class ReceivedPaymentSerializer(serializers.ModelSerializer):
     # customer_name = serializers.CharField(
@@ -135,10 +141,12 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
     # contact_no = serializers.CharField(source="service.rfq_category.rfq.contact_no")
     service_name = serializers.CharField(source="service.service.service_name")
     received_money = serializers.SerializerMethodField()
+    admin_sub_bill = SubBillSerializer(many=True)
 
     class Meta:
         model = Bill
         fields = (
+            "admin_sub_bill",
             "tracking_id",
             "created_on",
             "vendor_bill",

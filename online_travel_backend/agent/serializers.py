@@ -448,6 +448,8 @@ class PaidBillSerializer(serializers.ModelSerializer):
 class BillPaySerializer(serializers.ModelSerializer):
     tracking_id = serializers.UUIDField()
     paid_amount = serializers.FloatField()
+    receipt_img = serializers.URLField(required=False, allow_blank=True)
+    received_by = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Bill
@@ -455,6 +457,8 @@ class BillPaySerializer(serializers.ModelSerializer):
             "tracking_id",
             "admin_payment_type",
             "paid_amount",
+            "receipt_img",
+            "received_by",
         )
 
 

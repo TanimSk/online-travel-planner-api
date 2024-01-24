@@ -2,6 +2,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import timezone
 import uuid
 
 
@@ -77,10 +78,58 @@ class Bill(models.Model):
     agent_due = models.FloatField(default=0)
     admin_due = models.FloatField(default=0)
 
+    @property
+    def admin_sub_bill(self):
+        return self.bill_subbill_admin.all().order_by("-paid_on")
+
+    @property
+    def agent_sub_bill(self):
+        return self.bill_subbill_agent.all().order_by("-paid_on")
+
     # payment type
+    # PAYMENT_TYPE = (
+    #     ("cash", "cash"),
+    #     ("account_transfer", "account_transfer"),
+    # )
+    # admin_payment_type = models.CharField(choices=PAYMENT_TYPE, default="cash")
+    # vendor_payment_type = models.CharField(choices=PAYMENT_TYPE, default="cash")
+
+
+class AdminSubBill(models.Model):
+    bill = models.ForeignKey(
+        Bill, on_delete=models.CASCADE, related_name="bill_subbill_admin"
+    )
     PAYMENT_TYPE = (
         ("cash", "cash"),
         ("account_transfer", "account_transfer"),
     )
-    admin_payment_type = models.CharField(choices=PAYMENT_TYPE, default="cash")
-    vendor_payment_type = models.CharField(choices=PAYMENT_TYPE, default="cash")
+    payment_type = models.CharField(choices=PAYMENT_TYPE, default="cash")
+
+    # account transfer
+    receipt_img = models.URLField(blank=True, null=True)
+
+    # cash
+    received_by = models.CharField(blank=True, null=True, max_length=400)
+
+    paid_on = models.DateTimeField(default=timezone.now, editable=False)
+    paid_amount = models.FloatField()
+
+
+class AgentSubBill(models.Model):
+    bill = models.ForeignKey(
+        Bill, on_delete=models.CASCADE, related_name="bill_subbill_agent"
+    )
+    PAYMENT_TYPE = (
+        ("cash", "cash"),
+        ("account_transfer", "account_transfer"),
+    )
+    payment_type = models.CharField(choices=PAYMENT_TYPE, default="cash")
+
+    # account transfer
+    receipt_img = models.URLField(blank=True, null=True)
+
+    # cash
+    received_by = models.CharField(blank=True, null=True, max_length=400)
+
+    paid_on = models.DateTimeField(default=timezone.now, editable=False)
+    paid_amount = models.FloatField()

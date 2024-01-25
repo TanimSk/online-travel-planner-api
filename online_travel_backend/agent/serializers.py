@@ -116,6 +116,18 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
+        # calculate transportation price
+        if rfq_service_instance.get("car_quantity", 0) == 0:
+            added_price = service_instance.service_price * rfq_service_instance.get(
+                "duration", 0
+            )
+        else:
+            added_price = (
+                service_instance.service_price
+                * rfq_service_instance.get("duration", 0)
+                * rfq_service_instance.get("car_quantity", 0)
+            )
+
         total_price = (
             (
                 service_instance.infant_price
@@ -129,9 +141,18 @@ class RfqSerializer(serializers.ModelSerializer):
                 service_instance.adult_price
                 * rfq_service_instance.get("adult_members", 0)
             )
-            + (service_instance.service_price * rfq_service_instance.get("members", 0))
-            * delta_days
-            + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
+            + (
+                (
+                    service_instance.service_price
+                    * rfq_service_instance.get("members", 0)
+                )
+                * delta_days
+            )
+            + (
+                (service_instance.service_price)
+                * rfq_service_instance.get("quantity", 0)
+            )
+            + added_price
         )
 
         agent_commission = Agent.objects.get(
@@ -318,6 +339,11 @@ class QueryServiceSerializer(serializers.Serializer):
     # tour package
     services_name = serializers.ListField(required=False, allow_null=True)
 
+    quantity = serializers.IntegerField(required=False, allow_null=True)
+    duration = serializers.IntegerField(required=False, allow_null=True)
+    car_quantity = serializers.IntegerField(required=False, allow_null=True)
+    p_members = serializers.IntegerField(required=False, allow_null=True)
+
 
 class QueryResultSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField(method_name="get_total_price")
@@ -351,6 +377,18 @@ class QueryResultSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
+        # calculate transportation price
+        if rfq_service_instance.get("car_quantity", 0) == 0:
+            added_price = service_instance.service_price * rfq_service_instance.get(
+                "duration", 0
+            )
+        else:
+            added_price = (
+                service_instance.service_price
+                * rfq_service_instance.get("duration", 0)
+                * rfq_service_instance.get("car_quantity", 0)
+            )
+
         total_price = (
             (
                 service_instance.infant_price
@@ -364,9 +402,31 @@ class QueryResultSerializer(serializers.ModelSerializer):
                 service_instance.adult_price
                 * rfq_service_instance.get("adult_members", 0)
             )
-            + (service_instance.service_price * rfq_service_instance.get("members", 0))
-            * delta_days
-            + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
+            + (
+                (
+                    service_instance.service_price
+                    * rfq_service_instance.get("members", 0)
+                )
+                * delta_days
+            )
+            + (
+                (service_instance.service_price)
+                * rfq_service_instance.get("quantity", 0)
+            )
+            + added_price
+        )
+
+        # added commission
+        try:
+            agent_instance = Agent.objects.get(agent=self.context["request"].user)
+            commission = agent_instance.commission
+        except Agent.DoesNotExist:
+            commission = 0
+
+        total_price = (
+            total_price
+            + (total_price * service_instance.admin_commission * 0.01)
+            + (total_price * commission * 0.01)
         )
 
         return total_price

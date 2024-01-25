@@ -58,7 +58,6 @@ class OverviewAPI(APIView):
         cancelled_rfq = rfqs_instance.filter(status="declined").count()
         pending_rfq = rfqs_instance.filter(status="pending").count()
         confirmed_rfq = rfqs_instance.filter(status="confirmed").count()
-
         completed_rfq = rfqs_instance.filter(status="completed").count()
 
         return Response(

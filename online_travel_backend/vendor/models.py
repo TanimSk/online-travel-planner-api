@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 import uuid
 from commons.models import Category
 
@@ -14,15 +15,14 @@ class Vendor(models.Model):
     vendor_name = models.CharField(max_length=200)
     vendor_address = models.CharField(max_length=500)
     vendor_number = models.CharField(max_length=20)
-    
+
     logo_url = models.URLField()
     office_images = ArrayField(models.URLField(), default=list, blank=True, null=True)
-
 
     password_text = models.CharField(blank=True, null=True, max_length=300)
 
     # tracing
-    added_on = models.DateTimeField(auto_now_add=True)
+    added_on = models.DateTimeField(default=timezone.now, editable=False)
     approved = models.BooleanField(default=False)
 
     def __str__(self) -> str:
@@ -67,7 +67,7 @@ class Service(models.Model):
         VendorCategory, on_delete=models.CASCADE, related_name="service_vendorcategory"
     )
     # tracing
-    created_on = models.DateTimeField(auto_now_add=True, editable=False)
+    created_on = models.DateTimeField(default=timezone.now, editable=False)
     added_by_admin = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)  # service should be approved by admin
     tracking_id = models.UUIDField(default=uuid.uuid4, editable=False)
@@ -96,7 +96,7 @@ class Service(models.Model):
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
 
-    # flight booking + transportation
+    # flight booking
     from_area = models.CharField(max_length=500, blank=True, null=True)
     to_area = models.CharField(max_length=500, blank=True, null=True)
 
@@ -119,7 +119,7 @@ class Service(models.Model):
     transfer_type = models.CharField(max_length=200, blank=True, null=True)
 
     # AV production
-    duration = models.FloatField(blank=True, null=True)
+    # duration = models.FloatField(blank=True, null=True)
 
     # daily transportation
     car_type = models.CharField(blank=True, null=True)

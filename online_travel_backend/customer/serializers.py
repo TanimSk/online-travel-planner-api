@@ -27,7 +27,9 @@ class CustomerCustomRegistrationSerializer(RegisterSerializer):
             "customer_address": self.validated_data.get("customer_address", ""),
             "customer_number": self.validated_data.get("customer_number", ""),
             "customer_nationality": self.validated_data.get("customer_nationality", ""),
-            "customer_country_code": self.validated_data.get("customer_country_code", "")
+            "customer_country_code": self.validated_data.get(
+                "customer_country_code", ""
+            ),
         }
         data.update(extra_data)
         return data
@@ -121,6 +123,18 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
+        # calculate transportation price
+        if rfq_service_instance.get("car_quantity", 0) == 0:
+            added_price = service_instance.service_price * rfq_service_instance.get(
+                "duration", 0
+            )
+        else:
+            added_price = (
+                service_instance.service_price
+                * rfq_service_instance.get("duration", 0)
+                * rfq_service_instance.get("car_quantity", 0)
+            )
+
         total_price = (
             (
                 service_instance.infant_price
@@ -134,9 +148,14 @@ class RfqSerializer(serializers.ModelSerializer):
                 service_instance.adult_price
                 * rfq_service_instance.get("adult_members", 0)
             )
-            + (service_instance.service_price * rfq_service_instance.get("members", 0))
-            * delta_days
-            + (service_instance.cost_per_hour) * rfq_service_instance.get("duration", 0)
+            + (
+                (
+                    service_instance.service_price
+                    * rfq_service_instance.get("members", 0)
+                )
+                * delta_days
+            )
+            + added_price
         )
 
         # appending commissions
@@ -189,7 +208,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 customer=self.context.get("request").user
             )
 
-            print(validated_data)
+            # print(validated_data)
 
             # setting customer data to itself
             rfq_instance = Rfq.objects.create(

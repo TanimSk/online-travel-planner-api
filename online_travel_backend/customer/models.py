@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Customer(models.Model):
@@ -14,7 +15,7 @@ class Customer(models.Model):
     customer_country_code = models.CharField(max_length=60)
 
     # tracing
-    added_on = models.DateTimeField(auto_now_add=True)
+    added_on = models.DateTimeField(default=timezone.now, editable=False)
     confirmed = models.BooleanField(default=True)  # set to False, if OTP is implemented
 
     def __str__(self) -> str:

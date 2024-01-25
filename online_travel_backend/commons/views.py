@@ -83,6 +83,10 @@ class QueryServicesAPI(APIView):
                 "duration",
                 "depart_time",
                 "return_time",
+                "car_quantity",
+                "quantity",
+                "p_members",
+                "services_name",
             ]:
                 try:
                     serialized_copy.pop(key)
@@ -97,7 +101,7 @@ class QueryServicesAPI(APIView):
             serialized_services = QueryResultSerializer(
                 services_instances,
                 many=True,
-                context={"dictionary": serialized_data.data},
+                context={"dictionary": serialized_data.data, "request": request},
             )
             return Response(serialized_services.data)
 

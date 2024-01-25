@@ -38,9 +38,19 @@ class Bill(models.Model):
         blank=True,
         null=True,
     )
+
     agent = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bill_agent"
     )
+
+    customer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="bill_customer",
+        blank=True,
+        null=True,
+    )
+
     service = models.OneToOneField(
         "agent.RfqService", on_delete=models.CASCADE, related_name="bill_service"
     )
@@ -62,7 +72,7 @@ class Bill(models.Model):
     status_2 = models.CharField(choices=STATUS_2, default="vendor_bill", max_length=20)
 
     # dates
-    created_on = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(default=timezone.now, editable=False)
     admin_billed_on = models.DateTimeField(blank=True, null=True)
     agent_billed_on = models.DateTimeField(blank=True, null=True)
 

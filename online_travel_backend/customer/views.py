@@ -11,7 +11,7 @@ from .serializers import (
     CustomerCustomRegistrationSerializer,
     RfqSerializer,
     ProfileSerializer,
-    ServiceInfo
+    ServiceInfo,
 )
 from agent.serializers import (
     PaidBillSerializer,
@@ -152,6 +152,7 @@ class RFQTypesAPI(APIView):
                 Bill.objects.create(
                     **vendor_ref,
                     agent=rfq_service_instance.rfq_category.rfq.agent,
+                    customer=request.user,
                     vendor_bill=rfq_service_instance.service_price,
                     admin_bill=rfq_service_instance.service_price * admin_commission,
                     agent_bill=rfq_service_instance.service_price * agent_commission,
@@ -239,6 +240,7 @@ class AgentBillsAPI(APIView):
         if request.GET.get("paid") == "true":
             # list of paid bills
             bills_instance = Bill.objects.filter(
+                customer=request.user,
                 agent=agent_instance.agent,
                 status_1="admin_paid",
                 service__rfq_category__rfq__customer=request.user,
@@ -249,6 +251,7 @@ class AgentBillsAPI(APIView):
         # list of bill requests with due payment
         bills_instance = (
             Bill.objects.filter(
+                customer=request.user,
                 agent=agent_instance.agent,
                 agent_due__gt=0,
                 service__rfq_category__rfq__customer=request.user,

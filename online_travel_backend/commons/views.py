@@ -77,17 +77,49 @@ class QueryServicesAPI(APIView):
                 id=serialized_data.data.get("category_id"),
                 category_name="Daily Activity Transportation",
             ).exists():
-                if serialized_data.data.get("car_type") == "Sedan" and serialized_data.data.get("members") > 5:
-                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
-                
-                elif serialized_data.data.get("car_type") == "SUV" and serialized_data.data.get("members") > 8:
-                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
-                    
-                elif serialized_data.data.get("car_type") == "Micro" and serialized_data.data.get("members") > 12:
-                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
-                
-                elif serialized_data.data.get("car_type") == "Mini Bus" and serialized_data.data.get("members") > 30:
-                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
+                if serialized_data.data.get(
+                    "car_type"
+                ) == "Sedan" and serialized_data.data.get("members") > (
+                    5 * serialized_data.data.get("car_quantity")
+                ):
+                    return Response(
+                        {
+                            "status": "Passenger capacity exceeded for this type of car, please Re-query"
+                        }
+                    )
+
+                elif serialized_data.data.get(
+                    "car_type"
+                ) == "SUV" and serialized_data.data.get("members") > (
+                    8 * serialized_data.data.get("car_quantity")
+                ):
+                    return Response(
+                        {
+                            "status": "Passenger capacity exceeded for this type of car, please Re-query"
+                        }
+                    )
+
+                elif serialized_data.data.get(
+                    "car_type"
+                ) == "Micro" and serialized_data.data.get("members") > (
+                    12 * serialized_data.data.get("car_quantity")
+                ):
+                    return Response(
+                        {
+                            "status": "Passenger capacity exceeded for this type of car, please Re-query"
+                        }
+                    )
+
+                elif serialized_data.data.get(
+                    "car_type"
+                ) == "Mini Bus" and serialized_data.data.get("members") > (
+                    30 * serialized_data.data.get("car_quantity")
+                ):
+                    return Response(
+                        {
+                            "status": "Passenger capacity exceeded for this type of car, please Re-query"
+                        }
+                    )
 
             for key in [
                 "category_id",

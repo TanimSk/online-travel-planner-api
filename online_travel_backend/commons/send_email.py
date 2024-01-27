@@ -631,8 +631,33 @@ def bill_pay_vendor(bill_instance):
         },
     )
 
+    # pdf
+    latest_bill = (
+        AdminSubBill.objects.filter(bill=bill_instance).order_by("-paid_on").first()
+    )
+
+    html_pdf_array = [
+        {
+            "name": f"Admin-paid-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}",
+            "content": render_to_string(
+                "email_notifications/pdfs/bill_pay_vendor.html",
+                {
+                    "bill_instance": bill_instance,
+                    "paid_amount": bill_instance.vendor_bill - bill_instance.admin_due,
+                    "paid_by": latest_bill.payment_type,
+                    "receipt_img": latest_bill.receipt_img,
+                    "received_by": latest_bill.received_by,
+                },
+            ),
+        }
+    ]
+
     send_html_mail(
-        "Bill Paid", html_content, [bill_instance.vendor.email], DEFAULT_FROM_EMAIL
+        "Bill Paid",
+        html_content,
+        [bill_instance.vendor.email],
+        DEFAULT_FROM_EMAIL,
+        html_pdf_array,
     )
 
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Paid</title>
+    <style type="text/css">
+        body {
+            font-family: Tahoma, sans-serif;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <table style="width: 100%;">
+        <tr>
+            <td>Agency</td>
+            <td>
+                <img src="{{ logo_url }}" alt="" style="width: 4rem;">
+                {{ agency_name }}
+            </td>
+        </tr>
+
+        <tr>
+            <td>Paid Amount</td>
+            <td>{{ paid_amount }} Tk.</td>
+        </tr>
+
+        <tr>
+            <td>Paid By</td>
+            <td>{{ paid_by }} Tk.</td>
+        </tr>
+
+        <tr>
+            <td>Paid on</td>
+            <td>{{ bill_instance.admin_paid_on }}</td>
+        </tr>
+
+        <tr>
+            <td>Paid on</td>
+            <td>{{ bill_instance.admin_paid_on }}</td>
+        </tr>
+
+        {% if received_by != "" or received_by != None %}
+        <tr>
+            <td>
+                Received By
+            </td>
+            <td>
+                {{ received_by }}
+            </td>
+        </tr>
+        {% endif %}
+
+
+        {% if receipt_img != "" or receipt_img != None %}
+        <tr>
+            <td>
+                Receipt image
+            </td>
+            <td>
+                <img src="{{ receipt_img }}" alt="" style="width: 10rem;">
+            </td>
+        </tr>
+        {% endif %}
+
+
+        <tr>
+            <td>Payment due</td>
+            <td>{{ bill_instance.admin_due }} Tk.</td>
+        </tr>
+        <tr>
+            <td>Total Amount</td>
+            <td>{{ bill_instance.admin_bill }} Tk. </td>
+        </tr>
+    </table>
+</body>
+
+</html>

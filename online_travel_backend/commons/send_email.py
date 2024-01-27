@@ -13,6 +13,7 @@ import math
 from agent.models import Agent, Rfq, RfqCategory, RfqService
 from customer.models import Customer
 from vendor.models import Vendor
+from commons.models import AdminSubBill, AgentSubBill
 from datetime import datetime
 from weasyprint import HTML
 
@@ -372,7 +373,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
 
         services_pdf_array.append(
             {
-                "name": f"Invoice-{timezone.now()}.pdf",
+                "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
                 "content": generate_invoice(rfq_instance, rfq_services, is_customer),
             }
         )
@@ -408,7 +409,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
 
         services_pdf_array.append(
             {
-                "name": f"Invoice-{timezone.now()}.pdf",
+                "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
                 "content": generate_invoice(rfq_instance, rfq_services, is_customer),
             }
         )
@@ -516,6 +517,32 @@ def bill_pay_admin(bill_instance, is_customer=False):
             },
         )
 
+        # pdf
+        latest_bill = (
+            AgentSubBill.objects.filter(bill=bill_instance).order_by("-paid_on").first()
+        )
+
+        html_pdf_array = [
+            {
+                "name": f"Agent-paid-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}",
+                "content": render_to_string(
+                    "email_notifications/pdfs/bill_pay_admin.html",
+                    {
+                        "agent_name": agent_instance.agent_name,
+                        "agency_name": agent_instance.agency_name,
+                        "agent_num": agent_instance.mobile_no,
+                        "bill_instance": bill_instance,
+                        "paid_amount": bill_instance.admin_bill
+                        + bill_instance.vendor_bill
+                        - bill_instance.agent_due,
+                        "paid_by": latest_bill.payment_type,
+                        "receipt_img": latest_bill.receipt_img,
+                        "received_by": latest_bill.received_by,
+                    },
+                ),
+            }
+        ]
+
     else:
         html_content = render_to_string(
             "email_notifications_customer/bill_pay_admin.html",
@@ -535,7 +562,32 @@ def bill_pay_admin(bill_instance, is_customer=False):
             },
         )
 
-    send_html_mail("Bill Paid", html_content, emails, DEFAULT_FROM_EMAIL)
+        # pdf
+        latest_bill = (
+            AgentSubBill.objects.filter(bill=bill_instance).order_by("-paid_on").first()
+        )
+
+        html_pdf_array = [
+            {
+                "name": f"Customer-paid-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}",
+                "content": render_to_string(
+                    "email_notifications/pdfs/bill_pay_admin.html",
+                    {
+                        "bill_instance": bill_instance,
+                        "paid_amount": bill_instance.admin_bill
+                        + bill_instance.vendor_bill
+                        - bill_instance.agent_due,
+                        "paid_by": latest_bill.payment_type,
+                        "receipt_img": latest_bill.receipt_img,
+                        "received_by": latest_bill.received_by,
+                    },
+                ),
+            }
+        ]
+
+    send_html_mail(
+        "Bill Paid", html_content, emails, DEFAULT_FROM_EMAIL, html_pdf_array
+    )
 
 
 def bill_request_admin(bill_instance):

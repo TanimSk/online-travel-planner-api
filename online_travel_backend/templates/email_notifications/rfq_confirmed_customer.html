@@ -45,28 +45,9 @@
     RFQ ID: {{ tracking_id }} <br>
     </p>
 
-    <h6>
+    <h3>
         Service details are attached below:
-    </h6>
-
-    <p>
-    <h2>Services:</h2>
-    {% for rfq_service in rfq_services %}
-    - {{ rfq_service.service.service_name }} <br>
-
-    <b class="desc">Description:</b> <br>
-    {{ rfq_service.service.description | safe}} <br> <br>
-
-    <b class="desc">Itinerary:</b> <br>
-    {{ rfq_service.service.itinerary | safe}} <br>
-
-    <b class="desc">Overview:</b> <br>
-    {{ rfq_service.service.overview | safe}} <br>
-
-    <b class="desc">Rates:</b> <br>
-    {{ rfq_service.service.rates | safe}} <br>
-    {% endfor %}
-    </p>
+    </h3>
 
 </body>
 

@@ -24,6 +24,12 @@
         .desc {
             text-decoration: underline;
         }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
     </style>
 </head>
 
@@ -34,22 +40,39 @@
         </h1>
     </div>
 
-    <p>
     <h2>Service Detail:</h2>
-    {{ rfq_service.service.service_name }} <br> <br>
 
-    <b class="desc">Description:</b> <br>
-    {{ rfq_service.service.description | safe}} <br> <br>
+    <table>
+        <tr>
+            <td>Service Category:</td>
+            <td>{{ rfq_service.rfq_category.category.category_name }}</td>
+        </tr>
+        <tr>
+            <td>Service Name</td>
+            <td>{{ rfq_service.service.service }}</td>
+        </tr>
+        <tr>
+            <td>Service Name</td>
+            <td>{{ rfq_service.service.service }}</td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>{{ rfq_service.service.description | safe}}</td>
+        </tr>
+        <tr>
+            <td>Itinerary</td>
+            <td>{{ rfq_service.service.itinerary | safe}} </td>
+        </tr>
+        <tr>
+            <td>Overview</td>
+            <td>{{ rfq_service.service.overview | safe}} </td>
+        </tr>
+        <tr>
+            <td>Rates</td>
+            <td>{{ rfq_service.service.rates | safe}} </td>
+        </tr>
+    </table>
 
-    <b class="desc">Itinerary:</b> <br>
-    {{ rfq_service.service.itinerary | safe}} <br>
-
-    <b class="desc">Overview:</b> <br>
-    {{ rfq_service.service.overview | safe}} <br>
-
-    <b class="desc">Rates:</b> <br>
-    {{ rfq_service.service.rates | safe}} <br>
-    </p>
 
 </body>
 

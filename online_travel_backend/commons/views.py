@@ -88,7 +88,7 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }
+                            }, status=400
                         )
 
                     elif serialized_data.data.get(
@@ -99,7 +99,7 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }
+                            }, status=400
                         )
 
                     elif serialized_data.data.get(
@@ -110,7 +110,7 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }
+                            }, status=400
                         )
 
                     elif serialized_data.data.get(
@@ -121,10 +121,10 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }
+                            }, status=400
                         )
             except Category.DoesNotExist:
-                return Response({"status": "Something went wrong"})
+                return Response({"status": "Something went wrong"}, status=400)
 
             for key in [
                 "category_id",

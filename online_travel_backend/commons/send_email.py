@@ -533,7 +533,8 @@ def bill_pay_admin(bill_instance, is_customer=False):
                         "agency_name": agent_instance.agency_name,
                         "agent_num": agent_instance.mobile_no,
                         "bill_instance": bill_instance,
-                        "paid_amount": bill_instance.admin_bill
+                        "paid_amount": latest_bill.paid_amount,
+                        "t_paid_amount": bill_instance.admin_bill
                         + bill_instance.vendor_bill
                         - bill_instance.agent_due,
                         "paid_by": latest_bill.payment_type,
@@ -575,7 +576,8 @@ def bill_pay_admin(bill_instance, is_customer=False):
                     "email_notifications/pdfs/bill_pay_admin.html",
                     {
                         "bill_instance": bill_instance,
-                        "paid_amount": bill_instance.admin_bill
+                        "paid_amount": latest_bill.paid_amount ,
+                        "t_paid_amount": bill_instance.admin_bill
                         + bill_instance.vendor_bill
                         - bill_instance.agent_due,
                         "paid_by": latest_bill.payment_type,
@@ -643,7 +645,8 @@ def bill_pay_vendor(bill_instance):
                 "email_notifications/pdfs/bill_pay_vendor.html",
                 {
                     "bill_instance": bill_instance,
-                    "paid_amount": bill_instance.vendor_bill - bill_instance.admin_due,
+                    "paid_amount": latest_bill.paid_amount ,
+                    "t_paid_amount": bill_instance.vendor_bill - bill_instance.admin_due,
                     "paid_by": latest_bill.payment_type,
                     "receipt_img": latest_bill.receipt_img,
                     "received_by": latest_bill.received_by,

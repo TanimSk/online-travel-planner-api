@@ -33,23 +33,28 @@
 
     <table style="width: 100%;">
         <tr>
-            <td><b>Paid Amount</b></td>
+            <td style="font-weight: bold;"><b>Paid Amount</b></td>
             <td>{{ paid_amount }} Tk.</td>
         </tr>
 
         <tr>
-            <td><b>Paid By</b></td>
+            <td><b>Total Paid Amount</b></td>
+            <td>{{ t_paid_amount }} Tk.</td>
+        </tr>
+
+        <tr>
+            <td style="font-weight: bold;"><b>Paid By</b></td>
             <td>{{ paid_by }}</td>
         </tr>
 
         <tr>
-            <td><b>Paid on</b></td>
+            <td style="font-weight: bold;"><b>Paid on</b></td>
             <td>{{ bill_instance.admin_paid_on }}</td>
         </tr>
 
         {% if received_by != None %}
         <tr>
-            <td>
+            <td style="font-weight: bold;">
                 <b>Received By</b>
             </td>
             <td>
@@ -60,7 +65,7 @@
 
         {% if receipt_img != None %}
         <tr>
-            <td>
+            <td style="font-weight: bold;">
                 <b>Receipt image</b>
             </td>
             <td>
@@ -70,11 +75,11 @@
         {% endif %}
 
         <tr>
-            <td><b>Payment due</b></td>
+            <td style="font-weight: bold;"><b>Payment due</b></td>
             <td>{{ bill_instance.agent_due }} Tk.</td>
         </tr>
         <tr>
-            <td><b>Total Amount</b></td>
+            <td style="font-weight: bold;"><b>Total Amount</b></td>
             <td>{{ bill_instance.admin_bill|add:bill_instance.vendor_bill }} Tk. </td>
         </tr>
     </table>

@@ -31,23 +31,28 @@
 <body>
     <table style="width: 100%;">
         <tr>
-            <td>Paid Amount</td>
+            <td style="font-weight: bold;">Paid Amount</td>
             <td>{{ paid_amount }} Tk.</td>
         </tr>
 
         <tr>
-            <td>Paid By</td>
+            <td style="font-weight: bold;">Total Paid Amount</td>
+            <td>{{ t_paid_amount }} Tk.</td>
+        </tr>
+
+        <tr>
+            <td style="font-weight: bold;">Paid By</td>
             <td>{{ paid_by }}</td>
         </tr>
 
         <tr>
-            <td>Paid on</td>
+            <td style="font-weight: bold;">Paid on</td>
             <td>{{ bill_instance.admin_paid_on }}</td>
         </tr>
 
         {% if received_by != None %}
         <tr>
-            <td>
+            <td style="font-weight: bold;">
                 Received By
             </td>
             <td>
@@ -59,7 +64,7 @@
 
         {% if receipt_img != None %}
         <tr>
-            <td>
+            <td style="font-weight: bold;">
                 Receipt image
             </td>
             <td>
@@ -69,11 +74,11 @@
         {% endif %}
 
         <tr>
-            <td>Payment due</td>
+            <td style="font-weight: bold;">Payment due</td>
             <td>{{ bill_instance.admin_due }} Tk.</td>
         </tr>
         <tr>
-            <td>Total Amount</td>
+            <td style="font-weight: bold;">Total Amount</td>
             <td>{{ bill_instance.vendor_bill }} Tk. </td>
         </tr>
     </table>

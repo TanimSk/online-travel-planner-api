@@ -528,6 +528,7 @@ def bill_pay_admin(bill_instance, is_customer=False):
                 "content": render_to_string(
                     "email_notifications/pdfs/bill_pay_admin.html",
                     {
+                        "logo_url": agent_instance.logo_url,
                         "agent_name": agent_instance.agent_name,
                         "agency_name": agent_instance.agency_name,
                         "agent_num": agent_instance.mobile_no,

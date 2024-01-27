@@ -41,7 +41,7 @@
 
         <tr>
             <td>Paid By</td>
-            <td>{{ paid_by }} Tk.</td>
+            <td>{{ paid_by }}</td>
         </tr>
 
         <tr>
@@ -49,12 +49,7 @@
             <td>{{ bill_instance.admin_paid_on }}</td>
         </tr>
 
-        <tr>
-            <td>Paid on</td>
-            <td>{{ bill_instance.admin_paid_on }}</td>
-        </tr>
-
-        {% if received_by != "" or received_by != None %}
+        {% if received_by != None %}
         <tr>
             <td>
                 Received By
@@ -66,7 +61,7 @@
         {% endif %}
 
 
-        {% if receipt_img != "" or receipt_img != None %}
+        {% if receipt_img != None %}
         <tr>
             <td>
                 Receipt image
@@ -77,14 +72,13 @@
         </tr>
         {% endif %}
 
-
         <tr>
             <td>Payment due</td>
-            <td>{{ bill_instance.admin_due }} Tk.</td>
+            <td>{{ bill_instance.agent_due }} Tk.</td>
         </tr>
         <tr>
             <td>Total Amount</td>
-            <td>{{ bill_instance.admin_bill }} Tk. </td>
+            <td>{{ bill_instance.admin_bill|add:bill_instance.vendor_bill }} Tk. </td>
         </tr>
     </table>
 </body>

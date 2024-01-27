@@ -85,8 +85,7 @@ class QueryServicesAPI(APIView):
                 "return_time",
                 "car_quantity",
                 "quantity",
-                "p_members",
-                "services_name",
+                "_members",                
             ]:
                 try:
                     serialized_copy.pop(key)

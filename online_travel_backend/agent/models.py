@@ -134,7 +134,7 @@ class RfqService(models.Model):
     area_name = models.CharField(blank=True, null=True, max_length=500)
 
     quantity = models.IntegerField(default=0, blank=True, null=True)
-    p_members = models.IntegerField(default=0, blank=True, null=True)
+    # _members = models.IntegerField(default=0, blank=True, null=True)
 
     # Hotel
     # hotel_name = models.CharField(max_length=300, blank=True, null=True)

@@ -68,6 +68,7 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
     total_price = serializers.SerializerMethodField(method_name="get_total_price")
+    _members = serializers.IntegerField(required=False)
 
     customer_name = serializers.CharField(required=False)
     customer_address = serializers.CharField(required=False)
@@ -229,6 +230,9 @@ class RfqSerializer(serializers.ModelSerializer):
 
                 for rfq_service in rfq_services:
                     service_id = rfq_service.pop("service")
+                    total_members = rfq_service.get("members") + rfq_service.get(
+                        "_members"
+                    )
 
                     for key in [
                         "service_price",
@@ -236,6 +240,8 @@ class RfqSerializer(serializers.ModelSerializer):
                         "bed_type",
                         "services_name",
                         "area_name",
+                        "members",
+                        "_members",
                     ]:
                         try:
                             rfq_service.pop(key)
@@ -261,6 +267,7 @@ class RfqSerializer(serializers.ModelSerializer):
                         bed_type=service_instance.bed_type,
                         services_name=service_instance.services_name,
                         area_name=service_instance.area_name,
+                        members=total_members,
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
                     )

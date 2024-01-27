@@ -66,6 +66,7 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
     total_price = serializers.SerializerMethodField(method_name="get_total_price")
+    _members = serializers.IntegerField(required=False)
 
     class Meta:
         exclude = ("agent",)
@@ -213,6 +214,9 @@ class RfqSerializer(serializers.ModelSerializer):
 
                 for rfq_service in rfq_services:
                     service_id = rfq_service.pop("service")
+                    total_members = rfq_service.get("members") + rfq_service.get(
+                        "_members"
+                    )
 
                     for key in [
                         "service_price",
@@ -220,6 +224,8 @@ class RfqSerializer(serializers.ModelSerializer):
                         "bed_type",
                         "services_name",
                         "area_name",
+                        "members",
+                        "_members",
                     ]:
                         try:
                             rfq_service.pop(key)
@@ -251,6 +257,7 @@ class RfqSerializer(serializers.ModelSerializer):
                         services_name=service_instance.services_name,
                         area_name=service_instance.area_name,
                         #####
+                        members=total_members,
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,
                         agent_commission=agent_commission
@@ -337,12 +344,12 @@ class QueryServiceSerializer(serializers.Serializer):
     car_type = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 
     # tour package
-    services_name = serializers.ListField(required=False, allow_null=True)
+    # services_name = serializers.ListField(required=False, allow_null=True)
 
     quantity = serializers.IntegerField(required=False, allow_null=True)
     duration = serializers.IntegerField(required=False, allow_null=True)
     car_quantity = serializers.IntegerField(required=False, allow_null=True)
-    p_members = serializers.IntegerField(required=False, allow_null=True)
+    _members = serializers.IntegerField(required=False, allow_null=True)
 
 
 class QueryResultSerializer(serializers.ModelSerializer):

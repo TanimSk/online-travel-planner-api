@@ -216,7 +216,7 @@
             {% for key, val in rfq_service.items %}
             {% if key == "infant_members" or key == "child_members" or key == "adult_members" or key == "members" %}
             {% if val != None and val != "" and val != 0 %}
-            <div class="address_container">
+            <div class="address_container" style="padding-top: 0;">
               <div class="address">
                 <p class="label-table">{{ key | title | replace:"_"}}:</p>
                 <p>

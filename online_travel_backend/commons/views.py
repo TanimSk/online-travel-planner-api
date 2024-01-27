@@ -72,6 +72,8 @@ class QueryServicesAPI(APIView):
             # keeping all keys instead of non-search params, for searching
             serialized_copy = serialized_data.data.copy()
 
+            print(Category.objects.get(id=serialized_data.data.get("category_id")).category_name)
+
             # For transportation
             if Category.objects.filter(
                 id=serialized_data.data.get("category_id"),

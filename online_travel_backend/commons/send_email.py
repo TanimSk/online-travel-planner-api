@@ -3,8 +3,12 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 
 # from django.utils.html import strip_tags
+from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from administrator.models import Administrator
 from online_travel_backend.settings import DEFAULT_FROM_EMAIL
+from django.db.models import Sum, F
+from django.utils import timezone
+import math
 
 from agent.models import Agent, Rfq, RfqCategory, RfqService
 from customer.models import Customer
@@ -198,6 +202,49 @@ def rfq_declined_agent(rfq_instance):
     send_html_mail("RFQ Declined", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
+def generate_invoice(rfq_instance, services_instance, is_customer):
+    # Calculation
+    total_service_charge = services_instance.aggregate(Sum("service_price"))[
+        "service_price__sum"
+    ]
+    extra_charge_admin = services_instance.aggregate(
+        charge=Sum((F("service_price") * F("admin_commission")) / 100)
+    )["charge"]
+    extra_charge_agent = services_instance.aggregate(
+        charge=Sum((F("service_price") * F("agent_commission")) / 100)
+    )["charge"]
+
+    serialized_data = RfqInvoiceSerializer(rfq_instance)
+
+    if not is_customer:
+        return render_to_string(
+            "agent/invoice.html",
+            {
+                "data": serialized_data.data,
+                "today_date": timezone.now(),
+                "total_charge": math.ceil(total_service_charge),
+                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(
+                    total_service_charge + extra_charge_agent + extra_charge_admin
+                ),
+            },
+        )
+
+    else:
+        return render_to_string(
+            "customer/invoice.html",
+            {
+                "data": serialized_data.data,
+                "today_date": timezone.now(),
+                "total_charge": math.ceil(total_service_charge),
+                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(
+                    total_service_charge + extra_charge_agent + extra_charge_admin
+                ),
+            },
+        )
+
+
 def rfq_confirmed_admin(rfq_instance, is_customer=False):
     rfq_services = RfqService.objects.filter(rfq_category__rfq=rfq_instance)
     emails = list(
@@ -323,6 +370,13 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
                 }
             )
 
+        services_pdf_array.append(
+            {
+                "name": f"Invoice-{timezone.now()}.pdf",
+                "content": generate_invoice(rfq_instance, rfq_services, is_customer),
+            }
+        )
+
     else:
         html_content = render_to_string(
             "email_notifications_customer/rfq_confirmed_customer.html",
@@ -351,6 +405,13 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
                     ),
                 }
             )
+
+        services_pdf_array.append(
+            {
+                "name": f"Invoice-{timezone.now()}.pdf",
+                "content": generate_invoice(rfq_instance, rfq_services, is_customer),
+            }
+        )
 
     send_html_mail(
         "RFQ Confirmed",

@@ -311,7 +311,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
         for rfq_service in rfq_services:
             services_pdf_array.append(
                 {
-                    "name": f"{rfq_service.services_name}.pdf",
+                    "name": f"{rfq_service.service.service_name}.pdf",
                     "content": render_to_string(
                         "email_notifications/pdfs/rfq_confirmed_customer.html",
                         {
@@ -342,7 +342,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
         for rfq_service in rfq_services:
             services_pdf_array.append(
                 {
-                    "name": f"{rfq_service.services_name}.pdf",
+                    "name": f"{rfq_service.service.service_name}.pdf",
                     "content": render_to_string(
                         "email_notifications_customer/pdfs/rfq_confirmed_customer.html",
                         {

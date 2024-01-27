@@ -11,14 +11,14 @@
         }
 
         .heading {
-            margin: 3rem auto;
+            margin: 1rem auto;
             text-align: center;
             display: blocks;
         }
 
         .heading img {
-            width: 8rem;
-            border-radius: 1rem;
+            width: 4rem;
+            border-radius: .2rem;
         }
 
         .desc {
@@ -29,6 +29,7 @@
         th,
         td {
             border: 1px solid black;
+            border-collapse: collapse;
         }
     </style>
 </head>
@@ -36,22 +37,18 @@
 <body>
     <div class="heading">
         <img src="{{ logo_url }}" alt="logo">
-        <h1>
+        <h3>
             {{ agency_name }}
-        </h1>
+        </h3>
     </div>
 
 
     <h2>Service Detail:</h2>
 
-    <table>
+    <table style="width: 100%;">
         <tr>
-            <td>Service Category:</td>
+            <td>Service Category</td>
             <td>{{ rfq_service.rfq_category.category.category_name }}</td>
-        </tr>
-        <tr>
-            <td>Service Name</td>
-            <td>{{ rfq_service.service.service }}</td>
         </tr>
         <tr>
             <td>Service Name</td>
@@ -73,6 +70,7 @@
             <td>Rates</td>
             <td>{{ rfq_service.service.rates | safe}} </td>
         </tr>
+
     </table>
 
 </body>

@@ -155,6 +155,7 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
             # "contact_no",
             "service_name",
             "received_money",
+            "vendor_paid_on",
         )
 
     def get_received_money(self, obj):
@@ -182,6 +183,7 @@ class BillServicesSerializer(serializers.ModelSerializer):
             "customer_address",
             "contact_no",
             "service_name",
+            "created_on",
         )
 
 

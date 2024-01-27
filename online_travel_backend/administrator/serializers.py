@@ -183,6 +183,7 @@ class ReceivedPaymentSerializer(serializers.ModelSerializer):
             "contact_no",
             "service_name",
             "received_money",
+            "admin_paid_on",
         )
 
     def get_total_bill(self, obj):
@@ -216,6 +217,7 @@ class BillServicesSerializer(serializers.ModelSerializer):
             "customer_address",
             "contact_no",
             "service_name",
+            "created_on",
         )
 
     def get_total_bill(self, obj):

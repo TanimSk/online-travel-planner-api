@@ -230,8 +230,8 @@ class RfqSerializer(serializers.ModelSerializer):
 
                 for rfq_service in rfq_services:
                     service_id = rfq_service.pop("service")
-                    total_members = rfq_service.get("members") + rfq_service.get(
-                        "_members"
+                    total_members = rfq_service.get("members", 0) + rfq_service.get(
+                        "_members", 0
                     )
 
                     for key in [

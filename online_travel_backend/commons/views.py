@@ -72,6 +72,23 @@ class QueryServicesAPI(APIView):
             # keeping all keys instead of non-search params, for searching
             serialized_copy = serialized_data.data.copy()
 
+            # For transportation
+            if Category.objects.filter(
+                id=serialized_data.data.get("category_id"),
+                category_name="Daily Activity Transportation",
+            ).exists():
+                if serialized_data.data.get("car_type") == "Sedan" and serialized_data.data.get("members") > 5:
+                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
+                
+                elif serialized_data.data.get("car_type") == "SUV" and serialized_data.data.get("members") > 8:
+                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
+                    
+                elif serialized_data.data.get("car_type") == "Micro" and serialized_data.data.get("members") > 12:
+                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
+                
+                elif serialized_data.data.get("car_type") == "Mini Bus" and serialized_data.data.get("members") > 30:
+                    return Response({"status": "Passenger capacity exceeded for this type of car, please Re-query"})
+
             for key in [
                 "category_id",
                 "infant_members",
@@ -85,7 +102,7 @@ class QueryServicesAPI(APIView):
                 "return_time",
                 "car_quantity",
                 "quantity",
-                "_members",                
+                "_members",
             ]:
                 try:
                     serialized_copy.pop(key)

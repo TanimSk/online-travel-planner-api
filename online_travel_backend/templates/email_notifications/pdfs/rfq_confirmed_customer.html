@@ -13,6 +13,12 @@
         .heading {
             margin: 3rem auto;
             text-align: center;
+            display: blocks;
+        }
+
+        .heading img {
+            width: 8rem;
+            border-radius: 1rem;
         }
 
         .desc {
@@ -22,37 +28,16 @@
 </head>
 
 <body>
-    <h1 class="heading">
-        {{ agency_name }}
-    </h1>
+    <div class="heading">
+        <img src="{{ logo_url }}" alt="logo">
+        <h1>
+            {{ agency_name }}
+        </h1>
+    </div>
 
     <p>
-        Greetings from {{ agency_name }}, <br>
-        Your RFQ (created on: {{ created_on }}) has been confirmed by agent (<b>{{ agent_name }}</b>).
-        Please pay bills to the agent and take a printout of the invoice (provided by the agent).
-    </p>
-
-    <p>
-    <h2>Agent Info:</h2>
-    Agency Name: {{ agency_name }} <br>
-    Agent Name: {{ agent_name }} <br>
-    Agent Mobile: {{ agent_num }} <br>
-    </p>
-
-    <p>
-    <h2>RFQ Info:</h2>
-    Tentative Travel Date: {{ travel_date }} <br>
-    RFQ ID: {{ tracking_id }} <br>
-    </p>
-
-    <h6>
-        Service details are attached below:
-    </h6>
-
-    <p>
-    <h2>Services:</h2>
-    {% for rfq_service in rfq_services %}
-    - {{ rfq_service.service.service_name }} <br>
+    <h2>Service Detail:</h2>
+    {{ rfq_service.service.service_name }} <br> <br>
 
     <b class="desc">Description:</b> <br>
     {{ rfq_service.service.description | safe}} <br> <br>
@@ -65,7 +50,6 @@
 
     <b class="desc">Rates:</b> <br>
     {{ rfq_service.service.rates | safe}} <br>
-    {% endfor %}
     </p>
 
 </body>

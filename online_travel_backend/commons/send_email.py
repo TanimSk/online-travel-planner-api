@@ -92,7 +92,7 @@ def rfq_created_admin(rfq_instance, is_customer=False):
             html_content_agent,
             [rfq_instance.agent.email],
             DEFAULT_FROM_EMAIL,
-            [{"name": "test.pdf", "content": html_content}],
+            # [{"name": "test.pdf", "content": html_content}],
         )
 
     else:
@@ -304,6 +304,25 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
                 "rfq_services": rfq_services,
             },
         )
+
+        # services pdfs
+        services_pdf_array = []
+
+        for rfq_service in rfq_services:
+            services_pdf_array.append(
+                {
+                    "name": f"{rfq_service.services_name}.pdf",
+                    "content": render_to_string(
+                        "email_notifications_customer/pdfs/rfq_confirmed_customer.html",
+                        {
+                            "agency_name": agent_instance.agency_name,
+                            "logo_url": agent_instance.logo_url,
+                            "rfq_service": rfq_service,
+                        },
+                    ),
+                }
+            )
+
     else:
         html_content = render_to_string(
             "email_notifications_customer/rfq_confirmed_customer.html",
@@ -317,8 +336,28 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
             },
         )
 
+        # services pdfs
+        services_pdf_array = []
+
+        for rfq_service in rfq_services:
+            services_pdf_array.append(
+                {
+                    "name": f"{rfq_service.services_name}.pdf",
+                    "content": render_to_string(
+                        "email_notifications/pdfs/rfq_confirmed_customer.html",
+                        {
+                            "rfq_service": rfq_service,
+                        },
+                    ),
+                }
+            )
+
     send_html_mail(
-        "RFQ Confirmed", html_content, [rfq_instance.email_address], DEFAULT_FROM_EMAIL
+        "RFQ Confirmed",
+        html_content,
+        [rfq_instance.email_address],
+        DEFAULT_FROM_EMAIL,
+        pdfs=services_pdf_array,
     )
 
 

@@ -82,7 +82,7 @@ class QueryServicesAPI(APIView):
                 ):
                     if serialized_data.data.get(
                         "car_type"
-                    ) == "Sedan" and serialized_data.data.get("members") > (
+                    ) == "Sedan" and serialized_data.data.get("_members") > (
                         5 * serialized_data.data.get("car_quantity")
                     ):
                         return Response(
@@ -93,7 +93,7 @@ class QueryServicesAPI(APIView):
 
                     elif serialized_data.data.get(
                         "car_type"
-                    ) == "SUV" and serialized_data.data.get("members") > (
+                    ) == "SUV" and serialized_data.data.get("_members") > (
                         8 * serialized_data.data.get("car_quantity")
                     ):
                         return Response(
@@ -104,7 +104,7 @@ class QueryServicesAPI(APIView):
 
                     elif serialized_data.data.get(
                         "car_type"
-                    ) == "Micro" and serialized_data.data.get("members") > (
+                    ) == "Micro" and serialized_data.data.get("_members") > (
                         12 * serialized_data.data.get("car_quantity")
                     ):
                         return Response(
@@ -115,7 +115,7 @@ class QueryServicesAPI(APIView):
 
                     elif serialized_data.data.get(
                         "car_type"
-                    ) == "Mini Bus" and serialized_data.data.get("members") > (
+                    ) == "Mini Bus" and serialized_data.data.get("_members") > (
                         30 * serialized_data.data.get("car_quantity")
                     ):
                         return Response(

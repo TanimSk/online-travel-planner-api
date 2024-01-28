@@ -70,8 +70,7 @@
     <h1 class="invoice-txt">
         INVOICE
     </h1>
-    <div class="header-invoice">
-    </div>
+
 
     <span style="font-size: .7rem; margin-bottom: 1rem; display: block; width: 75vw; margin: auto;">
         <b>
@@ -126,7 +125,7 @@
             <td>{{ bill_instance.admin_paid_on }}</td>
         </tr>
 
-        {% if received_by is None or received_by == ""  %}
+        {% if received_by is None or received_by == "" %}
         {% else %}
         <tr>
             <td>

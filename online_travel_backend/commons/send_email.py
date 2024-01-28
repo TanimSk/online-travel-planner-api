@@ -380,7 +380,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
             {
                 "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
                 "content": generate_invoice(rfq_instance, rfq_services, is_customer),
-                "css_file": "agent/invoice.css"
+                "css_file": "agent/invoice.css",
             }
         )
 
@@ -417,7 +417,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
             {
                 "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
                 "content": generate_invoice(rfq_instance, rfq_services, is_customer),
-                "css_file": "customer/invoice.css"
+                "css_file": "customer/invoice.css",
             }
         )
 

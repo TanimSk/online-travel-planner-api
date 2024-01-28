@@ -117,7 +117,6 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
-        print(rfq_service_instance)
 
         # calculate with duration, car quantity, quantity
         added_price = 0

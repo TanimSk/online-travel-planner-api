@@ -119,22 +119,13 @@ class RfqSerializer(serializers.ModelSerializer):
 
         print(service_instance.service_price, "----------")
 
-        # calculate transportation price
-        if rfq_service_instance.get("car_quantity"):
+        # calculate with duration and car quantity
+        if rfq_service_instance.get("duration"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )
-        else:
-            print("---------------------------------------")
-            print(service_instance.service_price)
-            print(rfq_service_instance.get("duration", 0))
-            print(rfq_service_instance.get("car_quantity", 0))
-
-            added_price = (
-                service_instance.service_price
-                * rfq_service_instance.get("duration", 0)
-                * rfq_service_instance.get("car_quantity", 0)
-            )
+            if rfq_service_instance.get("car_quantity"):
+                added_price *= rfq_service_instance.get("car_quantity", 0)
 
         total_price = (
             (
@@ -392,16 +383,13 @@ class QueryResultSerializer(serializers.ModelSerializer):
             delta_days = abs((date2 - date1).days) + 1
 
         # calculate transportation price
-        if rfq_service_instance.get("car_quantity"):
+        # calculate with duration and car quantity
+        if rfq_service_instance.get("duration"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )
-        else:
-            added_price = (
-                service_instance.service_price
-                * rfq_service_instance.get("duration", 0)
-                * rfq_service_instance.get("car_quantity", 0)
-            )
+            if rfq_service_instance.get("car_quantity"):
+                added_price *= rfq_service_instance.get("car_quantity", 0)
 
         total_price = (
             (

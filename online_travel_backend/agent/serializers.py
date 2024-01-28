@@ -116,6 +116,8 @@ class RfqSerializer(serializers.ModelSerializer):
                 rfq_service_instance.get("check_out_date", None), date_format
             )
             delta_days = abs((date2 - date1).days) + 1
+        
+        print(service_instance.service_price, "----------")
 
         # calculate transportation price
         if rfq_service_instance.get("car_quantity", 0) == 0:

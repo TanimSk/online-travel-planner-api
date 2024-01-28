@@ -126,7 +126,8 @@
             <td>{{ bill_instance.admin_paid_on }}</td>
         </tr>
 
-        {% if not (received_by == None or received_by == "" ) %}
+        {% if received_by is None or received_by == ""  %}
+        {% else %}
         <tr>
             <td>
                 <b>Received By</b>
@@ -147,7 +148,8 @@
     </table>
 
 
-    {% if not (receipt_img == None or receipt_img == "" ) %}
+    {% if receipt_img is None or receipt_img == "" %}
+    {% else %}
     <span style="width: 75vw; margin: 2rem auto; display: block; font-size: .85rem;">
         <b>Receipt image:</b> <br>
         <img src="{{ receipt_img }}" alt="img" style="width: 100%; margin-top: 1rem;">

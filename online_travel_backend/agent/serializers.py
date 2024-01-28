@@ -119,13 +119,20 @@ class RfqSerializer(serializers.ModelSerializer):
 
         print(rfq_service_instance)
 
-        # calculate with duration and car quantity
+        # calculate with duration, car quantity, quantity
+        added_price = 0
+
         if rfq_service_instance.get("duration"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )
             if rfq_service_instance.get("car_quantity"):
-                added_price *= rfq_service_instance.get("car_quantity", 0)
+                added_price = added_price * rfq_service_instance.get("car_quantity", 0)
+
+        if rfq_service_instance.get("quantity"):
+            added_price += (service_instance.service_price) * rfq_service_instance.get(
+                "quantity", 0
+            )
 
         total_price = (
             (
@@ -146,10 +153,6 @@ class RfqSerializer(serializers.ModelSerializer):
                     * rfq_service_instance.get("members", 0)
                 )
                 * delta_days
-            )
-            + (
-                (service_instance.service_price)
-                * rfq_service_instance.get("quantity", 0)
             )
             + added_price
         )
@@ -382,14 +385,20 @@ class QueryResultSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
-        # calculate transportation price
-        # calculate with duration and car quantity
+        # calculate with duration, car quantity, quantity
+        added_price = 0
+
         if rfq_service_instance.get("duration"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )
             if rfq_service_instance.get("car_quantity"):
-                added_price *= rfq_service_instance.get("car_quantity", 0)
+                added_price = added_price * rfq_service_instance.get("car_quantity", 0)
+
+        if rfq_service_instance.get("quantity"):
+            added_price += (service_instance.service_price) * rfq_service_instance.get(
+                "quantity", 0
+            )
 
         total_price = (
             (
@@ -410,10 +419,6 @@ class QueryResultSerializer(serializers.ModelSerializer):
                     * rfq_service_instance.get("members", 0)
                 )
                 * delta_days
-            )
-            + (
-                (service_instance.service_price)
-                * rfq_service_instance.get("quantity", 0)
             )
             + added_price
         )

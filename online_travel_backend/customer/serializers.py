@@ -124,13 +124,20 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
-        # calculate with duration and car quantity
+        # calculate with duration, car quantity, quantity
+        added_price = 0
+
         if rfq_service_instance.get("duration"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )
             if rfq_service_instance.get("car_quantity"):
-                added_price *= rfq_service_instance.get("car_quantity", 0)
+                added_price = added_price * rfq_service_instance.get("car_quantity", 0)
+
+        if rfq_service_instance.get("quantity"):
+            added_price += (service_instance.service_price) * rfq_service_instance.get(
+                "quantity", 0
+            )
 
         total_price = (
             (

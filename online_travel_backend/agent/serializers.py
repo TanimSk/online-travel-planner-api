@@ -120,7 +120,7 @@ class RfqSerializer(serializers.ModelSerializer):
         print(service_instance.service_price, "----------")
 
         # calculate transportation price
-        if rfq_service_instance.get("car_quantity", 0) == 0:
+        if rfq_service_instance.get("car_quantity"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )
@@ -387,7 +387,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
             delta_days = abs((date2 - date1).days) + 1
 
         # calculate transportation price
-        if rfq_service_instance.get("car_quantity", 0) == 0:
+        if rfq_service_instance.get("car_quantity"):
             added_price = service_instance.service_price * rfq_service_instance.get(
                 "duration", 0
             )

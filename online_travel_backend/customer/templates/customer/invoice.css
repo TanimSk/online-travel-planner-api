@@ -1,0 +1,127 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+  color: #565656;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.pt-3 {
+  padding-top: 3rem;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.heading {
+  text-align: center;
+  font-size: 3rem;
+  position: absolute;
+  background-color: rgb(31, 31, 31);
+  color: white;
+  top: 0;
+  padding: 1rem;
+  width: 100vw;
+  right: 0;
+}
+
+.address {
+  display: flex;
+  gap: 2rem;
+}
+
+.address_container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 2rem;
+}
+
+.address p {
+  font-size: 1.6rem;
+}
+
+.address .label {
+  width: 80px;
+}
+
+.address .label-table {
+  width: 100px;
+}
+
+.title {
+  text-decoration: underline;
+  font-size: 2.5rem;
+}
+
+.customer_info {
+  padding-top: 3rem;
+}
+
+.customer_info .address_container {
+  padding-left: 2rem;
+}
+
+/* Table */
+.table_container {
+  padding-top: 3rem;
+}
+
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1.5rem;
+  border-radius: 10px !important;
+  border: 1px solid #ddd;
+}
+
+#customers td,
+#customers th {
+  padding: 8px;
+}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #191919;
+  font-weight: 300;
+  color: rgb(214, 214, 214);
+}
+
+#customers tr {
+  padding: 20px 0;
+  border: 1px solid #ddd;
+}
+
+.total {
+  text-align: right;
+  font-size: 2rem;
+  padding-top: 2rem;
+}

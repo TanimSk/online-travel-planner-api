@@ -532,6 +532,7 @@ def bill_pay_admin(bill_instance, is_customer=False):
                         "agent_name": agent_instance.agent_name,
                         "agency_name": agent_instance.agency_name,
                         "agent_num": agent_instance.mobile_no,
+                        "agent_address": agent_instance.agent_address,
                         "bill_instance": bill_instance,
                         "paid_amount": latest_bill.paid_amount,
                         "t_paid_amount": bill_instance.admin_bill
@@ -569,14 +570,17 @@ def bill_pay_admin(bill_instance, is_customer=False):
             AgentSubBill.objects.filter(bill=bill_instance).order_by("-paid_on").first()
         )
 
+        customer_instance = Customer.objects.get(customer=bill_instance.customer)
+
         html_pdf_array = [
             {
                 "name": f"Customer-paid-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}",
                 "content": render_to_string(
-                    "email_notifications/pdfs/bill_pay_admin.html",
+                    "email_notifications_customer/pdfs/bill_pay_admin.html",
                     {
+                        "customer": customer_instance,
                         "bill_instance": bill_instance,
-                        "paid_amount": latest_bill.paid_amount ,
+                        "paid_amount": latest_bill.paid_amount,
                         "t_paid_amount": bill_instance.admin_bill
                         + bill_instance.vendor_bill
                         - bill_instance.agent_due,
@@ -637,6 +641,7 @@ def bill_pay_vendor(bill_instance):
     latest_bill = (
         AdminSubBill.objects.filter(bill=bill_instance).order_by("-paid_on").first()
     )
+    vendor_instance = Vendor.objects.get(vendor=bill_instance.vendor)
 
     html_pdf_array = [
         {
@@ -644,9 +649,11 @@ def bill_pay_vendor(bill_instance):
             "content": render_to_string(
                 "email_notifications/pdfs/bill_pay_vendor.html",
                 {
+                    "vendor": vendor_instance,
                     "bill_instance": bill_instance,
-                    "paid_amount": latest_bill.paid_amount ,
-                    "t_paid_amount": bill_instance.vendor_bill - bill_instance.admin_due,
+                    "paid_amount": latest_bill.paid_amount,
+                    "t_paid_amount": bill_instance.vendor_bill
+                    - bill_instance.admin_due,
                     "paid_by": latest_bill.payment_type,
                     "receipt_img": latest_bill.receipt_img,
                     "received_by": latest_bill.received_by,

@@ -54,9 +54,16 @@
 
     .heading {
       text-align: center;
-      font-size: 25px;
-      text-decoration: underline;
+      font-size: 3rem;
+      position: absolute;
+      background-color: rgb(31, 31, 31);
+      color: white;
+      top: 0;
+      padding: 1rem;
+      width: 100vw;
+      right: 0;
     }
+
 
     .address {
       display: flex;
@@ -104,7 +111,7 @@
       font-family: Arial, Helvetica, sans-serif;
       border-collapse: collapse;
       width: 100%;
-      font-size: 2rem;
+      font-size: 1.5rem;
       border-radius: 10px !important;
       border: 1px solid #ddd;
     }
@@ -118,8 +125,9 @@
       padding-top: 12px;
       padding-bottom: 12px;
       text-align: left;
-      background-color: #e8e8e8;
+      background-color: #191919;
       font-weight: 300;
+      color: rgb(214, 214, 214);
     }
 
     #customers tr {
@@ -143,8 +151,9 @@
       <h1 class="heading">Invoice</h1>
     </div>
 
-    <div class="flex between">
+    <br><br><br>
 
+    <div class="flex between">
       <div class="address_container">
         <img src="{{ data.agent_info.logo_url }}" alt="logo" class="logo" />
         <h1>{{ data.agent_info.agency_name }}</h1>
@@ -230,7 +239,8 @@
           </td>
 
           <td>
-            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission as bill %}
+            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission
+            as bill %}
             {{ bill }} BDT.
           </td>
         </tr>

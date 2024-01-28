@@ -10,6 +10,12 @@
             font-family: Tahoma, sans-serif;
         }
 
+        table {
+            margin: auto;
+            font-size: 0.85rem;
+            width: 75vw;
+        }
+
         table,
         th,
         td {
@@ -21,25 +27,85 @@
         td {
             padding: 10px;
         }
+
+        .header-invoice {
+            background-color: rgb(78, 0, 74);
+            height: 5rem;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -10;
+        }
+
+        .invoice-txt {
+            color: white;
+            padding-left: 4rem;
+            margin-bottom: 2rem;
+        }
+
+        .container-before-table {
+            display: flex;
+            flex-direction: row;
+            width: 75vw;
+            margin: auto;
+            justify-content: space-between;
+        }
+
+        .container-before-table h1 {
+            font-size: 1.5rem;
+        }
+
+        .container-before-table h2 {
+            font-size: 1.2rem;
+        }
+
+        .container-before-table p {
+            font-size: .8rem;
+        }
     </style>
 </head>
 
 <body>
-    <table style="width: 100%;">
-        <tr>
-            <td><b>Agent Logo</b></td>
-            <td>
-                <img src="{{ logo_url }}" alt="" style="width: 4rem;">
-            </td>
-        </tr>
+    <h1 class="invoice-txt">
+        INVOICE
+    </h1>
+    <div class="header-invoice">
+    </div>
 
-        <tr>
-            <td><b>Agency</b></td>
-            <td>
-                {{ agency_name }}
-            </td>
-        </tr>
+    <span style="font-size: .7rem; margin-bottom: 1rem; display: block; width: 75vw; margin: auto;">
+        <b>
+            Tracking id:
+        </b>
+        #{{ bill_instance.tracking_id }}
+    </span>
 
+    <div class="container-before-table">
+        <div style="display: flex; justify-content: center; flex-direction: column;">
+            <h1>
+                Bill To:
+            </h1>
+            <h2>
+                Discover Thailand
+            </h2>
+        </div>
+
+        <div>
+            <h1>
+                Bill Received From:
+            </h1>
+            <p>
+                <img src="{{ logo_url }}" alt="Agent logo" style="width: 4rem; margin: auto; display: block;"> <br>
+                <b>Agency Name: </b> {{ agency_name }} <br>
+                <b>Agent Name: </b> {{ agent_name }} <br>
+                <b>Agent Address: </b> {{ agent_address }} <br>
+                <b>Agent Mobile: </b> {{ agent_num }} <br>
+            </p>
+
+        </div>
+    </div>
+
+    <table>
         <tr>
             <td><b>Paid Amount</b></td>
             <td>{{ paid_amount }} Tk.</td>
@@ -60,7 +126,7 @@
             <td>{{ bill_instance.admin_paid_on }}</td>
         </tr>
 
-        {% if received_by != None %}
+        {% if not (received_by == None or received_by == "" ) %}
         <tr>
             <td>
                 <b>Received By</b>
@@ -70,19 +136,6 @@
             </td>
         </tr>
         {% endif %}
-
-
-        {% if receipt_img != None %}
-        <tr>
-            <td>
-                <b>Receipt image</b>
-            </td>
-            <td>
-                <img src="{{ receipt_img }}" alt="" style="width: 10rem;">
-            </td>
-        </tr>
-        {% endif %}
-
         <tr>
             <td><b>Payment due</b></td>
             <td>{{ bill_instance.agent_due }} Tk.</td>
@@ -92,6 +145,18 @@
             <td>{{ bill_instance.admin_bill|add:bill_instance.vendor_bill }} Tk. </td>
         </tr>
     </table>
+
+
+    {% if not (receipt_img == None or receipt_img == "" ) %}
+    <span style="width: 75vw; margin: 2rem auto; display: block; font-size: .85rem;">
+        <b>Receipt image:</b> <br>
+        <img src="{{ receipt_img }}" alt="img" style="width: 100%; margin-top: 1rem;">
+    </span>
+    {% endif %}
+
+    <span style="width: 75vw; margin: 2rem auto; display: block; font-size: .85rem;">
+        Thank You
+    </span>
 </body>
 
 </html>

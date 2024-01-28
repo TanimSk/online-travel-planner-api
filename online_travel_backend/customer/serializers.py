@@ -163,7 +163,7 @@ class RfqSerializer(serializers.ModelSerializer):
         )
 
         print("service price", service_instance.service_price)
-        print("members", rfq_service_instance.get("members", 0))
+        print(rfq_service_instance)
 
         # appending commissions
         total_price_added = total_price + (

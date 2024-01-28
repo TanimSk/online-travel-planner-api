@@ -162,9 +162,6 @@ class RfqSerializer(serializers.ModelSerializer):
             + added_price
         )
 
-        print("service price", service_instance.service_price)
-        print(rfq_service_instance)
-
         # appending commissions
         total_price_added = total_price + (
             total_price * service_instance.admin_commission * 0.01
@@ -240,6 +237,13 @@ class RfqSerializer(serializers.ModelSerializer):
                         "_members", 0
                     )
 
+                    # price calculation
+                    service_instance = Service.objects.get(id=service_id)
+
+                    total_price = self.calc_total_price_value(
+                        service_instance, rfq_service
+                    )
+
                     for key in [
                         "service_price",
                         "room_type",
@@ -253,13 +257,6 @@ class RfqSerializer(serializers.ModelSerializer):
                             rfq_service.pop(key)
                         except KeyError:
                             pass
-
-                    # price calculation
-                    service_instance = Service.objects.get(id=service_id)
-
-                    total_price = self.calc_total_price_value(
-                        service_instance, rfq_service
-                    )
 
                     # price with commission
                     rfq_total_price += total_price[0]

@@ -117,7 +117,6 @@ class RfqSerializer(serializers.ModelSerializer):
             )
             delta_days = abs((date2 - date1).days) + 1
 
-
         # calculate with duration, car quantity, quantity
         added_price = 0
 
@@ -218,6 +217,13 @@ class RfqSerializer(serializers.ModelSerializer):
                         "_members", 0
                     )
 
+                    # price calculation
+                    service_instance = Service.objects.get(id=service_id)
+
+                    total_price = self.calc_total_price_value(
+                        service_instance, rfq_service
+                    )
+
                     for key in [
                         "service_price",
                         "room_type",
@@ -231,13 +237,6 @@ class RfqSerializer(serializers.ModelSerializer):
                             rfq_service.pop(key)
                         except KeyError:
                             pass
-
-                    # price calculation
-                    service_instance = Service.objects.get(id=service_id)
-
-                    total_price = self.calc_total_price_value(
-                        service_instance, rfq_service
-                    )
 
                     # price with commission
                     rfq_total_price += total_price[0]

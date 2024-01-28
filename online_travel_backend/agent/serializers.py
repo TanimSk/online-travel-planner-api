@@ -392,6 +392,12 @@ class QueryResultSerializer(serializers.ModelSerializer):
                 "duration", 0
             )
         else:
+
+            print("---------------------------------------")
+            print(service_instance.service_price)
+            print(rfq_service_instance.get("duration", 0))
+            print(rfq_service_instance.get("car_quantity", 0))
+
             added_price = (
                 service_instance.service_price
                 * rfq_service_instance.get("duration", 0)

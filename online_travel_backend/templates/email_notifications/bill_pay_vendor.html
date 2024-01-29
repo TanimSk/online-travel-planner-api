@@ -24,7 +24,7 @@
 
     <p>
         Hi, <br>
-        Discover Thailand has paid <b>{{ amount_paid }} Tk.</b> against the bill (ID: <b>{{ bill_instance.tracking_id }}</b>).
+        Discover Thailand has paid total <b>{{ amount_paid }} Tk.</b> against the bill (ID: <b>{{ bill_instance.tracking_id }}</b>).
     </p>
 
     <p>
@@ -32,7 +32,7 @@
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
     Service: {{ bill_instance.service.service.service_name }} <br>
-    Paid Amount: {{ amount_paid }}
+    Total Paid Amount: {{ amount_paid }}
     Bill: {{ bill_instance.vendor_bill }} <br>
     </p>
 

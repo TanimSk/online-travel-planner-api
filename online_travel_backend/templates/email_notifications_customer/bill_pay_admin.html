@@ -24,7 +24,7 @@
 
     <p>
         Hi, <br>
-        A customer (customer name: {{ customer_name }}) has paid <b>{{ paid_amount }}Tk.</b> on
+        A customer (customer name: {{ customer_name }}) has paid total <b>{{ paid_amount }}Tk.</b> on
         <b>{{ bill_instance.admin_paid_on }}</b>
         against bill <b>#{{ bill_instance.tracking_id }}</b>.
     </p>
@@ -34,7 +34,7 @@
     Tentative Travel Date: {{ travel_date }} <br>
     RFQ ID: {{ tracking_id }} <br>
     Service: {{ bill_instance.service.service.service_name }} <br>
-    Paid Amount: {{ paid_amount }}
+    Total Paid Amount: {{ paid_amount }}
     Bill: {{ bill_instance.admin_bill|add:bill_instance.vendor_bill }}
     </p>
 

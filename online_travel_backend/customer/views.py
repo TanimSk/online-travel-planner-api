@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 from dj_rest_auth.registration.views import RegisterView
 from agent.models import Agent, Rfq, RfqService
-from commons.models import Bill
+from commons.models import Bill, AgentSubBill
 from vendor.models import Service
 from .models import Customer
 
@@ -289,6 +289,16 @@ class AgentBillsAPI(APIView):
                 bill_instance.admin_paid_on = timezone.now()
                 bill_instance.status_1 = "admin_paid"
                 bill_instance.save()
+
+                # sub bills
+                AgentSubBill.objects.create(
+                    bill=bill_instance,
+                    payment_type=service.get("admin_payment_type"),
+                    receipt_img=service.get("receipt_img"),
+                    received_by=service.get("received_by"),
+                    paid_amount=service.get("paid_amount"),
+                )
+
 
                 # Send Emails
                 bill_pay_admin(bill_instance=bill_instance, is_customer=True)

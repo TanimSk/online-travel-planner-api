@@ -15,7 +15,7 @@
     }
 
     @page {
-      size: A4;      
+      size: A4;
       margin: 0mm;
     }
 
@@ -61,7 +61,7 @@
       text-align: center;
       font-size: 3rem;
       /* position: absolute; */
-      background-color: rgb(31, 31, 31);
+      background-color: rgb(81, 0, 74);
       color: white;
       /* top: 0; */
       padding: 1rem;
@@ -84,6 +84,10 @@
 
     .address p {
       font-size: 1.6rem;
+    }
+
+    .label {
+      font-weight: bold;
     }
 
     .address .label {
@@ -130,9 +134,13 @@
       padding-top: 12px;
       padding-bottom: 12px;
       text-align: left;
-      background-color: #191919;
+      background-color: rgb(81, 0, 74);
       font-weight: 300;
       color: rgb(214, 214, 214);
+    }
+
+    .address p {
+      font-size: 1.3rem;
     }
 
     #customers tr {
@@ -156,14 +164,14 @@
   </div>
 
   <div class="container invoice">
-    <br><br><br>
+    <br>
 
     <div class="flex between">
       <div class="address_container">
         <img src="{{ data.agent_info.logo_url }}" alt="logo" class="logo" />
         <h1>{{ data.agent_info.agency_name }}</h1>
       </div>
-      <div class="address_container">
+      <div class="address_container" style="width: 28rem;">
         <div class="address">
           <p class="label">Address:</p>
           <p>{{ data.agent_info.agent_address }}</p>
@@ -244,8 +252,7 @@
           </td>
 
           <td>
-            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission
-            as bill %}
+            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission as bill %}
             {{ bill }} BDT.
           </td>
         </tr>

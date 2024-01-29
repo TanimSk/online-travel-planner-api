@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Invoice</title>
-  <!-- <style>
+  <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
     * {
@@ -55,13 +55,13 @@
     .heading {
       text-align: center;
       font-size: 3rem;
-      position: absolute;
+      /* position: absolute; */
       background-color: rgb(31, 31, 31);
       color: white;
-      top: 0;
+      /* top: 0; */
       padding: 1rem;
       width: 100vw;
-      right: 0;
+      /* right: 0; */
     }
 
 
@@ -140,17 +140,17 @@
       font-size: 2rem;
       padding-top: 2rem;
     }
-  </style> -->
+  </style>
   {% load replace %}
 
 </head>
 
 <body>
-  <div class="container invoice">
-    <div>
-      <h1 class="heading">Invoice</h1>
-    </div>
+  <div>
+    <h1 class="heading">Invoice</h1>
+  </div>
 
+  <div class="container invoice">
     <br><br><br>
 
     <div class="flex between">
@@ -239,7 +239,8 @@
           </td>
 
           <td>
-            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission as bill %}
+            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission
+            as bill %}
             {{ bill }} BDT.
           </td>
         </tr>

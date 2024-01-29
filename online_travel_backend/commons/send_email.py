@@ -33,11 +33,11 @@ class EmailThread(threading.Thread):
         # sending PDFs
         if self.pdfs is not None:
             for pdf in self.pdfs:
-                if pdf.get("css_file"):
-                    css_file = CSS(filename=pdf["css_file"])
-                    pdf_data = HTML(string=pdf["content"]).write_pdf(
-                        stylesheets=[css_file]
-                    )
+                # if pdf.get("css_file"):
+                #     css_file = CSS(filename=pdf["css_file"])
+                #     pdf_data = HTML(string=pdf["content"]).write_pdf(
+                #         stylesheets=[css_file]
+                #     )
                 pdf_data = HTML(string=pdf["content"]).write_pdf()
                 msg.attach(pdf["name"], pdf_data, "application/pdf")
 

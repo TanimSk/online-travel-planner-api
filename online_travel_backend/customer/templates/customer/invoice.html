@@ -165,6 +165,10 @@
 
 
   <div class="container invoice">
+    <p style="font-size: 1.2rem;">
+      <b> Order ID: </b> #{{ data.tracking_id }}
+    </p>
+
     <br>
     <div class="customer_info">
       <h1 class="title">Customer Info:</h1>
@@ -227,7 +231,8 @@
           </td>
 
           <td>
-            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission as bill %}
+            {% calculate_total_bill rfq_service.service_price rfq_service.admin_commission rfq_service.agent_commission
+            as bill %}
             {{ bill }} BDT.
           </td>
         </tr>

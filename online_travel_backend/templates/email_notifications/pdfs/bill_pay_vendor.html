@@ -66,6 +66,12 @@
         tr:nth-child(odd) {
             background-color: #f2f2f2;
         }
+
+        .attrib {
+            width: 7rem;
+            display: block;
+            float: left;
+        }
     </style>
 </head>
 
@@ -89,9 +95,9 @@
                 Bill Received From:
             </h1>
             <br>
-            <h2>
+            <h3>
                 Discover Thailand
-            </h2>
+            </h3>
         </div>
 
         <div style="width: 17rem; float: right;">
@@ -101,9 +107,18 @@
             <p>
                 <img src="{{ vendor.logo_url }}" alt="Vendor logo not available"
                     style="width: 4rem; margin: auto; display: block; border-radius: 0.2rem;"> <br>
-                <b>Vendor Name: </b> {{ vendor.vendor_name }} <br>
-                <b>Vendor Address: </b> {{ vendor.vendor_address }} <br>
-                <b>Vendor Mobile: </b> {{ vendor.vendor_number }} <br>
+                <b class="attrib">Vendor Name: </b>
+                <span>
+                    {{ vendor.vendor_name }}
+                </span>
+                <br>
+                <b class="attrib">Vendor Address: </b>
+                <span>
+                    {{ vendor.vendor_address }}
+                </span>
+                <br>
+                <b class="attrib">Vendor Mobile: </b>
+                <span>{{ vendor.vendor_number }}</span> <br>
             </p>
         </div>
     </div>

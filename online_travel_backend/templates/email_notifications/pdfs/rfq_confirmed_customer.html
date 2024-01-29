@@ -10,10 +10,15 @@
             font-family: Tahoma, sans-serif;
         }
 
+        @page {
+            size: A4;
+            margin: 0mm;
+        }
+
         .heading {
             margin: 1rem auto;
             text-align: center;
-            display: blocks;
+            display: block;
         }
 
         .heading img {
@@ -36,6 +41,10 @@
         td {
             padding: 10px;
         }
+
+        tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 
@@ -50,29 +59,40 @@
 
     <h2>Service Detail:</h2>
 
+    <p>
+        We are delighted to inform you that an RFQ has been expertly curated by our dedicated agent <b>
+            {{ rfq_service.rfq_category.rfq.rfq_agent.agent_name }}
+        </b>, tailored to
+        meet your unique requirements. Notably, we've included service <b>
+            {{ rfq_service.service.service_name }}
+        </b> to your RFQ.
+
+        Kindly find the detailed information about this service below:
+    </p>
+
     <table style="width: 100%;">
         <tr>
-            <td>Service Category</td>
+            <td><b>Service Category</b></td>
             <td>{{ rfq_service.rfq_category.category.category_name }}</td>
         </tr>
         <tr>
-            <td>Service Name</td>
+            <td><b>Service Name</b></td>
             <td>{{ rfq_service.service.service_name }}</td>
         </tr>
         <tr>
-            <td>Description</td>
+            <td><b>Description</b></td>
             <td>{{ rfq_service.service.description | safe}}</td>
         </tr>
         <tr>
-            <td>Itinerary</td>
+            <td><b>Itinerary</b></td>
             <td>{{ rfq_service.service.itinerary | safe}} </td>
         </tr>
         <tr>
-            <td>Overview</td>
+            <td><b>Overview</b></td>
             <td>{{ rfq_service.service.overview | safe}} </td>
         </tr>
         <tr>
-            <td>Rates</td>
+            <td><b>Rates</b></td>
             <td>{{ rfq_service.service.rates | safe}} </td>
         </tr>
 

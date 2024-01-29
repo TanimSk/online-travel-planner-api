@@ -15,7 +15,7 @@ from customer.models import Customer
 from vendor.models import Vendor
 from commons.models import AdminSubBill, AgentSubBill
 from datetime import datetime
-from weasyprint import HTML, CSS
+from weasyprint import HTML
 
 
 class EmailThread(threading.Thread):
@@ -93,7 +93,7 @@ def rfq_created_admin(rfq_instance, is_customer=False):
 
         # send to agent
         send_html_mail(
-            "RFQ Created",
+            "Quotation Created",
             html_content_agent,
             [rfq_instance.agent.email],
             DEFAULT_FROM_EMAIL,
@@ -117,7 +117,7 @@ def rfq_created_admin(rfq_instance, is_customer=False):
         )
 
     # send to admin
-    send_html_mail("RFQ Created", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail("Quotation Created", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def rfq_updated_agent(rfq_instance):
@@ -159,7 +159,7 @@ def rfq_updated_agent(rfq_instance):
             },
         )
 
-    send_html_mail("RFQ Updated and Approved", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail("Quotation Updated and Approved", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def rfq_declined_agent(rfq_instance):
@@ -200,7 +200,7 @@ def rfq_declined_agent(rfq_instance):
             },
         )
 
-    send_html_mail("RFQ Declined", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail("Quotation Declined", html_content, emails, DEFAULT_FROM_EMAIL)
 
 
 def generate_invoice(rfq_instance, services_instance, is_customer):
@@ -291,7 +291,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
             },
         )
 
-    send_html_mail("RFQ Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail("Quotation Confirmed", html_content, emails, DEFAULT_FROM_EMAIL)
 
     # send email to all vendors
     for service in rfq_services:
@@ -330,7 +330,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
                 )
 
             send_html_mail(
-                "RFQ Confirmed",
+                "Quotation Confirmed",
                 html_content,
                 [service.service.vendor_category.vendor.vendor.email],
                 DEFAULT_FROM_EMAIL,
@@ -415,7 +415,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
         )
 
     send_html_mail(
-        "RFQ Confirmed",
+        "Quotation Confirmed",
         html_content,
         [rfq_instance.email_address],
         DEFAULT_FROM_EMAIL,
@@ -439,7 +439,7 @@ def rfq_assigned_vendor(service_instance):
         },
     )
     send_html_mail(
-        "RFQ Assigned",
+        "Quotation Assigned",
         html_content,
         [service_instance.service.vendor_category.vendor.vendor.email],
         DEFAULT_FROM_EMAIL,

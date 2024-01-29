@@ -73,7 +73,7 @@ class CreateRfqAPI(APIView):
             rfq_instance.save()
 
             rfq_created_admin(rfq_instance=rfq_instance, is_customer=True)
-            return Response({"status": "Successfully created RFQ"})
+            return Response({"status": "Successfully created Quotation"})
 
 
 # RFQ Types
@@ -164,7 +164,7 @@ class RFQTypesAPI(APIView):
 
             rfq_confirmed_admin(rfq_instance, is_customer=True)
 
-        return Response({"status": "Successfully confirmed RFQ"})
+        return Response({"status": "Successfully confirmed Quotation"})
 
     def delete(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
@@ -173,7 +173,7 @@ class RFQTypesAPI(APIView):
         rfq_instance = Rfq.objects.get(id=rfq_id, customer=request.user)
         rfq_instance.delete()
 
-        return Response({"status": "Successfully deleted RFQ"})
+        return Response({"status": "Successfully deleted Quotation"})
 
 
 # Get Invoice

@@ -33,11 +33,6 @@ class EmailThread(threading.Thread):
         # sending PDFs
         if self.pdfs is not None:
             for pdf in self.pdfs:
-                # if pdf.get("css_file"):
-                #     css_file = CSS(filename=pdf["css_file"])
-                #     pdf_data = HTML(string=pdf["content"]).write_pdf(
-                #         stylesheets=[css_file]
-                #     )
                 pdf_data = HTML(string=pdf["content"]).write_pdf()
                 msg.attach(pdf["name"], pdf_data, "application/pdf")
 
@@ -379,8 +374,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
         services_pdf_array.append(
             {
                 "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
-                "content": generate_invoice(rfq_instance, rfq_services, is_customer),
-                "css_file": "agent/templates/agent/invoice.css",
+                "content": generate_invoice(rfq_instance, rfq_services, is_customer),                
             }
         )
 
@@ -417,7 +411,6 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
             {
                 "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
                 "content": generate_invoice(rfq_instance, rfq_services, is_customer),
-                "css_file": "customer/invoice.css",
             }
         )
 

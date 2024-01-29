@@ -45,11 +45,10 @@
         }
 
         .container-before-table {
-            display: flex;
-            flex-direction: row;
             width: 34rem;
             margin: auto;
-            justify-content: space-between;
+            display: block;
+
         }
 
         .container-before-table h1 {
@@ -82,9 +81,10 @@
         #{{ bill_instance.tracking_id }}
     </span>
 
+    <br>
 
     <div class="container-before-table">
-        <div style="display: flex; justify-content: center; flex-direction: column;">
+        <div style="width: 17rem; float: left;">
             <h1>
                 Bill To:
             </h1>
@@ -93,7 +93,7 @@
             </h2>
         </div>
 
-        <div>
+        <div style="width: 17rem; float: right;">
             <h1>
                 Bill Received From:
             </h1>
@@ -105,6 +105,8 @@
 
         </div>
     </div>
+
+    <br>
 
     <table>
         <tr>

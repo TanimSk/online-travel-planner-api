@@ -66,12 +66,6 @@
         tr:nth-child(odd) {
             background-color: #f2f2f2;
         }
-
-        .attrib {
-            width: 7rem;
-            display: block;
-            float: left;
-        }
     </style>
 </head>
 
@@ -104,21 +98,9 @@
                 Bill Received From:
             </h1>
             <p>
-                <b class="attrib">Customer Name: </b>
-                <span>
-                    {{ customer.customer_name }}
-                </span>
-                <br>
-                <b class="attrib">Customer Address: </b>
-                <span>
-                    {{ customer.customer_address }}
-                </span>
-                <br>
-                <b class="attrib">Customer Mobile: </b>
-                <span>
-                    {{ customer.customer_number }}
-                </span>
-                <br>
+                <b>Customer Name: </b> {{ customer.customer_name }} <br>
+                <b>Customer Address: </b> {{ customer.customer_address }} <br>
+                <b>Customer Mobile: </b> {{ customer.customer_number }} <br>
             </p>
 
         </div>

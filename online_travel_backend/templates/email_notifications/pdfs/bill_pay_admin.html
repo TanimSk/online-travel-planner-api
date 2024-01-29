@@ -60,17 +60,11 @@
         }
 
         .container-before-table p {
-            font-size: .7rem;
+            font-size: .8rem;
         }
 
         tr:nth-child(odd) {
             background-color: #f2f2f2;
-        }
-
-        .attrib {
-            width: 7rem;
-            display: block;
-            float: left;
         }
     </style>
 </head>
@@ -107,25 +101,10 @@
             <p>
                 <img src="{{ logo_url }}" alt="Agent logo not available"
                     style="width: 4rem; margin: auto; display: block; border-radius: 0.2rem;"> <br>
-                <b class="attrib">Agency Name: </b>
-                <span>
-                    {{ agency_name }}
-                </span>
-                <br>
-                <b class="attrib">Agent Name: </b>
-                <span>
-                    {{ agent_name }}
-                </span>
-                <br>
-                <b class="attrib">Agent Address: </b>
-                <span>
-                    {{ agent_address }}
-                </span>
-                <br>
-                <b class="attrib">Agent Mobile: </b>
-                <span>
-                    {{ agent_num }}
-                </span> <br>
+                <b>Agency Name: </b> {{ agency_name }} <br>
+                <b>Agent Name: </b> {{ agent_name }} <br>
+                <b>Agent Address: </b> {{ agent_address }} <br>
+                <b>Agent Mobile: </b> {{ agent_num }} <br>
             </p>
 
         </div>

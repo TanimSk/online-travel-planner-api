@@ -62,7 +62,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 # RFQ
 class RfqServiceSerializer(serializers.ModelSerializer):
     class Meta:
-        exclude = ("rfq_category",)
+        exclude = ("rfq_category", "base_price")
         model = RfqService
         depth = 1
 

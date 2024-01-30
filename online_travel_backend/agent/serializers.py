@@ -51,7 +51,7 @@ class AgentCustomRegistrationSerializer(RegisterSerializer):
 
 class RfqServiceSerializer(serializers.ModelSerializer):
     class Meta:
-        exclude = ("rfq_category",)
+        exclude = ("rfq_category", "base_price")
         model = RfqService
 
 
@@ -160,10 +160,11 @@ class RfqSerializer(serializers.ModelSerializer):
         ).commission
 
         # appending commissions
-        total_price_added = (
-            total_price
-            + (total_price * service_instance.admin_commission * 0.01)
-            + (total_price * agent_commission * 0.01)
+        total_price_added = total_price * (
+            1
+            + (service_instance.admin_commission * 0.01)
+            + (agent_commission * 0.01)
+            + ((service_instance.admin_commission * 0.01) * (agent_commission * 0.01))
         )
 
         return [total_price_added, total_price]
@@ -248,8 +249,9 @@ class RfqSerializer(serializers.ModelSerializer):
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
                         service=service_instance,
-                        # without commisssion, base price
+                        ######
                         service_price=total_price[0],
+                        base_price=total_price[1],
                         #####
                         room_type=service_instance.room_type,
                         bed_type=service_instance.bed_type,
@@ -428,10 +430,11 @@ class QueryResultSerializer(serializers.ModelSerializer):
         except Agent.DoesNotExist:
             commission = 0
 
-        total_price = (
-            total_price
-            + (total_price * service_instance.admin_commission * 0.01)
-            + (total_price * commission * 0.01)
+        total_price = total_price * (
+            1
+            + (service_instance.admin_commission * 0.01)
+            + (commission * 0.01)
+            + ((service_instance.admin_commission * 0.01) * (commission * 0.01))
         )
 
         return total_price

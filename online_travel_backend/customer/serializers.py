@@ -52,7 +52,7 @@ class CustomerCustomRegistrationSerializer(RegisterSerializer):
 
 class RfqServiceSerializer(serializers.ModelSerializer):
     class Meta:
-        exclude = ("rfq_category",)
+        exclude = ("rfq_category", "base_price")
         model = RfqService
 
 
@@ -264,12 +264,15 @@ class RfqSerializer(serializers.ModelSerializer):
                     RfqService.objects.create(
                         rfq_category=rfq_category_instance,
                         service=service_instance,
-                        # without commisssion, base price
+                        ########
                         service_price=total_price[0],
+                        base_price=total_price[1],
+                        ######
                         room_type=service_instance.room_type,
                         bed_type=service_instance.bed_type,
                         services_name=service_instance.services_name,
                         area_name=service_instance.area_name,
+                        ######
                         members=total_members,
                         **rfq_service,
                         admin_commission=service_instance.admin_commission,

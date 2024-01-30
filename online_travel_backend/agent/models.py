@@ -174,6 +174,7 @@ class RfqService(models.Model):
     #  ---- Prices ----
     # Calculate price, when placing rfq order
     service_price = models.FloatField(default=0)
+    base_price = models.FloatField(default=0)
     admin_commission = models.FloatField(default=0)
     agent_commission = models.FloatField(default=0)
 

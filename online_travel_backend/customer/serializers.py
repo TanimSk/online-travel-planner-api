@@ -265,7 +265,7 @@ class RfqSerializer(serializers.ModelSerializer):
                         rfq_category=rfq_category_instance,
                         service=service_instance,
                         # without commisssion, base price
-                        service_price=total_price[1],
+                        service_price=total_price[0],
                         room_type=service_instance.room_type,
                         bed_type=service_instance.bed_type,
                         services_name=service_instance.services_name,

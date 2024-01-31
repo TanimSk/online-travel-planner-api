@@ -216,12 +216,12 @@ class GetInvoiceAPI(APIView):
         total_service_charge = services_instance.aggregate(Sum("service_price"))[
             "service_price__sum"
         ]
-        extra_charge_admin = services_instance.aggregate(
-            charge=Sum((F("service_price") * F("admin_commission")) / 100)
-        )["charge"]
-        extra_charge_agent = services_instance.aggregate(
-            charge=Sum((F("service_price") * F("agent_commission")) / 100)
-        )["charge"]
+        # extra_charge_admin = services_instance.aggregate(
+        #     charge=Sum((F("service_price") * F("admin_commission")) / 100)
+        # )["charge"]
+        # extra_charge_agent = services_instance.aggregate(
+        #     charge=Sum((F("service_price") * F("agent_commission")) / 100)
+        # )["charge"]
 
         serialized_data = RfqInvoiceSerializer(rfq_instance)
         return render(
@@ -230,11 +230,9 @@ class GetInvoiceAPI(APIView):
             {
                 "data": serialized_data.data,
                 "today_date": timezone.now(),
-                "total_charge": math.ceil(total_service_charge),
-                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
-                "total_price": math.ceil(
-                    total_service_charge + extra_charge_agent + extra_charge_admin
-                ),
+                # "total_charge": math.ceil(total_service_charge),
+                # "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(total_service_charge),
             },
         )
 

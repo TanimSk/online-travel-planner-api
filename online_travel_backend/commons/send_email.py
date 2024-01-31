@@ -159,7 +159,9 @@ def rfq_updated_agent(rfq_instance):
             },
         )
 
-    send_html_mail("Quotation Updated and Approved", html_content, emails, DEFAULT_FROM_EMAIL)
+    send_html_mail(
+        "Quotation Updated and Approved", html_content, emails, DEFAULT_FROM_EMAIL
+    )
 
 
 def rfq_declined_agent(rfq_instance):
@@ -208,12 +210,12 @@ def generate_invoice(rfq_instance, services_instance, is_customer):
     total_service_charge = services_instance.aggregate(Sum("service_price"))[
         "service_price__sum"
     ]
-    extra_charge_admin = services_instance.aggregate(
-        charge=Sum((F("service_price") * F("admin_commission")) / 100)
-    )["charge"]
-    extra_charge_agent = services_instance.aggregate(
-        charge=Sum((F("service_price") * F("agent_commission")) / 100)
-    )["charge"]
+    # extra_charge_admin = services_instance.aggregate(
+    #     charge=Sum((F("service_price") * F("admin_commission")) / 100)
+    # )["charge"]
+    # extra_charge_agent = services_instance.aggregate(
+    #     charge=Sum((F("service_price") * F("agent_commission")) / 100)
+    # )["charge"]
 
     serialized_data = RfqInvoiceSerializer(rfq_instance)
 
@@ -223,11 +225,9 @@ def generate_invoice(rfq_instance, services_instance, is_customer):
             {
                 "data": serialized_data.data,
                 "today_date": timezone.now(),
-                "total_charge": math.ceil(total_service_charge),
-                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
-                "total_price": math.ceil(
-                    total_service_charge + extra_charge_agent + extra_charge_admin
-                ),
+                # "total_charge": math.ceil(total_service_charge),
+                # "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(total_service_charge),
             },
         )
 
@@ -237,11 +237,9 @@ def generate_invoice(rfq_instance, services_instance, is_customer):
             {
                 "data": serialized_data.data,
                 "today_date": timezone.now(),
-                "total_charge": math.ceil(total_service_charge),
-                "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
-                "total_price": math.ceil(
-                    total_service_charge + extra_charge_agent + extra_charge_admin
-                ),
+                # "total_charge": math.ceil(total_service_charge),
+                # "extra_charge": math.ceil(extra_charge_admin + extra_charge_agent),
+                "total_price": math.ceil(total_service_charge),
             },
         )
 
@@ -374,7 +372,7 @@ def rfq_confirmed_admin(rfq_instance, is_customer=False):
         services_pdf_array.append(
             {
                 "name": f"Invoice-{timezone.now().strftime('%d/%m/%Y-%H-%M-%S')}.pdf",
-                "content": generate_invoice(rfq_instance, rfq_services, is_customer),                
+                "content": generate_invoice(rfq_instance, rfq_services, is_customer),
             }
         )
 

@@ -267,4 +267,4 @@ class CheckHotelAPI(APIView):
                             status=400,
                         )
 
-        return Response()
+        return Response({"status": "OK"})

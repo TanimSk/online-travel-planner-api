@@ -72,9 +72,11 @@ class ManageServicesAPI(APIView):
                 vendor_category_instance = VendorCategory.objects.get(
                     vendor__vendor=request.user, category_id=category_id
                 )
-                Service.objects.create(
+                service_instance = Service.objects.create(
                     vendor_category=vendor_category_instance, **service_data
                 )
+                # send emails
+                service_created_admin(service_instance)
 
             except VendorCategory.DoesNotExist:
                 vendor_instance = get_object_or_404(Vendor, vendor=request.user)
@@ -213,7 +215,8 @@ class NewTasksAPI(APIView):
                 # completed tasks
                 rfq_service_instance = RfqService.objects.filter(
                     service__vendor_category__vendor__vendor=request.user,
-                    rfq_category__rfq=rfq, order_status="dispatched"
+                    rfq_category__rfq=rfq,
+                    order_status="dispatched",
                 ).order_by("-id")
             else:
                 rfq_service_instance = (

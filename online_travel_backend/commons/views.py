@@ -255,14 +255,14 @@ class CheckHotelAPI(APIView):
                     if has_extra_bed == 1:
                         return Response(
                             {
-                                "status": f"Guest Capacity Exceeded, Please Increase Rooms or Extra Beds"
+                                "status": f"Guest Capacity Exceeded For This Hotel, Please Increase Rooms or Extra Beds"
                             },
                             status=400,
                         )
                     else:
                         return Response(
                             {
-                                "status": "Guest Capacity Exceeded, Please Increase Rooms"
+                                "status": "Guest Capacity Exceeded For This Hotel, Please Increase Rooms"
                             },
                             status=400,
                         )

@@ -141,23 +141,31 @@ class RfqSerializer(serializers.ModelSerializer):
 
         total_price = (
             (
-                service_instance.infant_price
-                * rfq_service_instance.get("infant_members", 0)
+                # hotel booking
+                (
+                    service_instance.service_price
+                    * rfq_service_instance.get("total_room", 0)
+                    * delta_days
+                )
+                + (
+                    service_instance.extra_breakfast_price
+                    * int(rfq_service_instance.get("include_breakfast", 0))
+                    + (
+                        rfq_service_instance.get("child_members", 0)
+                        + rfq_service_instance.get("adult_members", 0)
+                    )
+                )
+                + (
+                    service_instance.extra_bed_price
+                    * rfq_service_instance.get("extra_bed_price", 0)
+                )
             )
-            + (
-                service_instance.child_price
-                * rfq_service_instance.get("child_members", 0)
-            )
-            + (
-                service_instance.adult_price
-                * rfq_service_instance.get("adult_members", 0)
-            )
+            # others
             + (
                 (
                     service_instance.service_price
                     * rfq_service_instance.get("members", 0)
                 )
-                * delta_days
             )
             + added_price
         )

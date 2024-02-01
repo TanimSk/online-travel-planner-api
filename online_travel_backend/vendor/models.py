@@ -95,6 +95,9 @@ class Service(models.Model):
     # hotel_name = models.CharField(max_length=300, blank=True, null=True)
     room_type = models.CharField(max_length=300, blank=True, null=True)
     bed_type = models.CharField(max_length=300, blank=True, null=True)
+    max_guests = models.IntegerField(default=0)
+    extra_bed_price = models.FloatField(default=0)
+    extra_breakfast_price = models.FloatField(default=0)
 
     # flight booking
     from_area = models.CharField(max_length=500, blank=True, null=True)

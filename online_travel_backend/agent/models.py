@@ -132,9 +132,7 @@ class RfqService(models.Model):
     adult_members = models.IntegerField(default=0, blank=True, null=True)
     members = models.IntegerField(default=0, blank=True, null=True)
     area_name = models.CharField(blank=True, null=True, max_length=500)
-
     quantity = models.IntegerField(default=0, blank=True, null=True)
-    # _members = models.IntegerField(default=0, blank=True, null=True)
 
     # Hotel
     # hotel_name = models.CharField(max_length=300, blank=True, null=True)
@@ -142,6 +140,9 @@ class RfqService(models.Model):
     bed_type = models.CharField(max_length=300, blank=True, null=True)
     check_in_date = models.DateTimeField(blank=True, null=True)
     check_out_date = models.DateTimeField(blank=True, null=True)
+    total_room = models.IntegerField(default=0)
+    total_extra_bed = models.IntegerField(default=0)
+    include_breakfast = models.BooleanField(default=False)
 
     # Area
     from_area = models.CharField(max_length=300, blank=True, null=True)

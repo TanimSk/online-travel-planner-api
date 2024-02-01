@@ -13,6 +13,7 @@ from agent.serializers import (
     ServiceInfo,
     SuggestionSerializer,
 )
+from commons.serializers import CheckHotelSerializer
 
 
 # Login
@@ -74,12 +75,11 @@ class QueryServicesAPI(APIView):
 
             # For transportation
             try:
-                if (
-                    Category.objects.get(
-                        id=serialized_data.data.get("category_id")
-                    ).category_name
-                    == "Daily Activity Transportation"
-                ):
+                category_name = Category.objects.get(
+                    id=serialized_data.data.get("category_id")
+                ).category_name
+
+                if category_name == "Daily Activity Transportation":
                     if serialized_data.data.get(
                         "car_type"
                     ) == "Sedan" and serialized_data.data.get("_members") > (
@@ -88,7 +88,8 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }, status=400
+                            },
+                            status=400,
                         )
 
                     elif serialized_data.data.get(
@@ -99,7 +100,8 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }, status=400
+                            },
+                            status=400,
                         )
 
                     elif serialized_data.data.get(
@@ -110,7 +112,8 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }, status=400
+                            },
+                            status=400,
                         )
 
                     elif serialized_data.data.get(
@@ -121,8 +124,10 @@ class QueryServicesAPI(APIView):
                         return Response(
                             {
                                 "status": "Passenger capacity exceeded for this type of car, please Re-query"
-                            }, status=400
+                            },
+                            status=400,
                         )
+
             except Category.DoesNotExist:
                 return Response({"status": "Something went wrong"}, status=400)
 
@@ -140,6 +145,9 @@ class QueryServicesAPI(APIView):
                 "car_quantity",
                 "quantity",
                 "_members",
+                "total_room",
+                "total_extra_bed",
+                "include_breakfast",
             ]:
                 try:
                     serialized_copy.pop(key)
@@ -189,3 +197,74 @@ class SuggestionAPI(APIView):
                 .distinct()[:15]
             )
             return Response(suggestions)
+
+
+class CheckHotelAPI(APIView):
+    serializer_class = CheckHotelSerializer
+
+    def post(self, request, format=None, *args, **kwargs):
+        serialized_data = self.serializer_class(data=request.data)
+
+        if serialized_data.is_valid(raise_exception=True):
+            category_name = Category.objects.get(
+                id=serialized_data.data.get("category_id")
+            ).category_name
+
+            if category_name == "Hotel Booking":
+                service_instance = Service.objects.get(
+                    id=serialized_data.data.get("service_id"),
+                    vendor_category__category_id=serialized_data.data.get(
+                        "category_id"
+                    ),
+                )
+
+                # checking capacity of rooms
+                has_extra_bed = 0
+                if service_instance.extra_bed_price > 0:
+                    has_extra_bed = 1
+
+                # show extra beds are available or not
+                if (
+                    has_extra_bed == 0
+                    and serialized_data.data.get("total_extra_bed", 0) > 0
+                ):
+                    return Response(
+                        {"status": "Extra beds are not available for this hotel"},
+                        status=400,
+                    )
+
+                # validating extra beds
+                if serialized_data.data.get("total_room") < serialized_data.data.get(
+                    "total_extra_bed"
+                ):
+                    return Response(
+                        {
+                            "status": f"You can have maximum {serialized_data.data.get('total_room')} extra beds"
+                        },
+                        status=400,
+                    )
+
+                if (
+                    serialized_data.data.get("adult_members")
+                    - (
+                        service_instance.max_guests
+                        * serialized_data.data.get("total_room")
+                    )
+                    - (serialized_data.data.get("total_extra_bed", 0) * has_extra_bed)
+                ) > 0:
+                    if has_extra_bed == 1:
+                        return Response(
+                            {
+                                "status": f"Guest Capacity Exceeded, Please Increase Rooms or Extra Beds"
+                            },
+                            status=400,
+                        )
+                    else:
+                        return Response(
+                            {
+                                "status": "Guest Capacity Exceeded, Please Increase Rooms"
+                            },
+                            status=400,
+                        )
+
+        return Response()

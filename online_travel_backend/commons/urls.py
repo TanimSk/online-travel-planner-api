@@ -8,6 +8,7 @@ urlpatterns = [
     path("suggestions/", SuggestionAPI.as_view(), name="suggestions"),
     # Query Services
     path("query_services/", QueryServicesAPI.as_view(), name="query_services"),
+    path("check_hotel/", QueryServicesAPI.as_view(), name="query_services"),
     path(
         "view_service/<int:service_id>", QueryServicesAPI.as_view(), name="view_service"
     ),

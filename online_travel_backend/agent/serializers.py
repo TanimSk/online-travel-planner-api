@@ -454,6 +454,15 @@ class QueryResultSerializer(serializers.ModelSerializer):
         except Agent.DoesNotExist:
             commission = 0
 
+        print(commission, "agent")
+        print(service_instance.admin_commission, "admin")
+        print(
+            1
+            + (service_instance.admin_commission * 0.01)
+            + (commission * 0.01)
+            + ((service_instance.admin_commission * 0.01) * (commission * 0.01))
+        )
+
         total_price = total_price * (
             1
             + (service_instance.admin_commission * 0.01)

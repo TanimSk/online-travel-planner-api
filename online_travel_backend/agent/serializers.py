@@ -143,7 +143,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 + (
                     service_instance.extra_breakfast_price
                     * int(rfq_service_instance.get("include_breakfast", 0))
-                    + (
+                    * (
                         rfq_service_instance.get("child_members", 0)
                         + rfq_service_instance.get("adult_members", 0)
                     )
@@ -423,7 +423,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
                 + (
                     service_instance.extra_breakfast_price
                     * int(rfq_service_instance.get("include_breakfast", 0))
-                    + (
+                    * (
                         rfq_service_instance.get("child_members", 0)
                         + rfq_service_instance.get("adult_members", 0)
                     )

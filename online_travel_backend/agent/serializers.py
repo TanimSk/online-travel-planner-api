@@ -131,6 +131,8 @@ class RfqSerializer(serializers.ModelSerializer):
             added_price += (service_instance.service_price) * rfq_service_instance.get(
                 "quantity", 0
             )
+        
+        print(added_price)
 
         total_price = (
             (

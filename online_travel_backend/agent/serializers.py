@@ -445,7 +445,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
             + added_price
         )
 
-        print(added_price)
+        print(total_price)
 
         # added commission
         try:

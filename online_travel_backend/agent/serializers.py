@@ -461,6 +461,8 @@ class QueryResultSerializer(serializers.ModelSerializer):
             + ((service_instance.admin_commission * 0.01) * (commission * 0.01))
         )
 
+        print(total_price)
+
         return total_price
 
     class Meta:

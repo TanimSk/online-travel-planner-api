@@ -132,8 +132,6 @@ class RfqSerializer(serializers.ModelSerializer):
                 "quantity", 0
             )
 
-        print(added_price)
-
         total_price = (
             (
                 # hotel booking
@@ -152,7 +150,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 )
                 + (
                     service_instance.extra_bed_price
-                    * rfq_service_instance.get("extra_bed_price", 0)
+                    * rfq_service_instance.get("total_extra_bed", 0)
                 )
             )
             # others
@@ -432,7 +430,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
                 )
                 + (
                     service_instance.extra_bed_price
-                    * rfq_service_instance.get("extra_bed_price", 0)
+                    * rfq_service_instance.get("total_extra_bed", 0)
                 )
             )
             # others
@@ -445,8 +443,6 @@ class QueryResultSerializer(serializers.ModelSerializer):
             + added_price
         )
 
-        print(total_price)
-
         # added commission
         try:
             agent_instance = Agent.objects.get(agent=self.context["request"].user)
@@ -454,23 +450,12 @@ class QueryResultSerializer(serializers.ModelSerializer):
         except Agent.DoesNotExist:
             commission = 0
 
-        print(commission, "agent")
-        print(service_instance.admin_commission, "admin")
-        print(
-            1
-            + (service_instance.admin_commission * 0.01)
-            + (commission * 0.01)
-            + ((service_instance.admin_commission * 0.01) * (commission * 0.01))
-        )
-
         total_price = total_price * (
             1
             + (service_instance.admin_commission * 0.01)
             + (commission * 0.01)
             + ((service_instance.admin_commission * 0.01) * (commission * 0.01))
         )
-
-        print(total_price)
 
         return total_price
 

@@ -157,7 +157,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 )
                 + (
                     service_instance.extra_bed_price
-                    * rfq_service_instance.get("extra_bed_price", 0)
+                    * rfq_service_instance.get("total_extra_bed", 0)
                 )
             )
             # others

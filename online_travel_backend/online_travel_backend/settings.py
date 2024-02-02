@@ -199,10 +199,10 @@ EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 # EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'ongshak@miahtrip.com'
-EMAIL_HOST_PASSWORD = 'ongshak1@Ota_zoho'
-DEFAULT_FROM_EMAIL = 'ongshak@miahtrip.com'
-SERVER_EMAIL = 'ongshak@miahtrip.com'
+EMAIL_HOST_USER = 'noreply@discoverasiatrip.com'
+EMAIL_HOST_PASSWORD = 'ongshak1@Ota_zohO'
+DEFAULT_FROM_EMAIL = 'noreply@discoverasiatrip.com'
+SERVER_EMAIL = 'noreply@discoverasiatrip.com'
 
 
 AUTHENTICATION_BACKENDS = (

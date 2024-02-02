@@ -9,17 +9,17 @@ We would like to inform you that your email address has been provided by the use
 To verify and confirm this registration, kindly visit the following link:
 {% endblocktrans %}{% endautoescape %}
 {% if user.is_admin %}
-https://miahtrip.com/admin_auth/{{ activate_url }}
+https://discoverasiatrip.com/admin_auth/{{ activate_url }}
 {% elif user.is_agent %}
-https://miahtrip.com/agent_auth/{{ activate_url }}
+https://discoverasiatrip.com/agent_auth/{{ activate_url }}
 {% elif user.is_vendor %}
-https://miahtrip.com/vendor_auth/{{ activate_url }}
+https://discoverasiatrip.com/vendor_auth/{{ activate_url }}
 Your password is: {{ user.vendor.password_text }}
 {% else %}
-https://miahtrip.com/customer_auth/{{ activate_url }}
+https://discoverasiatrip.com/customer_auth/{{ activate_url }}
 {% endif %}
 
-We appreciate your trust in miahtrip.com, and we look forward to providing you with a seamless and secure experience.
+We appreciate your trust in discoverasiatrip.com, and we look forward to providing you with a seamless and secure experience.
 
 Thank you.
 

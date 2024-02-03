@@ -533,7 +533,8 @@ class PaidBillSerializer(serializers.ModelSerializer):
         return obj.vendor_bill + obj.admin_bill + obj.agent_bill
 
     def get_paid_amount(self, obj):
-        return obj.vendor_bill + obj.admin_bill + obj.agent_bill - obj.agent_due
+        return obj.vendor_bill + obj.admin_bill  - obj.agent_due
+        # + obj.agent_bill
 
 
 class BillPaySerializer(serializers.ModelSerializer):

@@ -140,9 +140,11 @@ class RfqSerializer(serializers.ModelSerializer):
                     * rfq_service_instance.get("total_room", 0)
                     * delta_days
                 )
+                # breakfast
                 + (
                     service_instance.extra_breakfast_price
                     * int(rfq_service_instance.get("include_breakfast", 0))
+                    * delta_days
                     * (
                         rfq_service_instance.get("child_members", 0)
                         + rfq_service_instance.get("adult_members", 0)
@@ -423,6 +425,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
                 + (
                     service_instance.extra_breakfast_price
                     * int(rfq_service_instance.get("include_breakfast", 0))
+                    * delta_days
                     * (
                         rfq_service_instance.get("child_members", 0)
                         + rfq_service_instance.get("adult_members", 0)

@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db import transaction
 from django.db.models import Subquery, OuterRef, Sum, F
+from commons.views import StandardResultsSetPagination
 from django.utils import timezone
 
 from .serializers import (
@@ -71,14 +72,6 @@ class VendorRegistrationView(RegisterView):
     serializer_class = VendorCustomRegistrationSerializer
 
 
-# Pagination Config
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 12
-    page_query_param = "p"
-
-
 class OverviewAPI(APIView):
     permission_classes = [AuthenticateOnlyAdmin]
 
@@ -95,10 +88,8 @@ class OverviewAPI(APIView):
             "confirmed_rfq": list_orders,
         }
 
-        serialized_data_table = RfqSerializer(
-            Rfq.objects.all().exclude(status="declined").order_by("-created_on"),
-            many=True,
-        )
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
 
         return Response(
             {
@@ -106,7 +97,14 @@ class OverviewAPI(APIView):
                 "list_of_orders": list_orders,
                 "total_services": total_services,
                 "pie_chart": pie_chart,
-                "rfq_status_table": serialized_data_table.data,
+                # paginated
+                "rfq_status_table": pagination_instance.get_res(
+                    serializer_obj=RfqSerializer,
+                    model_instance=Rfq.objects.all()
+                    .exclude(status="declined")
+                    .order_by("-created_on"),
+                    request=request,
+                ),
             }
         )
 
@@ -132,8 +130,14 @@ class PendingRfqAPI(APIView):
     def get(self, request, rfq_id=None, format=None, *args, **kwargs):
         if rfq_id is None:
             rfqs_instance = Rfq.objects.filter(status="pending").order_by("-created_on")
-            serialized_data = RfqSerializer(rfqs_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=RfqSerializer,
+                model_instance=rfqs_instance,
+                request=request,
+            )
 
         rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="pending")
         serialized_data = RfqSerializer(rfqs_instance)
@@ -483,10 +487,13 @@ class AssignAgentAPI(APIView):
             .distinct()
         )
 
-        response_array = []
-        for rfq_instance in rfq_instances:
-            data = {}
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
+        rfq_instances_slice = pagination_instance.paginate_queryset(rfq_instances, request)
 
+        response_array = []
+        for rfq_instance in rfq_instances_slice:
+            data = {}
             rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
             rfq_service_instance = RfqService.objects.filter(
                 rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
@@ -501,7 +508,7 @@ class AssignAgentAPI(APIView):
 
             response_array.append(data)
 
-        return Response(response_array)
+        return Response(pagination_instance.get_paginated_response(response_array))
 
     def post(self, request, service_id=None, format=None, *args, **kwargs):
         serialized_data = AssignServiceSerializer(data=request.data)

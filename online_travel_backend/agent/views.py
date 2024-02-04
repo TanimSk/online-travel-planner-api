@@ -138,6 +138,15 @@ class RFQTypesAPI(APIView):
         else:
             return Response({"error": "Invalid params"})
 
+        if has_multiple:
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=RfqInvoiceSerializer,
+                model_instance=rfq_instances,
+                request=request,
+            )
+
         serialized_data = RfqInvoiceSerializer(rfq_instances, many=has_multiple)
         return Response(serialized_data.data)
 
@@ -266,8 +275,14 @@ class AgentBillsAPI(APIView):
             bills_instance = Bill.objects.filter(
                 agent=request.user, status_1="admin_paid"
             ).order_by("-admin_paid_on")
-            serialized_data = PaidBillSerializer(bills_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=PaidBillSerializer,
+                model_instance=bills_instance,
+                request=request,
+            )
 
         # list of bill requests with due payment
         bills_instance = (
@@ -275,8 +290,14 @@ class AgentBillsAPI(APIView):
             .exclude(status_1="admin_bill")
             .order_by("-agent_billed_on")
         )
-        serialized_data = BillRequestSerializer(bills_instance, many=True)
-        return Response(serialized_data.data)
+
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
+        return pagination_instance.get_res(
+            serializer_obj=BillRequestSerializer,
+            model_instance=bills_instance,
+            request=request,
+        )
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)

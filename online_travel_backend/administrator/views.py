@@ -242,8 +242,16 @@ class ApprovedRfqAPI(APIView):
                 rfqs_instance = Rfq.objects.filter(status="approved").order_by(
                     "-created_on"
                 )
-            serialized_data = RfqSerializer(rfqs_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=RfqSerializer,
+                model_instance=rfqs_instance,
+                request=request,
+            )
+            # serialized_data = RfqSerializer(rfqs_instance, many=True)
+            # return Response(serialized_data.data)
 
         if request.GET.get("type") == "order":
             rfqs_instance = get_object_or_404(Rfq, id=rfq_id, status="confirmed")
@@ -263,7 +271,15 @@ class VendorListAPI(APIView):
             vendor_instances = Vendor.objects.filter(approved=True).order_by(
                 "-added_on"
             )
-            serialized_data = VendorListSerializer(vendor_instances, many=True)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=VendorListSerializer,
+                model_instance=vendor_instances,
+                request=request,
+            )
+
         else:
             vendor_instances = Vendor.objects.get(id=vendor_id, approved=True)
             serialized_data = VendorListSerializer(vendor_instances)
@@ -280,7 +296,14 @@ class RequestedVendorAPI(APIView):
             vendor_instances = Vendor.objects.filter(
                 approved=False, vendor__emailaddress__verified=True
             ).order_by("-added_on")
-            serialized_data = VendorListSerializer(vendor_instances, many=True)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=VendorListSerializer,
+                model_instance=vendor_instances,
+                request=request,
+            )
         else:
             vendor_instances = get_object_or_404(
                 Vendor,
@@ -352,8 +375,17 @@ class ManageVendorServicesAPI(APIView):
             instance = Service.objects.filter(
                 approved=approved, added_by_admin=False
             ).order_by("-created_on")
-            serialized_data = self.serializer_class(instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=ManageServicesSerializer,
+                model_instance=instance,
+                request=request,
+            )
+
+            # serialized_data = self.serializer_class(instance, many=True)
+            # return Response(serialized_data.data)
 
         try:
             instance = Service.objects.get(id=service_id, added_by_admin=False)
@@ -410,8 +442,16 @@ class ManageServicesAPI(APIView):
             instance = Service.objects.filter(added_by_admin=True).order_by(
                 "-created_on"
             )
-            serialized_data = self.serializer_class(instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=ManageServicesSerializer,
+                model_instance=instance,
+                request=request,
+            )
+            # serialized_data = self.serializer_class(instance, many=True)
+            # return Response(serialized_data.data)
         try:
             instance = Service.objects.get(id=service_id, added_by_admin=True)
             serialized_data = self.serializer_class(instance)
@@ -489,7 +529,9 @@ class AssignAgentAPI(APIView):
 
         # pagination
         pagination_instance = StandardResultsSetPagination()
-        rfq_instances_slice = pagination_instance.paginate_queryset(rfq_instances, request)
+        rfq_instances_slice = pagination_instance.paginate_queryset(
+            rfq_instances, request
+        )
 
         response_array = []
         for rfq_instance in rfq_instances_slice:
@@ -601,14 +643,29 @@ class AgentBillAPI(APIView):
             bills_instance = Bill.objects.filter(
                 vendor__isnull=False, status_1="admin_paid"
             ).order_by("-admin_paid_on")
-            serialized_data = ReceivedPaymentSerializer(bills_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=ReceivedPaymentSerializer,
+                model_instance=bills_instance,
+                request=request,
+            )
 
         bills_instance = Bill.objects.filter(
             vendor__isnull=False, status_1="admin_bill"
         ).order_by("-created_on")
-        serialized_data = BillServicesSerializer(bills_instance, many=True)
-        return Response(serialized_data.data)
+
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
+        return pagination_instance.get_res(
+            serializer_obj=BillServicesSerializer,
+            model_instance=bills_instance,
+            request=request,
+        )
+
+        # serialized_data = BillServicesSerializer(bills_instance, many=True)
+        # return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = DispatchBillServiceSerializer(data=request.data, many=True)
@@ -637,8 +694,16 @@ class VendorBillAPI(APIView):
             bills_instance = Bill.objects.filter(status_2="vendor_paid").order_by(
                 "-vendor_paid_on"
             )
-            serialized_data = PaidBillSerializer(bills_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=PaidBillSerializer,
+                model_instance=bills_instance,
+                request=request,
+            )
+            # serialized_data = PaidBillSerializer(bills_instance, many=True)
+            # return Response(serialized_data.data)
 
         # list of bill requests with due payment
         bills_instance = (
@@ -647,8 +712,15 @@ class VendorBillAPI(APIView):
             .order_by("-admin_billed_on")
         )
 
-        serialized_data = BillRequestSerializer(bills_instance, many=True)
-        return Response(serialized_data.data)
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
+        return pagination_instance.get_res(
+            serializer_obj=BillRequestSerializer,
+            model_instance=bills_instance,
+            request=request,
+        )
+        # serialized_data = BillRequestSerializer(bills_instance, many=True)
+        # return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)
@@ -699,8 +771,16 @@ class AgentListAPI(APIView):
                 customer_instance = Customer.objects.filter(
                     customer__emailaddress__verified=True
                 ).order_by("-added_on")
-                serialized_data = CustomerSerializer(customer_instance, many=True)
-                return Response(serialized_data.data)
+
+                # pagination
+                pagination_instance = StandardResultsSetPagination()
+                return pagination_instance.get_res(
+                    serializer_obj=CustomerSerializer,
+                    model_instance=customer_instance,
+                    request=request,
+                )
+                # serialized_data = CustomerSerializer(customer_instance, many=True)
+                # return Response(serialized_data.data)
 
             # get single customer
             customer_instance = Customer.objects.get(
@@ -713,8 +793,16 @@ class AgentListAPI(APIView):
             agents_instance = Agent.objects.filter(
                 agent__emailaddress__verified=True, pseudo_agent=False
             ).order_by("-registered_on")
-            serialized_data = self.serializer_class(agents_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=AgentSerializer,
+                model_instance=agents_instance,
+                request=request,
+            )
+            # serialized_data = self.serializer_class(agents_instance, many=True)
+            # return Response(serialized_data.data)
 
         # get single agent
         agents_instance = Agent.objects.get(

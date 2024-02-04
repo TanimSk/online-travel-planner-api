@@ -508,7 +508,7 @@ class AssignAgentAPI(APIView):
 
             response_array.append(data)
 
-        return Response(pagination_instance.get_paginated_response(response_array))
+        return pagination_instance.get_paginated_response(response_array)
 
     def post(self, request, service_id=None, format=None, *args, **kwargs):
         serialized_data = AssignServiceSerializer(data=request.data)

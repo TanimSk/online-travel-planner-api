@@ -14,6 +14,20 @@ from agent.serializers import (
     SuggestionSerializer,
 )
 from commons.serializers import CheckHotelSerializer
+from rest_framework.pagination import PageNumberPagination
+
+
+# Pagination Config
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 15
+    page_query_param = "p"
+
+    def get_res(self, serializer_obj, model_instance, request):
+        result_page = self.paginate_queryset(model_instance, request)
+        serialized_data = serializer_obj(result_page, many=True)
+        return self.get_paginated_response(serialized_data.data)
 
 
 # Login
@@ -183,9 +197,9 @@ class SuggestionAPI(APIView):
 
         if serialized_data.is_valid(raise_exception=True):
             dict = {}
-            dict[
-                f"{serialized_data.data.get('field_name')}__icontains"
-            ] = serialized_data.data.get("field_content")
+            dict[f"{serialized_data.data.get('field_name')}__icontains"] = (
+                serialized_data.data.get("field_content")
+            )
             suggestions = (
                 Service.objects.filter(
                     vendor_category__category_id=serialized_data.data.get(

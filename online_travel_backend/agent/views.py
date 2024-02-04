@@ -16,6 +16,7 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
 # from vendor.serializers import ManageServicesSerializer
 from commons.models import Bill, AgentSubBill
+from commons.views import StandardResultsSetPagination
 from .models import Rfq, RfqService, Agent
 from django.shortcuts import get_object_or_404
 from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
@@ -209,8 +210,17 @@ class GetInvoiceAPI(APIView):
                 rfq_instances = Rfq.objects.filter(
                     agent=request.user, status="confirmed"
                 ).order_by("-created_on")
-                serialized_data = RfqInvoiceSerializer(rfq_instances, many=True)
-                return Response(serialized_data.data)
+
+                # pagination
+                # paginator = StandardResultsSetPagination()
+                # result_page = paginator.paginate_queryset(rfq_instances, request)
+                # serialized_data = RfqInvoiceSerializer(result_page, many=True)
+                # return paginator.get_paginated_response(serialized_data.data)
+                return StandardResultsSetPagination.get_res(
+                    serializer_obj=RfqInvoiceSerializer,
+                    model_instance=rfq_instances,
+                    request=request,
+                )
 
             else:
                 return Response({"error": "User is not authenticated"})

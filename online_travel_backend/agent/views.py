@@ -216,7 +216,8 @@ class GetInvoiceAPI(APIView):
                 # result_page = paginator.paginate_queryset(rfq_instances, request)
                 # serialized_data = RfqInvoiceSerializer(result_page, many=True)
                 # return paginator.get_paginated_response(serialized_data.data)
-                return StandardResultsSetPagination.get_res(
+                pagination_instance = StandardResultsSetPagination()
+                return pagination_instance.get_res(
                     serializer_obj=RfqInvoiceSerializer,
                     model_instance=rfq_instances,
                     request=request,

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from commons.views import StandardResultsSetPagination
 
 from .serializers import (
     ManageServicesSerializer,
@@ -45,8 +46,14 @@ class ManageServicesAPI(APIView):
             instance = Service.objects.filter(
                 vendor_category__vendor__vendor=request.user
             ).order_by("-created_on")
-            serialized_data = self.serializer_class(instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=ManageServicesSerializer,
+                model_instance=instance,
+                request=request,
+            )
 
         try:
             instance = Service.objects.get(
@@ -163,8 +170,14 @@ class NewTasksAPI(APIView):
                     # .distinct()
                 )
 
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            rfq_instances_slice = pagination_instance.paginate_queryset(
+                rfq_instances, request
+            )
+
             response_array = []
-            for rfq_instance in rfq_instances:
+            for rfq_instance in rfq_instances_slice:
                 data = {}
 
                 rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
@@ -198,8 +211,9 @@ class NewTasksAPI(APIView):
 
                 response_array.append(data)
 
-            return Response(response_array)
+            return pagination_instance.get_paginated_response(response_array)
 
+        # get single
         else:
             data = {}
             rfq = (
@@ -289,15 +303,31 @@ class AdminBillAPI(APIView):
             bills_instance = Bill.objects.filter(
                 vendor=request.user, status_2="vendor_paid"
             ).order_by("-vendor_paid_on")
-            serialized_data = ReceivedPaymentSerializer(bills_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=ReceivedPaymentSerializer,
+                model_instance=bills_instance,
+                request=request,
+            )
+            # serialized_data = ReceivedPaymentSerializer(bills_instance, many=True)
+            # return Response(serialized_data.data)
 
         # getting bills
         bills_instance = Bill.objects.filter(
             vendor=request.user, status_2="vendor_bill"
         ).order_by("-created_on")
-        serialized_data = BillServicesSerializer(bills_instance, many=True)
-        return Response(serialized_data.data)
+
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
+        return pagination_instance.get_res(
+            serializer_obj=BillServicesSerializer,
+            model_instance=bills_instance,
+            request=request,
+        )
+        # serialized_data = BillServicesSerializer(bills_instance, many=True)
+        # return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = DispatchBillServiceSerializer(data=request.data, many=True)

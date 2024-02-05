@@ -6,6 +6,7 @@ from agent.models import Agent, Rfq, RfqService
 from commons.models import Bill, AgentSubBill
 from vendor.models import Service
 from .models import Customer
+from commons.views import StandardResultsSetPagination
 
 from .serializers import (
     CustomerCustomRegistrationSerializer,
@@ -120,6 +121,15 @@ class RFQTypesAPI(APIView):
         else:
             return Response({"error": "Invalid params"})
 
+        if has_multiple:
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=RfqInvoiceSerializer,
+                model_instance=rfq_instances,
+                request=request,
+            )
+
         serialized_data = RfqInvoiceSerializer(rfq_instances, many=has_multiple)
         return Response(serialized_data.data)
 
@@ -199,8 +209,16 @@ class GetInvoiceAPI(APIView):
                 rfq_instances = Rfq.objects.filter(
                     customer=request.user, status="confirmed"
                 ).order_by("-created_on")
-                serialized_data = RfqInvoiceSerializer(rfq_instances, many=True)
-                return Response(serialized_data.data)
+
+                # pagination
+                pagination_instance = StandardResultsSetPagination()
+                return pagination_instance.get_res(
+                    serializer_obj=RfqInvoiceSerializer,
+                    model_instance=rfq_instances,
+                    request=request,
+                )
+                # serialized_data = RfqInvoiceSerializer(rfq_instances, many=True)
+                # return Response(serialized_data.data)
 
             else:
                 return Response({"error": "User is not authenticated"})
@@ -258,8 +276,16 @@ class AgentBillsAPI(APIView):
                 status_1="admin_paid",
                 service__rfq_category__rfq__customer=request.user,
             ).order_by("-admin_paid_on")
-            serialized_data = PaidBillSerializer(bills_instance, many=True)
-            return Response(serialized_data.data)
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            return pagination_instance.get_res(
+                serializer_obj=PaidBillSerializer,
+                model_instance=bills_instance,
+                request=request,
+            )
+            # serialized_data = PaidBillSerializer(bills_instance, many=True)
+            # return Response(serialized_data.data)
 
         # list of bill requests with due payment
         bills_instance = (
@@ -272,8 +298,15 @@ class AgentBillsAPI(APIView):
             .exclude(status_1="admin_bill")
             .order_by("-agent_billed_on")
         )
-        serialized_data = BillRequestSerializer(bills_instance, many=True)
-        return Response(serialized_data.data)
+        # pagination
+        pagination_instance = StandardResultsSetPagination()
+        return pagination_instance.get_res(
+            serializer_obj=BillRequestSerializer,
+            model_instance=bills_instance,
+            request=request,
+        )
+        # serialized_data = BillRequestSerializer(bills_instance, many=True)
+        # return Response(serialized_data.data)
 
     def post(self, request, format=None, *args, **kwargs):
         serialized_data = BillPaySerializer(data=request.data, many=True)
@@ -348,6 +381,6 @@ class PackagesAPI(APIView):
 
         service_instance = Service.objects.filter(
             vendor_category__category__category_name="Tour Packages"
-        )
+        ).order_by("-created_on")
 
         return Response(ServiceInfo(service_instance, many=True).data)

@@ -90,6 +90,9 @@ class OverviewAPI(APIView):
 
         # pagination
         pagination_instance = StandardResultsSetPagination()
+        rfq_instances_slice = pagination_instance.paginate_queryset(
+            Rfq.objects.all(), request
+        )
 
         return Response(
             {
@@ -98,13 +101,12 @@ class OverviewAPI(APIView):
                 "total_services": total_services,
                 "pie_chart": pie_chart,
                 # paginated
-                "rfq_status_table": pagination_instance.get_res(
-                    serializer_obj=RfqSerializer,
-                    model_instance=Rfq.objects.all()
-                    .exclude(status="declined")
-                    .order_by("-created_on"),
-                    request=request,
-                ),
+                "rfq_status_table": {
+                    "count": pagination_instance.page.paginator.count,
+                    "next": pagination_instance.get_next_link(),
+                    "previous": pagination_instance.get_previous_link(),
+                    "results": RfqSerializer(rfq_instances_slice, many=True),
+                },
             }
         )
 

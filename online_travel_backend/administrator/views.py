@@ -105,7 +105,7 @@ class OverviewAPI(APIView):
                     "count": pagination_instance.page.paginator.count,
                     "next": pagination_instance.get_next_link(),
                     "previous": pagination_instance.get_previous_link(),
-                    "results": RfqSerializer(rfq_instances_slice, many=True),
+                    "results": RfqSerializer(rfq_instances_slice, many=True).data,
                 },
             }
         )

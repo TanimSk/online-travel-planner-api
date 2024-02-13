@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.db import transaction
 from django.db.models import Subquery, OuterRef, Sum, F
 from commons.views import StandardResultsSetPagination
+from datetime import datetime
 from django.utils import timezone
 
 from .serializers import (
@@ -134,10 +135,12 @@ class OverviewAPI(APIView):
             ):
                 rfq_instances = Rfq.objects.filter(
                     status="confirmed",
-                    created_on__range=[
-                        request.GET.get("from_date"),
-                        request.GET.get("to_date"),
-                    ],
+                    created_on__gte=timezone.make_aware(
+                        datetime.strptime(request.GET.get("from_date"), "%d-%m-%Y")
+                    ),
+                    created_on__lte=timezone.make_aware(
+                        datetime.strptime(request.GET.get("to_date"), "%d-%m-%Y")
+                    ),
                 )
 
             else:

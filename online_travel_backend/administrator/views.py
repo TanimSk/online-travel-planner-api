@@ -136,10 +136,14 @@ class OverviewAPI(APIView):
                 rfq_instances = Rfq.objects.filter(
                     status="confirmed",
                     created_on__gte=timezone.make_aware(
-                        datetime.strptime(request.GET.get("from_date"), "%d-%m-%Y")
+                        datetime.strptime(
+                            request.GET.get("from_date"), "%d-%m-%Y"
+                        ).replace(hour=0, minute=0, second=0)
                     ),
                     created_on__lte=timezone.make_aware(
-                        datetime.strptime(request.GET.get("to_date"), "%d-%m-%Y")
+                        datetime.strptime(
+                            request.GET.get("to_date"), "%d-%m-%Y"
+                        ).replace(hour=23, minute=59, second=59)
                     ),
                 )
 

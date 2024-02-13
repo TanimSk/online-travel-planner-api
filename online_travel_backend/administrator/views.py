@@ -88,11 +88,71 @@ class OverviewAPI(APIView):
             "confirmed_rfq": list_orders,
         }
 
-        # pagination
-        pagination_instance = StandardResultsSetPagination()
-        rfq_instances_slice = pagination_instance.paginate_queryset(
-            Rfq.objects.all(), request
-        )
+        ########## category wise filtering ##########
+        if request.GET.get("category") is not None:
+
+            rfq_instances = (
+                RfqService.objects.filter(
+                    rfq_category__rfq__status="confirmed",
+                    rfq_category__category__category_name=request.GET.get("category"),
+                )
+                .order_by("-rfq_category__rfq_id")
+                .distinct("rfq_category__rfq_id")
+                .values("rfq_category__rfq_id")
+            )
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            rfq_instances_slice = pagination_instance.paginate_queryset(
+                rfq_instances, request
+            )
+
+            response_array = []
+            for rfq_instance in rfq_instances_slice:
+                data = {}
+                rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
+
+                # Get category tasks
+                rfq_service_instance = RfqService.objects.filter(
+                    rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                    rfq_category__category__category_name=request.GET.get("category"),
+                ).order_by("-id")
+
+                data["rfq"] = BasicRfqSerializer(rfq).data
+                data["rfq_services"] = RfqServiceSerializer(
+                    rfq_service_instance, many=True
+                ).data
+
+                response_array.append(data)
+
+        else:
+
+            # filtering
+            if (
+                request.GET.get("from_date") is not None
+                and request.GET.get("to_date") is not None
+            ):
+                rfq_instances = Rfq.objects.filter(
+                    status="confirmed",
+                    created_on__range=[
+                        request.GET.get("from_date"),
+                        request.GET.get("to_date"),
+                    ],
+                )
+
+            else:
+                rfq_instances = Rfq.objects.filter(status="confirmed")
+
+            # pagination
+            pagination_instance = StandardResultsSetPagination()
+            rfq_instances_slice = pagination_instance.paginate_queryset(
+                rfq_instances, request
+            )
+            # serialisation
+            response_array = RfqSerializer(
+                rfq_instances_slice,
+                many=True,
+            ).data
 
         return Response(
             {
@@ -105,7 +165,7 @@ class OverviewAPI(APIView):
                     "count": pagination_instance.page.paginator.count,
                     "next": pagination_instance.get_next_link(),
                     "previous": pagination_instance.get_previous_link(),
-                    "results": RfqSerializer(rfq_instances_slice, many=True).data,
+                    "results": response_array,
                 },
             }
         )

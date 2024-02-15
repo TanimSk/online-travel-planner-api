@@ -149,7 +149,7 @@ class OverviewAPI(APIView):
                             Category.objects.filter(
                                 category_name=request.GET.get("category")
                             ).first()
-                        ),
+                        ).data,
                     }
                 )
                 response_array.append(data)

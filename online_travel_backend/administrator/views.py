@@ -102,6 +102,25 @@ class OverviewAPI(APIView):
                 .values("rfq_category__rfq_id")
             )
 
+            # date filtering added
+            if (
+                request.GET.get("from_date") is not None
+                and request.GET.get("to_date") is not None
+            ):
+                rfq_instances = rfq_instances.filter(
+                    status="confirmed",
+                    created_on__gte=timezone.make_aware(
+                        datetime.strptime(
+                            request.GET.get("from_date"), "%d-%m-%Y"
+                        ).replace(hour=0, minute=0, second=0)
+                    ),
+                    created_on__lte=timezone.make_aware(
+                        datetime.strptime(
+                            request.GET.get("to_date"), "%d-%m-%Y"
+                        ).replace(hour=23, minute=59, second=59)
+                    ),
+                )
+
             # pagination
             pagination_instance = StandardResultsSetPagination()
             rfq_instances_slice = pagination_instance.paginate_queryset(
@@ -110,7 +129,7 @@ class OverviewAPI(APIView):
 
             response_array = []
             for rfq_instance in rfq_instances_slice:
-                data = {}
+                # data = {}
                 rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
 
                 # Get category tasks
@@ -119,11 +138,20 @@ class OverviewAPI(APIView):
                     rfq_category__category__category_name=request.GET.get("category"),
                 ).order_by("-id")
 
-                data["rfq"] = BasicRfqSerializer(rfq).data
-                data["rfq_services"] = RfqServiceSerializer(
-                    rfq_service_instance, many=True
-                ).data
-
+                data = BasicRfqSerializer(rfq).data
+                data["rfq_categories"] = []
+                data["rfq_categories"].append(
+                    {
+                        "rfq_services": RfqServiceSerializer(
+                            rfq_service_instance, many=True
+                        ).data,
+                        "category": CategorySerializer(
+                            Category.objects.filter(
+                                category_name=request.GET.get("category")
+                            ).first()
+                        ),
+                    }
+                )
                 response_array.append(data)
 
         else:

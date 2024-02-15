@@ -92,14 +92,9 @@ class OverviewAPI(APIView):
         ########## category wise filtering ##########
         if request.GET.get("category") is not None:
 
-            rfq_instances = (
-                RfqService.objects.filter(
-                    rfq_category__rfq__status="confirmed",
-                    rfq_category__category__category_name=request.GET.get("category"),
-                )
-                .order_by("-rfq_category__rfq_id")
-                .distinct("rfq_category__rfq_id")
-                .values("rfq_category__rfq_id")
+            rfq_instances = RfqService.objects.filter(
+                rfq_category__rfq__status="confirmed",
+                rfq_category__category__category_name=request.GET.get("category"),
             )
 
             # date filtering added
@@ -120,6 +115,13 @@ class OverviewAPI(APIView):
                         ).replace(hour=23, minute=59, second=59)
                     ),
                 )
+
+            # minifying
+            rfq_instances = (
+                rfq_instances.order_by("-rfq_category__rfq_id")
+                .distinct("rfq_category__rfq_id")
+                .values("rfq_category__rfq_id")
+            )
 
             # pagination
             pagination_instance = StandardResultsSetPagination()

@@ -103,7 +103,7 @@ class OverviewAPI(APIView):
                 and request.GET.get("to_date") is not None
             ):
                 rfq_instances = rfq_instances.filter(
-                    status="confirmed",
+                    rfq_category__rfq__status="confirmed",
                     rfq_category__rfq__created_on__gte=timezone.make_aware(
                         datetime.strptime(
                             request.GET.get("from_date"), "%d-%m-%Y"

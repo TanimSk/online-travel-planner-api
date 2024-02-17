@@ -301,14 +301,18 @@ class PendingRfqAPI(APIView):
             )
 
             # adding commission while updating
-            rfq_service.service_price = serialized_data.data.get("service_price") * (
-                1
-                + (rfq_service.service.admin_commission * 0.01)
-                + (rfq_service.agent_commission * 0.01)
-                + (
-                    (rfq_service.service.admin_commission * 0.01)
-                    * (rfq_service.agent_commission * 0.01)
-                )
+            rfq_service.service_price = round(
+                serialized_data.data.get("service_price")
+                * (
+                    1
+                    + (rfq_service.service.admin_commission * 0.01)
+                    + (rfq_service.agent_commission * 0.01)
+                    + (
+                        (rfq_service.service.admin_commission * 0.01)
+                        * (rfq_service.agent_commission * 0.01)
+                    )
+                ),
+                2,
             )
 
             rfq_service.remarks = serialized_data.data.get("remarks")

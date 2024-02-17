@@ -203,7 +203,7 @@ class RfqSerializer(serializers.ModelSerializer):
                 total_price += self.calc_total_price_value(
                     service_instance, rfq_service
                 )[0]
-        return {"total_price": total_price, "total_services": total_services}
+        return {"total_price": round(total_price, 2), "total_services": round(total_services, 2)}
 
     def create(self, validated_data):
         rfq_total_price = 0

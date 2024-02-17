@@ -326,12 +326,12 @@ class GetInvoiceAPI(APIView):
                                     request.GET.get("to_date"), "%d-%m-%Y"
                                 ).replace(hour=23, minute=59, second=59)
                             ),
-                        )
+                        ).order_by("-created_on")
 
                     else:
                         rfq_instances = Rfq.objects.filter(
                             status="confirmed", agent=request.user
-                        )
+                        ).order_by("-created_on")
 
                     # pagination
                     pagination_instance = StandardResultsSetPagination()

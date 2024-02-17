@@ -14,8 +14,8 @@ from .serializers import (
 from vendor.serializers import RfqServiceSerializer
 from administrator.serializers import BasicRfqSerializer
 from commons.serializers import CategorySerializer
-
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
+
 
 # from vendor.serializers import ManageServicesSerializer
 from commons.models import Bill, AgentSubBill
@@ -236,6 +236,7 @@ class GetInvoiceAPI(APIView):
                 if request.GET.get("category") is not None:
 
                     rfq_instances = RfqService.objects.filter(
+                        rfq_category__rfq__agent=request.user,
                         rfq_category__rfq__status="confirmed",
                         rfq_category__category__category_name=request.GET.get(
                             "category"
@@ -248,6 +249,7 @@ class GetInvoiceAPI(APIView):
                         and request.GET.get("to_date") is not None
                     ):
                         rfq_instances = rfq_instances.filter(
+                            rfq_category__rfq__agent=request.user,
                             rfq_category__rfq__status="confirmed",
                             rfq_category__rfq__created_on__gte=timezone.make_aware(
                                 datetime.strptime(
@@ -281,6 +283,7 @@ class GetInvoiceAPI(APIView):
 
                         # Get category tasks
                         rfq_service_instance = RfqService.objects.filter(
+                            rfq_category__rfq__agent=request.user,
                             rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
                             rfq_category__category__category_name=request.GET.get(
                                 "category"
@@ -311,6 +314,7 @@ class GetInvoiceAPI(APIView):
                         and request.GET.get("to_date") is not None
                     ):
                         rfq_instances = Rfq.objects.filter(
+                            agent=request.user,
                             status="confirmed",
                             created_on__gte=timezone.make_aware(
                                 datetime.strptime(
@@ -325,7 +329,9 @@ class GetInvoiceAPI(APIView):
                         )
 
                     else:
-                        rfq_instances = Rfq.objects.filter(status="confirmed")
+                        rfq_instances = Rfq.objects.filter(
+                            status="confirmed", agent=request.user
+                        )
 
                     # pagination
                     pagination_instance = StandardResultsSetPagination()
@@ -333,7 +339,7 @@ class GetInvoiceAPI(APIView):
                         rfq_instances, request
                     )
                     # serialisation
-                    response_array = RfqSerializer(
+                    response_array = RfqInvoiceSerializer(
                         rfq_instances_slice,
                         many=True,
                     ).data

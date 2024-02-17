@@ -11,6 +11,9 @@ from .serializers import (
     BillRequestSerializer,
     BillPaySerializer,
 )
+from vendor.serializers import RfqServiceSerializer
+from administrator.serializers import BasicRfqSerializer
+from commons.serializers import CategorySerializer
 
 from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 
@@ -18,6 +21,7 @@ from administrator.serializers import RfqSerializer as RfqInvoiceSerializer
 from commons.models import Bill, AgentSubBill
 from commons.views import StandardResultsSetPagination
 from .models import Rfq, RfqService, Agent
+from commons.models import Category
 from django.shortcuts import get_object_or_404
 from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_admin
 
@@ -26,6 +30,8 @@ from commons.send_email import rfq_created_admin, rfq_confirmed_admin, bill_pay_
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Sum, F
+from datetime import datetime
+from django.utils import timezone
 import math
 
 
@@ -50,6 +56,7 @@ class OverviewAPI(APIView):
     permission_classes = [AuthenticateOnlyAgent]
 
     def get(self, request, format=None, *args, **kwargs):
+
         rfqs_instance = Rfq.objects.filter(agent=request.user)
 
         total_rfq = rfqs_instance.count()
@@ -216,20 +223,129 @@ class GetInvoiceAPI(APIView):
     def get(self, request, rfq_tracing_id=None, format=None, *args, **kwargs):
         if rfq_tracing_id is None:
             if request.user.is_authenticated:
-                rfq_instances = Rfq.objects.filter(
-                    agent=request.user, status="confirmed"
-                ).order_by("-created_on")
+                # rfq_instances = Rfq.objects.filter(
+                #     agent=request.user, status="confirmed"
+                # ).order_by("-created_on")
 
                 # pagination
                 # paginator = StandardResultsSetPagination()
                 # result_page = paginator.paginate_queryset(rfq_instances, request)
                 # serialized_data = RfqInvoiceSerializer(result_page, many=True)
                 # return paginator.get_paginated_response(serialized_data.data)
-                pagination_instance = StandardResultsSetPagination()
-                return pagination_instance.get_res(
-                    serializer_obj=RfqInvoiceSerializer,
-                    model_instance=rfq_instances,
-                    request=request,
+
+                if request.GET.get("category") is not None:
+
+                    rfq_instances = RfqService.objects.filter(
+                        rfq_category__rfq__status="confirmed",
+                        rfq_category__category__category_name=request.GET.get(
+                            "category"
+                        ),
+                    )
+
+                    # date filtering added
+                    if (
+                        request.GET.get("from_date") is not None
+                        and request.GET.get("to_date") is not None
+                    ):
+                        rfq_instances = rfq_instances.filter(
+                            rfq_category__rfq__status="confirmed",
+                            rfq_category__rfq__created_on__gte=timezone.make_aware(
+                                datetime.strptime(
+                                    request.GET.get("from_date"), "%d-%m-%Y"
+                                ).replace(hour=0, minute=0, second=0)
+                            ),
+                            rfq_category__rfq__created_on__lte=timezone.make_aware(
+                                datetime.strptime(
+                                    request.GET.get("to_date"), "%d-%m-%Y"
+                                ).replace(hour=23, minute=59, second=59)
+                            ),
+                        )
+
+                    # minifying
+                    rfq_instances = (
+                        rfq_instances.order_by("-rfq_category__rfq_id")
+                        .distinct("rfq_category__rfq_id")
+                        .values("rfq_category__rfq_id")
+                    )
+
+                    # pagination
+                    pagination_instance = StandardResultsSetPagination()
+                    rfq_instances_slice = pagination_instance.paginate_queryset(
+                        rfq_instances, request
+                    )
+
+                    response_array = []
+                    for rfq_instance in rfq_instances_slice:
+                        # data = {}
+                        rfq = Rfq.objects.get(id=rfq_instance["rfq_category__rfq_id"])
+
+                        # Get category tasks
+                        rfq_service_instance = RfqService.objects.filter(
+                            rfq_category__rfq_id=rfq_instance["rfq_category__rfq_id"],
+                            rfq_category__category__category_name=request.GET.get(
+                                "category"
+                            ),
+                        ).order_by("-id")
+
+                        data = BasicRfqSerializer(rfq).data
+                        data["rfq_categories"] = []
+                        data["rfq_categories"].append(
+                            {
+                                "rfq_services": RfqServiceSerializer(
+                                    rfq_service_instance, many=True
+                                ).data,
+                                "category": CategorySerializer(
+                                    Category.objects.filter(
+                                        category_name=request.GET.get("category")
+                                    ).first()
+                                ).data,
+                            }
+                        )
+                        response_array.append(data)
+
+                else:
+
+                    # filtering
+                    if (
+                        request.GET.get("from_date") is not None
+                        and request.GET.get("to_date") is not None
+                    ):
+                        rfq_instances = Rfq.objects.filter(
+                            status="confirmed",
+                            created_on__gte=timezone.make_aware(
+                                datetime.strptime(
+                                    request.GET.get("from_date"), "%d-%m-%Y"
+                                ).replace(hour=0, minute=0, second=0)
+                            ),
+                            created_on__lte=timezone.make_aware(
+                                datetime.strptime(
+                                    request.GET.get("to_date"), "%d-%m-%Y"
+                                ).replace(hour=23, minute=59, second=59)
+                            ),
+                        )
+
+                    else:
+                        rfq_instances = Rfq.objects.filter(status="confirmed")
+
+                    # pagination
+                    pagination_instance = StandardResultsSetPagination()
+                    rfq_instances_slice = pagination_instance.paginate_queryset(
+                        rfq_instances, request
+                    )
+                    # serialisation
+                    response_array = RfqSerializer(
+                        rfq_instances_slice,
+                        many=True,
+                    ).data
+
+                # pagination_instance = StandardResultsSetPagination()
+                return Response(
+                    {
+                        "count": pagination_instance.page.paginator.count,
+                        "next": pagination_instance.get_next_link(),
+                        "previous": pagination_instance.get_previous_link(),
+                        "results": response_array,
+                    }
                 )
 
             else:

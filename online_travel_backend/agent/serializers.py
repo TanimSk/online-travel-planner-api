@@ -460,7 +460,7 @@ class QueryResultSerializer(serializers.ModelSerializer):
             + ((service_instance.admin_commission * 0.01) * (commission * 0.01))
         )
 
-        return total_price
+        return round(total_price, 2)
 
     class Meta:
         exclude = (

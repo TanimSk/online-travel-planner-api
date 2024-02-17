@@ -79,6 +79,10 @@ class RfqCategorySerializer(serializers.ModelSerializer):
 class RfqSerializer(serializers.ModelSerializer):
     rfq_categories = RfqCategorySerializer(many=True)
     agent_info = AgentSerializer(read_only=True)
+    total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, obj):
+        return round(obj.total_price, 2)
 
     class Meta:
         exclude = (

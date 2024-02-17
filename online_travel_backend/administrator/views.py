@@ -314,7 +314,7 @@ class PendingRfqAPI(APIView):
                 ),
                 2,
             )
-
+            rfq_service.base_price = serialized_data.data.get("service_price")
             rfq_service.remarks = serialized_data.data.get("remarks")
             rfq_service.save()
 

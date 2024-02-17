@@ -300,7 +300,17 @@ class PendingRfqAPI(APIView):
                 rfq_category__rfq_id=rfq_id,
             )
 
-            rfq_service.service_price = serialized_data.data.get("service_price")
+            # adding commission while updating
+            rfq_service.service_price = serialized_data.data.get("service_price") * (
+                1
+                + (rfq_service.service.admin_commission * 0.01)
+                + (rfq_service.agent_commission * 0.01)
+                + (
+                    (rfq_service.service.admin_commission * 0.01)
+                    * (rfq_service.agent_commission * 0.01)
+                )
+            )
+
             rfq_service.remarks = serialized_data.data.get("remarks")
             rfq_service.save()
 
@@ -310,8 +320,8 @@ class PendingRfqAPI(APIView):
             ).aggregate(
                 service_price=Sum(
                     F("service_price")
-                    + (F("admin_commission") * F("service_price") * 0.01)
-                    + (F("agent_commission") * F("service_price") * 0.01)
+                    # + (F("admin_commission") * F("service_price") * 0.01)
+                    # + (F("agent_commission") * F("service_price") * 0.01)
                 )
             )[
                 "service_price"

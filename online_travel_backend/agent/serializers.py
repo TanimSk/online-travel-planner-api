@@ -177,7 +177,7 @@ class RfqSerializer(serializers.ModelSerializer):
             + ((service_instance.admin_commission * 0.01) * (agent_commission * 0.01))
         )
 
-        return [total_price_added, total_price]
+        return [round(total_price_added, 2), round(total_price, 2)]
 
     # get json
     def calc_total_price(self, validated_data):
@@ -203,7 +203,10 @@ class RfqSerializer(serializers.ModelSerializer):
                 total_price += self.calc_total_price_value(
                     service_instance, rfq_service
                 )[0]
-        return {"total_price": round(total_price, 2), "total_services": round(total_services, 2)}
+        return {
+            "total_price": round(total_price, 2),
+            "total_services": round(total_services, 2),
+        }
 
     def create(self, validated_data):
         rfq_total_price = 0
@@ -533,7 +536,7 @@ class PaidBillSerializer(serializers.ModelSerializer):
         return obj.vendor_bill + obj.admin_bill + obj.agent_bill
 
     def get_paid_amount(self, obj):
-        return obj.vendor_bill + obj.admin_bill  - obj.agent_due
+        return obj.vendor_bill + obj.admin_bill - obj.agent_due
         # + obj.agent_bill
 
 

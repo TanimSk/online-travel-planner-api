@@ -176,7 +176,7 @@ class RfqSerializer(serializers.ModelSerializer):
             total_price * service_instance.admin_commission * 0.01
         )
 
-        return [total_price_added, total_price]
+        return [round(total_price_added, 2), round(total_price, 2)]
 
     # get json
     def calc_total_price(self, validated_data):

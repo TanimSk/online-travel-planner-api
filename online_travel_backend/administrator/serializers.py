@@ -15,6 +15,7 @@ class AdminCustomRegistrationSerializer(RegisterSerializer):
     )  # by default allow_null = False
     admin_name = serializers.CharField(required=True)
     mobile_no = serializers.CharField(required=True)
+    access_routes = serializers.JSONField(required=True)
 
     def get_cleaned_data(self):
         data = super(AdminCustomRegistrationSerializer, self).get_cleaned_data()
@@ -22,6 +23,7 @@ class AdminCustomRegistrationSerializer(RegisterSerializer):
             "admin_name": self.validated_data.get("admin_name", ""),
             "mobile_no": self.validated_data.get("mobile_no", ""),
             "password_txt": self.validated_data.get("password1", ""),
+            "access_routes": self.validated_data.get("access_routes", ""),
         }
         data.update(extra_data)
         return data
@@ -35,6 +37,7 @@ class AdminCustomRegistrationSerializer(RegisterSerializer):
             admin_name=self.cleaned_data.get("admin_name"),
             mobile_no=self.cleaned_data.get("mobile_no"),
             password_txt=self.cleaned_data.get("password_txt"),
+            access_routes=self.cleaned_data.get("access_routes"),
         )
         administrator.save()
         return user

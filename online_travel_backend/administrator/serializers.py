@@ -357,3 +357,10 @@ class VendorCustomRegistrationSerializer(RegisterSerializer):
         )
         vendor.save()
         return user
+
+
+# role management
+class AdminRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ("access_routes",)
+        model = Administrator

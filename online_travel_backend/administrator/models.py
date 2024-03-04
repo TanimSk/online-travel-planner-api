@@ -36,6 +36,7 @@ class Administrator(models.Model):
     password_txt = models.CharField(max_length=200)
 
     access_routes = models.JSONField(default=get_default_access_routes)
+    
 
     def __str__(self) -> str:
         return self.admin_name

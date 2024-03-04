@@ -11,11 +11,11 @@ from .views import (
     AssignAgentAPI,
     AgentBillAPI,
     VendorBillAPI,
-
     TaskListAPI,
     VendorRegistrationView,
     AgentListAPI,
     OverviewAPI,
+    AdminRoleAPI,
 )
 
 urlpatterns = [
@@ -68,4 +68,6 @@ urlpatterns = [
     # update order api
     path("agent_bills/", AgentBillAPI.as_view(), name="agent_bill"),
     path("vendor_bills/", VendorBillAPI.as_view(), name="vendor_bill"),
+    # role management
+    path("admin_roles/", AdminRoleAPI.as_view(), name="admin_roles"),
 ]

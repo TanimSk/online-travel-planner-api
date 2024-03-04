@@ -9,6 +9,8 @@ from django.db.models import Subquery, OuterRef, Sum, F
 from commons.views import StandardResultsSetPagination
 from datetime import datetime
 from django.utils import timezone
+from .models import Administrator
+
 
 from .serializers import (
     AdminCustomRegistrationSerializer,
@@ -27,6 +29,7 @@ from .serializers import (
     PaidBillSerializer,
     ReceivedPaymentSerializer,
     CustomerSerializer,
+    AdminRoleSerializer,
 )
 from commons.serializers import CategorySerializer
 from vendor.serializers import (
@@ -922,4 +925,14 @@ class AgentListAPI(APIView):
             agent__emailaddress__verified=True, id=agent_id, pseudo_agent=False
         )
         serialized_data = self.serializer_class(agents_instance)
+        return Response(serialized_data.data)
+
+
+class AdminRoleAPI(APIView):
+    permission_classes = [AuthenticateOnlyAdmin]
+    serializer_class = AdminRoleSerializer
+
+    def get(self, request, format=None, *args, **kwargs):
+        admin_instance = Administrator.objects.get(administrator=request.user)
+        serialized_data = self.serializer_class(admin_instance)
         return Response(serialized_data.data)

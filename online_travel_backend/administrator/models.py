@@ -19,7 +19,6 @@ def get_default_access_routes():
         {"path": "/dashboard/admin/create-service"},
         {"path": "/dashboard/admin/admin-service"},
         {"path": "/dashboard/admin/task-list"},
-        {"path": "/dashboard/admin/all-bills"},
         {"path": "/dashboard/admin/bills-paid"},
         {"path": "/dashboard/admin/bills-paid-vendor-by-admin"},
         {"path": "/dashboard/admin/recieved-payments-from-agent"},
@@ -36,7 +35,7 @@ class Administrator(models.Model):
     password_txt = models.CharField(max_length=200)
 
     access_routes = models.JSONField(default=get_default_access_routes)
-    
+
 
     def __str__(self) -> str:
         return self.admin_name
